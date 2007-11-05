@@ -1,0 +1,10 @@
+export(somgrid,batchsom,colorCode,mapToUnit,grid2lines,componentPlane,hitMap)
+export(umatrix,error.kaskilagus,error.quantisation,som.tune,som.tunecontrol)
+export(somPCAInit)
+S3method(print,somgrid)
+S3method(summary,somgrid)
+S3method(plot,somgrid)
+S3method(plot,som)
+useDynLib(yasomi)
+importFrom(e1071,allShortestPaths)
+
