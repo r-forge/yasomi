@@ -1,6 +1,5 @@
 \name{mapToUnit}
 \alias{mapToUnit}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Map additional data to a Self-Organising Map}
 \description{
 \code{mapToUnit} is used to map additional data to a fitted
@@ -9,7 +8,6 @@ Self-Organising Map.  The main use case is the mapping of variables that were no
 \usage{
 mapToUnit(som, values)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{som}{an object of class \code{"som"}}
   \item{values}{a matrix or a data frame of observations to map on to
@@ -41,7 +39,5 @@ som <- batchsom(sg,data)
 # map the class information and print the content of each cell
 print(mapToUnit(som,iris[[5]]))
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{cluster}
 

@@ -1,44 +1,67 @@
-- take care of the basesize problem!
-- document all exported symbols
-  - add examples
-  - follow guidelines (british english, pfui)
-  - add references
+- coding conventions
 - C implementation of slow functions:
   - umatrix
-  - hitmap
-- handling of missing values
-- handling of factors
+- batchsom
+  - handling of missing values
+  - handling of factors
+  - detect oscillatory behavior?
+  - save training information 
+- hitMap
+  - should perhaps return a value
 - tests of parameters
 - quality measures
-- better version of plot.som
-- add key to plot.somgrid without layout or a similar solution (?)
-- use somgrid$size where needed (and possible)
-- detect oscillatory behavior?
 - smarter som.tune (no repetition of pca init)
-- print.som and summary.som
-- add options to colorCode
 - torus topography?
+- classif or cluster in results?
+
++ graphics
+  - 3D umatrix (rgl)
+  - add key to plot.somgrid without layout or a similar solution (?)
+  - better version of plot.som
+  - add options to colorCode
+  - color mapping in CIE Lab space (cf colorspace package)
+
++ simple functions to improve
+  - summary for som (maybe print)
+
++ heuristics:
+  - annealing based on the map size
+  - number of initial radii based on the map size
+
++ documentation to improve
+  - add original references in graphical methods (in addition to Vesanto's thesis) 
+  - componentPlane: add details
+  - error.kaskilagus: add details
+  - colorCode: add details
+  - batchSom: add references (and maybe details)
+  - hitMap: check references
+  - plot.som: add details after better implementation
+  - predict.som: add example
+  - plot.somgrid: add seealso and maybe references (umatrix ?)
+  - somPCAInit: add references
+  - grid2lines: add details
+  - mapToUnit: will be rewritten when the function is
+  - umatrix: add details
 
 Done in version 0.1:
-- add a key to the plots (via layout)
+- plots:
+  - generic (plot.somgrid) with key (via layout)
+  - prototypes and additional variables (plot.som)
+  - U-matrix
+  - component planes
+  - hit map
 - quality measures:
   - first version of Kaski and Lagus measure
 - C implementation of slow functions:
   - batchsom and bmu* functions have been implemented in C
 - lower level access to batch som
-- documentation
-  - batchsom (references are needed)
-  - colorCode (details and references are needed)
-  - componentPlane (reference)
-  - grid2lines (details)
-  - error.* (standard format for references)
-  - hitMap (reference)
-  - mapToUnit
-  - plot.somgrid (reference)
-  - plot.som (reference?)
-  - print.somgrid
-  - somgrid
-  - somPCAInit (reference?)
-  - som.tune
-  - som.tunecontrol
-  - umatrix (reference)
+- first version of the documentation
+- predict.som (very basic)
+- first implementation of coding conventions
+- print.som 
+- summary.som (quite basic)
+- removed basesize 
+- use somgrid$size where needed
+- save some training parameters in the som structure
+- batchsom 
+  - avoids assignment recomputation when the temperature is changed

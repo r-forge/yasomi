@@ -1,23 +1,20 @@
 \name{somgrid}
 \alias{somgrid}
-%- Also NEED an '\alias' for EACH other topic documented here.
+\alias{print.somgrid}
+\alias{summary.somgrid}
 \title{Create a prior structure for a self-organising map}
 \description{Create a prior structure (a.k.a., a grid) for a
   self-organising map.  In essence this is simple a list of points in two
   dimensions. 
 }
 \usage{
-somgrid(xdim, ydim, topo = c("rectangular", "hexagonal"), basesize = 1)
+somgrid(xdim, ydim, topo = c("rectangular", "hexagonal"))
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{xdim}{the horizontal dimension of the grid}
   \item{ydim}{the vertical dimension of the grid}
   \item{topo}{the topology of the grid}
-  \item{basesize}{the base unit for the grid}
 }
-%\details{
-%}
 \value{
   An object of class \code{"somgrid"}, a list with components
   \item{pts}{a two-column matrix giving locations for the points of the
@@ -37,7 +34,5 @@ plot(somgrid(10,7))
 # and a hexagonal one
 plot(somgrid(9,11,topo="hexa"))
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{cluster}
 

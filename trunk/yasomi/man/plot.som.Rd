@@ -1,6 +1,5 @@
 \name{plot.som}
 \alias{plot.som}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Plot a Self-Organising Map}
 \description{
 Plot a glyph based rendering of the prototypes of a Self-Organising Map.
@@ -9,7 +8,6 @@ Each glyph is positioned thanks to the prior structure.
 \usage{
 \method{plot}{som}(x,y,...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{an object of class \code{"som"}}
   \item{y}{a matrix or a data frame of data associated to the som's prototypes}
@@ -19,7 +17,11 @@ Each glyph is positioned thanks to the prior structure.
 %}
 %\value{
 %}
-\references{Vesanto's thesis}
+\references{
+  Vesanto, J. (2002) \emph{Data Exploration Process Based on the
+    Self--Organizing Map}, PhD thesis, Helsinki University of Technology, Espoo (Finland), Acta Polytechnica Scandinavica, Mathematics and Computing Series No.
+  115.
+}
 \author{Fabrice Rossi}
 %\note{
 %}
@@ -41,7 +43,5 @@ plot(som)
 # display the class mapping
 plot(som,iris[[5]])
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{cluster}
 \keyword{hplot}

@@ -1,15 +1,16 @@
 \name{batchsom}
 \alias{batchsom}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Fit a Self-Organising Map to some data}
 \description{
 \code{batchsom} is used to fit a Self-Organising Map to some data, using a
 batch algorithm.
 }
 \usage{
-batchsom(somgrid, data, prototypes=somPCAInit(somgrid,data),assignment = c("single", "heskes"),radii,nbRadii=30, maxiter = 75,kernel=c("gaussian","linear"),normalised, cut = 1e-07, verbose = FALSE)
+batchsom(somgrid, data, prototypes=somPCAInit(somgrid,data),
+         assignment = c("single", "heskes"),radii,nbRadii=30,
+         maxiter = 75,kernel=c("gaussian","linear"),normalised,
+         cut = 1e-07, verbose = FALSE)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{somgrid}{an object of class \code{"somgrid"} that specifies the prior
     structure of the Self-Organising Map: see \code{\link{somgrid}} }
@@ -68,6 +69,4 @@ som <- batchsom(sg,data)
 # and display the prototypes
 plot(som)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{cluster}

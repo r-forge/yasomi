@@ -1,6 +1,5 @@
 \name{som.tune}
 \alias{som.tune}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Parameter tuning for Self-Organising Maps}
 \description{
 This function tunes some parameters of a Self-Organising Map by
@@ -10,7 +9,6 @@ optimised by this function.
 \usage{
 som.tune(somgrid, data, control = som.tunecontrol(somgrid), verbose = FALSE)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{somgrid}{an object of class 'somgrid'}
   \item{data}{a matrix or a data frame of observations}
@@ -29,7 +27,6 @@ the grid.
   \item{errors}{the error for each configuration}
   \item{best.som}{the best SOM according to the chosen error criterion}
 }
-%\references{}
 \author{Fabrice Rossi}
 \note{this function is modelled after David Mayer's \link[e1071]{tune} function.
 }
@@ -49,7 +46,5 @@ tune.results <-
 # plot errors
 plot(tune.results$errors,type="h")
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{cluster}
 

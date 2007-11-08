@@ -1,28 +1,30 @@
 \name{componentPlane}
 \alias{componentPlane}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Component Planes}
 \description{
-Plot a component plane for a Self-Organising Map.  The prior structure is represented by a regular grid of hexagons or squares which are colored according to the value of the chosen coordinate of the associated prototype. 
+Plot a component plane for a Self-Organising Map.  The prior structure
+is represented by a regular grid of hexagons or squares which are
+colored according to the value of the chosen coordinate of the
+associated prototype.  
 }
 \usage{
 componentPlane(som, dim = 1, ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{som}{an object of class \code{"som"}}
   \item{dim}{the coordinate to display}
-  \item{\dots}{additional parameters transmitted to the low level plot function \code{\link{plot.somgrid}}}
+  \item{\dots}{additional parameters transmitted to the low level plot
+    function \code{\link{plot.somgrid}}} 
 }
 %\details{
 %  ~~ If necessary, more details than the description above ~~
 %}
-%\value{
-%}
-\references{Vesanto's thesis}
+\references{
+  Vesanto, J. (2002) \emph{Data Exploration Process Based on the
+    Self--Organizing Map}, PhD thesis, Helsinki University of Technology, Espoo (Finland), Acta Polytechnica Scandinavica, Mathematics and Computing Series No.
+  115.
+}
 \author{Fabrice Rossi}
-%\note{ ~~further notes~~ 
-%}
 \seealso{\code{\link{plot.somgrid}}}
 \examples{
 data(iris)
@@ -42,7 +44,5 @@ for(i in 1:ncol(data)) {
 }
 par(spar)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{cluster}
 \keyword{hplot}

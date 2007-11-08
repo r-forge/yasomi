@@ -6,9 +6,11 @@
 Creates a list of parameters for the \code{\link{som.tune}} function.
 }
 \usage{
-som.tunecontrol(somgrid, init = "pca", ninit = 1, assignment = "single", radii = c(2, 2/3 * somgrid$diam), nradii = 10, innernradii = 30, maxiter = 75, annealing = "power", kernel = "gaussian", criterion = error.quantisation)
+som.tunecontrol(somgrid, init = "pca", ninit = 1, assignment = "single",
+                radii = c(2, 2/3 * somgrid$diam), nradii = 10,
+                innernradii = 30, maxiter = 75, annealing = "power",
+                kernel = "gaussian", criterion = error.quantisation)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{somgrid}{an object of class \code{"somgrid"}}
   \item{init}{prototypes initialization method. Valid values are \code{"pca"}
@@ -50,12 +52,9 @@ values expect for \code{kernel=c("gaussian","linear")} then
   contains a vector of radii to test rather than the bounds specified in
   the function call. 
 }
-%\references{ ~put references to the literature/web site here ~ }
 \author{Fabrice Rossi}
 \note{this function is modelled after David Mayer's \link[e1071]{tune.control} function.
 }
 \seealso{\code{\link{som.tune}}}
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{cluster}
 

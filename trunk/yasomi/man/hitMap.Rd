@@ -1,6 +1,5 @@
 \name{hitMap}
 \alias{hitMap}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Clustering Hit Map}
 \description{
 Plot a hit map for the clustering performed by a Self-Organising Map.
@@ -10,7 +9,6 @@ squares.  The surface of each element is proportional to the square root of the 
 \usage{
 hitMap(som,border=NA, ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{som}{an object of class \code{"som"}}
   \item{border}{the color to draw the border.  The default, \code{NA},
@@ -23,7 +21,11 @@ hitMap(som,border=NA, ...)
 %}
 %\value{
 %}
-\references{Vesanto's thesis}
+\references{
+  Vesanto, J. (2002) \emph{Data Exploration Process Based on the
+    Self--Organizing Map}, PhD thesis, Helsinki University of Technology, Espoo (Finland), Acta Polytechnica Scandinavica, Mathematics and Computing Series No.
+  115.
+}
 \author{Fabrice Rossi}
 %\note{
 %}
@@ -46,7 +48,5 @@ hitMap(som)
 hitMap(som,col="blue",border=NULL)
 
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{cluster}
 \keyword{hplot}

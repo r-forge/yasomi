@@ -1,6 +1,5 @@
 \name{plot.somgrid}
 \alias{plot.somgrid}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Plot a Self-Organising Map prior structure}
 \description{
 Plot the prior structure used by a Self-Organizing Map.  The rendering
@@ -10,9 +9,10 @@ fixed (according to the prior structure) but glyph size and color can be
 used to encode different type of results. 
 }
 \usage{
-\method{plot}{somgrid}(x, col = NA, size = NA, add = FALSE, border = NULL, colorValues = NA, sizeValues = NA, colormap = 50,withkey=FALSE, ...)
+\method{plot}{somgrid}(x, col = NA, size = NA, add = FALSE, border =
+   NULL,colorValues = NA, sizeValues = NA,
+   colormap = 50,withkey=FALSE, ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{an object of class \code{somgrid}}
   \item{col}{colors of the cells}
@@ -28,9 +28,11 @@ used to encode different type of results.
 \details{
 When asked for a key, this function uses the \code{\link{layout}} facilities. It is therefore incompatible with other device splitting functions (\code{\link{par}}(mfrow), \code{par(mfcol)} and \code{\link{split.screen}}).
 }
-%\value{
-%}
-\references{Vesanto's Thesis}
+\references{
+  Vesanto, J. (2002) \emph{Data Exploration Process Based on the
+    Self--Organizing Map}, PhD thesis, Helsinki University of Technology, Espoo (Finland), Acta Polytechnica Scandinavica, Mathematics and Computing Series No.
+  115.
+}
 \author{Fabrice Rossi}
 %\note{
 %}
@@ -61,7 +63,5 @@ col[colSums(classes)!=0] <-
     c("red","blue","green")[apply(classes[,colSums(classes)!=0],2,which.max)]
 plot(sg,col=col)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{cluster}
 \keyword{hplot}

@@ -1,7 +1,6 @@
 \encoding{UTF-8}
 \name{error.kaskilagus}
 \alias{error.kaskilagus}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Kaski and Lagus' error measure for Self-Organising Maps}
 \description{
 Compute an error measure of a fitted Self-Organising Maps defined by
@@ -12,7 +11,6 @@ in the original space should be mapped to close units in the grid).
 \usage{
 error.kaskilagus(som, data)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{som}{an object of class \code{"som"}}
   \item{data}{a matrix or a data frame of observations}
@@ -22,14 +20,14 @@ error.kaskilagus(som, data)
 \value{
   The value of the error.
 }
-\references{S. Kaski, K. Lagus, Comparing self-organizing maps, in:
+\references{
+  Kaski, S. and Lagus, K. (1996) Comparing self-organizing maps, in:
   C. von der Malsburg, W. von Seelen, J. Vorbrüggen, B. Sendhoff (eds.),
   Proceedings of International Conference on Artificial Neural Networks
-  (ICANN'96), vol. 1112 of Lecture Notes in Computer Science, Springer,
-  Berlin, Germany, 1996, pp. 809--814.}
+  (ICANN'96, Bochum, Germany), vol. 1112 of Lecture Notes in Computer
+  Science, Springer, pp. 809--814.
+}
 \author{Fabrice Rossi}
-%\note{   further notes   
-%}
 \seealso{\code{\link{error.quantisation}}, \code{\link{som.tunecontrol}}}
 \examples{
 data(iris)
@@ -46,6 +44,4 @@ som.tune(sg,data,som.tunecontrol(sg,,criterion=error.kaskilagus))$best.som
 # and display the prototypes
 plot(som)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{cluster}
