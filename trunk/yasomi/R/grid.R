@@ -1,4 +1,4 @@
-somgrid <- function(xdim,ydim,topo=c("rectangular", "hexagonal")) {
+somgrid <- function(xdim,ydim,topo=c("rectangular", "hexagonal"),with.dist=TRUE) {
     topo <- match.arg(topo)
     if(xdim == 1) {
         tmp <- xdim
@@ -15,9 +15,16 @@ somgrid <- function(xdim,ydim,topo=c("rectangular", "hexagonal")) {
     if(topo=="hexagonal" && ydim > 1 ) {
         pts[,1] <- pts[,1]+rep(c(0,0.5),each=xdim,length.out=nrow(pts))
     }
+    if(topo=="rectangular") {
+        diam <- sqrt(xdim^2+ydim^2)
+    } else {
+        diam <- sqrt(sum((pts[1,]-pts[nrow(pts),])^2))
+    }
     res <- list(pts = pts, xdim = xdim, ydim = ydim, topo = topo,
-                dist = as.matrix(dist(pts)),diam=0,size=xdim*ydim)
-    res$diam <- max(res$dist)
+                size = xdim*ydim, diam = diam)
+    if(with.dist) {
+        res$dist <- as.matrix(dist(pts))
+    }
     class(res) <- "somgrid"
     res
 }

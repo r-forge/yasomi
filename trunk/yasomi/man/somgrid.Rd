@@ -8,19 +8,21 @@
   dimensions. 
 }
 \usage{
-somgrid(xdim, ydim, topo = c("rectangular", "hexagonal"))
+somgrid(xdim, ydim, topo = c("rectangular", "hexagonal"),with.dist = TRUE)
 }
 \arguments{
   \item{xdim}{the horizontal dimension of the grid}
   \item{ydim}{the vertical dimension of the grid}
   \item{topo}{the topology of the grid}
+  \item{with.dist}{logical. If \code{TRUE} the result object will
+    contain a \code{dist} component (see below for details)}
 }
 \value{
   An object of class \code{"somgrid"}, a list with components
   \item{pts}{a two-column matrix giving locations for the points of the
     prior structure}
-  \item{dist}{a matrix containing the distances between all pairs of
-    points in the grid}
+  \item{dist}{if called with \code{with.dist=TRUE}, a matrix containing
+    the distances between all pairs of points in the grid}
   \item{diam}{the diameter of the grid, i.e., the largest distance
     between to points in the grid}
   \item{xdim,ydim,topo,basesize}{as in the arguments to \code{somgrid}}

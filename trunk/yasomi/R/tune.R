@@ -25,6 +25,10 @@ som.tune <- function(somgrid,data,control=som.tunecontrol(somgrid),verbose=FALSE
     performances <- rep(NA,nbconf)
     bestPerfSoFar <- Inf
     confIndex <- 1
+    ## compute distances if they are missing
+    if(is.null(somgrid$dist)) {
+        somgrid$dist <- as.matrix(dist(somgrid$pts))
+    }
     ## initialization method
     for(init in control$init) {
         ## assignment

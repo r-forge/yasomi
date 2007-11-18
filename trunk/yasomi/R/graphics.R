@@ -39,10 +39,15 @@ componentPlane <- function(som,dim=1,...) {
     do.call("plot",c(list(x=som$somgrid,colorValues=som$prototypes[,dim],border=NA),args))
 }
 
-hitMap <- function(som,border=NA,...) {
+hitMap <- function(som,border=NA,with.cells=TRUE,...) {
     args <- list(...)
     if(is.null(args$col)) {
         args$col <- "red"
+    }
+    if(with.cells) {
+        add <- !is.null(args$add) && args$add
+        plot(som$somgrid,add=add)
+        args$add <- TRUE
     }
     args$border <- border
     sizes <- table(factor(som$classif,levels=1:nrow(som$prototypes)))
@@ -118,7 +123,8 @@ umatrix <- function(som,...) {
                 distances[2*i-1,2*j-1] <- tmp/length(ni)
             }
         }
-        ugrid <- somgrid(xdim=2*sg$xdim-1,ydim=2*sg$ydim-1,topo="rectangular")
+        ugrid <- somgrid(xdim=2*sg$xdim-1,ydim=2*sg$ydim-1,topo="rectangular",
+                         with.dist=FALSE)
         do.call("plot",c(list(x=ugrid,colorValues=as.vector(distances)),args))
         invisible(distances)
     } else {
@@ -151,7 +157,7 @@ umatrix <- function(som,...) {
                 }
             }
         }
-        ugrid <- somgrid(2*sg$xdim,2*sg$ydim-1,topo="hexa")
+        ugrid <- somgrid(2*sg$xdim,2*sg$ydim-1,topo="hexa",with.dist=FALSE)
         for(i in 1:sg$xdim) {
             for(j in 1:sg$ydim) {
                 nn <- hexNeighbor(ugrid,2*i-j%%2,2*j-1)

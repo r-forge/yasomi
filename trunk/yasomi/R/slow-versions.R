@@ -57,6 +57,10 @@ batchsom.R <- function(somgrid,data,prototypes=somPCAInit(somgrid,data),
     if(class(somgrid)!="somgrid") {
         stop("'somgrid' is not of somgrid class")
     }
+    ## distances?
+    if(is.null(somgrid$dist)) {
+        somgrid$dist <- as.matrix(dist(somgrid$pts))
+    }
     ## compute radii
     if(missing(radii)) {
         if(kernel=="gaussian") {
@@ -107,55 +111,9 @@ batchsom.lowlevel.R <- function(somgrid,data,prototypes,
             print(paste("warning: can't reach a stable configuration with radius",i))
         }
     }
-    res <- list(somgrid=somgrid,prototypes=prototypes,classif=classif,errors=unlist(errors))
+    res <- list(somgrid=somgrid,prototypes=prototypes,classif=classif,
+                errors=unlist(errors))
     class(res) <- "som"
     res
 }
 
-prototype.distance <- function(som) {
-    sg <- som$somgrid
-    if(sg$topo=="rectangular") {
-        ## column major
-        distances <- matrix(NA,nrow=sg$size,ncol=8)
-        pos <- 1
-        for(j in 1:sg$ydim) {
-            for(i in 1:sg$xdim) {
-                ## right
-                if(i<sg$xdim) {
-                    distances[pos,1] <- protoDist(som,i,j,i+1,j)
-                }
-                ## lower right
-                if(j<sg$ydim & i<sg$xdim) {
-                    distances[pos,2] <- protoDist(som,i,j,i+1,j+1)
-                }
-                ## below neighbor
-                if(j<sg$ydim) {
-                    distances[pos,3] <- protoDist(som,i,j,i,j+1)
-                }
-                ## lower left
-                if(j<sg$ydim & i>1) {
-                    distances[pos,4] <- protoDist(som,i,j,i-1,j+1)
-                }
-                ## left
-                if(i>1) {
-                    distances[pos,5] <- distances[pos-1,1]
-                }
-                ## upper left
-                if(i>1 & j>1) {
-                    distances[pos,6] <- distances[pos-1-sg$xdim,2]
-                }
-                ## above
-                if(j>1) {
-                    distances[pos,7] <- distances[pos-sg$xdim,3]
-                }
-                ## upper right
-                if(j>1 & i<sg$xdim) {
-                    distances[pos,8] <- distances[pos+1-sg$xdim,4]
-                }
-                pos <- pos + 1
-            }
-        }
-        distances
-    } else {
-    }
-}

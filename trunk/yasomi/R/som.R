@@ -122,6 +122,10 @@ batchsom <- function(somgrid,data,prototypes=somPCAInit(somgrid,data),
     if(class(somgrid)!="somgrid") {
         stop("'somgrid' is not of somgrid class")
     }
+    ## distances?
+    if(is.null(somgrid$dist)) {
+        somgrid$dist <- as.matrix(dist(somgrid$pts))
+    }
     ## compute radii
     if(missing(radii)) {
         if(kernel=="gaussian") {
