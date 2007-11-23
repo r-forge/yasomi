@@ -1,6 +1,5 @@
 \name{error.quantisation}
 \alias{error.quantisation}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Quantisation error for a Self-Organising Map}
 \description{
 Compute the quantisation error made by a fitted Self-Organising Map:
@@ -10,7 +9,6 @@ observation and the prototype of its best matching unit.
 \usage{
 error.quantisation(som, data)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{som}{an object of class \code{"som"}}
   \item{data}{a matrix or a data frame of observations}
@@ -43,6 +41,4 @@ sg <- somgrid(xdim=12,ydim=12,topo="hex")
 som <- batchsom(sg,data)
 print(error.quantisation(som,data))
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{cluster}

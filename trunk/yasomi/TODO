@@ -1,3 +1,7 @@
++ BUGS
+  - umatrix gives incorrect results for rectangular grids
+  - umatrix failed to complete for a non square rectangular grid
+
 - coding conventions
 - C implementation of slow functions:
   - umatrix
@@ -43,12 +47,16 @@
   - grid2lines: add details
   - mapToUnit: will be rewritten when the function is
   - umatrix: add details
+  - prototype.distances: add details and examples
+  - distance.grid: add details and examples
 
 Done in version 0.1:
 - plots:
   - generic (plot.somgrid) with key (via layout)
   - prototypes and additional variables (plot.som)
-  - U-matrix
+  - U-matrix:
+    - custom rendering
+    - grid based rendering
   - component planes
   - hit map
 - quality measures:

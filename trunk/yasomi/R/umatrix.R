@@ -99,16 +99,27 @@ prototype.distances <- function(som) {
     res
 }
 
-distance.grid <- function(sompdist,mode=c("mean","full")) {
+choose.depth <- function(size) {
+    if(size>200) {
+        ceiling(log(size/50,base=4))
+    } else {
+        1
+    }
+}
+
+distance.grid <- function(sompdist,mode=c("mean","full"),nxo,nyo) {
     pdist <- sompdist$pdist
     sg <- sompdist$somgrid
     mode <- match.arg(mode)
+    means <- rowMeans(pdist,na.rm=T)
     if(sg$topo=="rectangular") {
-        means <- rowMeans(pdist,na.rm=T)
         if(mode=="mean") {
             reorder <-
                 rep(1:sg$xdim,sg$ydim)+rep((sg$ydim-1):0,each=sg$xdim)*sg$xdim
             distances <- matrix(means[reorder],ncol=sg$ydim)
+            x <- seq(from=1,by=1,length.out=sg$xdim)
+            y <- seq(from=1,by=1,length.out=sg$ydim)
+            radius <- 1
         } else {
             distances <- rep(NA,(2*sg$xdim-1)*(2*sg$ydim-1))
             pindex <- 1:sg$size
@@ -142,8 +153,90 @@ distance.grid <- function(sompdist,mode=c("mean","full")) {
                 pdist[pindex[-seq(sg$xdim,by=sg$xdim,length.out=sg$ydim-1)],2]+
                     pdist[pindex[-seq(1,by=sg$xdim,length.out=sg$ydim-1)],4])
             distances <- matrix(distances,ncol=2*sg$ydim-1)
+            x <- seq(from=1,to=sg$xdim,length.out=2*sg$xdim-1)
+            y <- seq(from=1,to=sg$ydim,length.out=2*sg$ydim-1)
+            radius <- 0.5
         }
+        if(!missing(nxo) || !missing(nyo)) {
+            ## interpolation asked
+            if(missing(nxo)) {
+                xo <- x
+            } else {
+                xo <- seq(from=1,to=max(x),length.out=nxo)
+            }
+            if(missing(nyo)) {
+                yo <- y
+            } else {
+                yo <- seq(from=1,to=max(y),length.out=nyo)
+            }
+            depth <- choose.depth(nrow(distances))
+            model <- terrainInterp(expand.grid(x,y),distances,depth,radius)
+            distances <- matrix(predict(model,expand.grid(xo,yo)),
+                                ncol=length(yo),nrow=length(xo))
+            list(x=xo,y=yo,z=distances)
+        } else {
+            list(x=x,y=y,z=distances)
+        }
+    } else {
+        ## interpolation is mandatory here
+        if(mode=="mean") {
+            depth <- choose.depth(sg$size)
+            model <- terrainInterp(sg$pts,means,depth,1)
+            if(missing(nxo)) {
+                nxo <- 2*sg$xdim+1
+            }
+            if(missing(nyo)) {
+                nyo <- 2*sg$ydim+1
+            }
+            distances <- means
+            grid <- sg$pts
+            radius <- 1
+        } else {
+            distances <- rep(NA,sg$size+(sg$xdim-1)*sg$ydim+
+                             sg$xdim*(sg$ydim-1)+(sg$xdim-1)*(sg$ydim-1))
+            grid <- matrix(NA,ncol=2,nrow=length(distances))
+            ## first means
+            grid[1:sg$size,] <- sg$pts
+            distances[1:sg$size] <- means
+            shift <- sg$size+1
+            ## then right neighbors
+            with.rn <- rep(1:(sg$xdim-1),sg$ydim)+
+                rep((0:(sg$ydim-1))*sg$xdim,each=sg$xdim-1)
+            indices <- shift:(shift+length(with.rn)-1)
+            distances[indices] <- pdist[with.rn,1]
+            grid[indices,] <- 0.5*(sg$pts[with.rn,]+sg$pts[with.rn+1,])
+            shift <- max(indices)+1
+            ## then vertical line (fixed x)
+            thelines <- seq(from=1,by=sg$xdim,length.out=sg$ydim-1)+
+                rep(0:(sg$xdim-1),each=sg$ydim-1)
+            component <- rep(rep(2:3,length=sg$ydim-1),sg$xdim)
+            indices <- shift:(shift+length(thelines)-1)
+            distances[indices] <- pdist[cbind(thelines,component)]
+            grid[indices,] <- 0.5*(sg$pts[thelines,]+sg$pts[thelines+sg$xdim,])
+            shift <- max(indices)+1
+            ## then remaining vertical lines (jagged x)
+            otherlines <- (thelines+rep(1:0,length=length(thelines)))[1:(length(thelines)-sg$ydim+1)]
+            component <- rep(rep(3:2,length=sg$ydim-1),sg$xdim-1)
+            indices <- shift:(shift+length(otherlines)-1)
+            distances[indices] <- pdist[cbind(otherlines,component)]
+            grid[indices,] <- 0.5*(sg$pts[otherlines,]+
+                                   sg$pts[otherlines+sg$xdim+rep(rep(c(-1,1),length=sg$ydim-1),length=sg$xdim-1),])
+            if(missing(nxo)) {
+                nxo <- 4*sg$xdim+1
+            }
+            if(missing(nyo)) {
+                nyo <- 4*sg$ydim+1
+            }
+            radius <- 0.5
+        }
+        depth <- choose.depth(length(distances))
+        model <- terrainInterp(grid,distances,depth,radius)
+        xlim <- range(sg$pts[,1])
+        ylim <- range(sg$pts[,2])
+        x <- seq(xlim[1],xlim[2],length.out=nxo)
+        y <- seq(ylim[1],ylim[2],length.out=nyo)
+        interpDist <- matrix(predict(model,expand.grid(x,y)),ncol=length(y))
+        list(x=x,y=y,z=interpDist)
     }
-    distances
 }
 

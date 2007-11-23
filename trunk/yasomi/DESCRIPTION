@@ -2,7 +2,7 @@ Package: yasomi
 Version: 0.1
 License: GPL-2
 Title: Yet Another Self Organising Map Implementation
-Depends: e1071
+Depends: e1071,proxy
 Author: Fabrice Rossi <Fabrice.Rossi@apiacoa.org>
 Maintainer: Fabrice Rossi <Fabrice.Rossi@apiacoa.org>
 Description: Yasomi provides an implementation of several variants of the Self

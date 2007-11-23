@@ -124,7 +124,7 @@ batchsom <- function(somgrid,data,prototypes=somPCAInit(somgrid,data),
     }
     ## distances?
     if(is.null(somgrid$dist)) {
-        somgrid$dist <- as.matrix(dist(somgrid$pts))
+        somgrid$dist <- as.matrix(dist(somgrid$pts,method="Euclidean"),diag=0)
     }
     ## compute radii
     if(missing(radii)) {

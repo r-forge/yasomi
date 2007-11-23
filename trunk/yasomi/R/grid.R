@@ -23,7 +23,7 @@ somgrid <- function(xdim,ydim,topo=c("rectangular", "hexagonal"),with.dist=TRUE)
     res <- list(pts = pts, xdim = xdim, ydim = ydim, topo = topo,
                 size = xdim*ydim, diam = diam)
     if(with.dist) {
-        res$dist <- as.matrix(dist(pts))
+        res$dist <- as.matrix(dist(pts,method="Euclidean"),diag=0)
     }
     class(res) <- "somgrid"
     res
