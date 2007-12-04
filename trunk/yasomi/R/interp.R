@@ -44,7 +44,12 @@ boxes <- function(pts,depth,delta) {
 gaussianRbfInterp <- function(pts,z,sigma=0.5) {
     ptdist <- as.matrix(dist(pts,method="Euclidean"),diag=0)
     A <- rbf.gaussian(ptdist,sigma)
-    structure(list(coeffs=solve(A,as.vector(z)),points=pts,sigma=sigma),
+    coeffs <- try(solve(A,as.vector(z)))
+    if(inherits(coeffs,"try-error")) {
+        print(A)
+        stop(coeffs)
+    }
+    structure(list(coeffs=coeffs,points=pts,sigma=sigma),
               class="gaussianRbfInterp")
 }
 

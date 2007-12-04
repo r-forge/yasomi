@@ -25,6 +25,24 @@ matching unit for each given observation.
     prototypes of this Self-Organising Map}
 }
 \author{Fabrice Rossi}
-\examples{}
+\examples{
+data(iris)
+# scaling
+data <- scale(iris[1:4])
+
+# use only part of the data
+train <- sample(1:nrow(data),100)
+data.train <- data[train,]
+
+# a small hexagonal grid
+sg <- somgrid(xdim=5,ydim=5,topo="hex")
+
+# fit the SOM
+som <- batchsom(sg,data)
+
+# map remaining data
+results <- predict(som,data[-train,])
+print(paste("Quantisation error:",results$error))
+}
 \keyword{cluster}
 

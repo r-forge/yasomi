@@ -1,7 +1,3 @@
-+ BUGS
-  - umatrix gives incorrect results for rectangular grids
-  - umatrix failed to complete for a non square rectangular grid
-
 - coding conventions
 - C implementation of slow functions:
   - umatrix
@@ -25,6 +21,7 @@
   - add options to colorCode
   - color mapping in CIE Lab space (cf colorspace package)
   - variation over the u-matrix principle
+  - grid2lines should be applicable to any matrix with the correct number of rows 
 
 + simple functions to improve
   - summary for som (maybe print)

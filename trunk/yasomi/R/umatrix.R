@@ -1,3 +1,9 @@
+protoDist <- function(som,i,j,k,l) {
+    from <- som$prototypes[i+(j-1)*som$somgrid$xdim,]
+    to <- som$prototypes[k+(l-1)*som$somgrid$xdim,]
+    sqrt(sum((from-to)^2))
+}
+
 prototype.distances <- function(som) {
     sg <- som$somgrid
     if(sg$topo=="rectangular") {
@@ -100,8 +106,8 @@ prototype.distances <- function(som) {
 }
 
 choose.depth <- function(size) {
-    if(size>200) {
-        ceiling(log(size/50,base=4))
+    if(size>40) {
+        ceiling(log(size/10,base=4))
     } else {
         1
     }
@@ -220,7 +226,8 @@ distance.grid <- function(sompdist,mode=c("mean","full"),nxo,nyo) {
             indices <- shift:(shift+length(otherlines)-1)
             distances[indices] <- pdist[cbind(otherlines,component)]
             grid[indices,] <- 0.5*(sg$pts[otherlines,]+
-                                   sg$pts[otherlines+sg$xdim+rep(rep(c(-1,1),length=sg$ydim-1),length=sg$xdim-1),])
+                                   sg$pts[otherlines+sg$xdim+
+                                          rep(rep(c(-1,1),length.out=sg$ydim-1),times=sg$xdim-1),])
             if(missing(nxo)) {
                 nxo <- 4*sg$xdim+1
             }
@@ -240,3 +247,103 @@ distance.grid <- function(sompdist,mode=c("mean","full"),nxo,nyo) {
     }
 }
 
+plot.sompdist <- function(x,mode=c("mean","full"),...) {
+    args <- list(...)
+    args$mode <- match.arg(mode)
+    if(is.null(args$border)) {
+        args$border <- NA
+    }
+    pdist <- x$pdist
+    sg <- x$somgrid
+    if(sg$topo=="rectangular") {
+        values <- as.vector(distance.grid(x,mode=args$mode)$z)
+        if(args$mode=="full") {
+            plotsg <- somgrid(xdim=2*sg$xdim-1,ydim=2*sg$ydim-1,
+                              topo="rectangular",with.dist=FALSE)
+        } else {
+            plotsg <- sg
+        }
+    } else {
+        if(args$mode=="mean") {
+            values <- rowMeans(pdist,na.rm=T)
+            plotsg <- sg
+        } else {
+            values <- rep(NA,2*sg$xdim*(2*sg$ydim-1))
+            pindex <- 1:sg$size
+            ## first fill mean values
+            vshift <- seq(1,by=4*sg$xdim,length=sg$ydim)+
+                rep(c(-1,0),length=sg$ydim)
+            index.means <- rep(seq(1,by=2,length=sg$xdim),sg$ydim)+
+                rep(vshift,each=sg$xdim)
+            values[index.means] <- rowMeans(pdist,na.rm=T)
+            ## then horizontal values
+            index.h <- rep(seq(1,by=2,length=sg$xdim-1),sg$ydim)+
+                rep(vshift,each=sg$xdim-1)+1
+            values[index.h] <-
+                pdist[pindex[-seq(sg$xdim,by=sg$xdim,length.out=sg$ydim)],1]
+            if(sg$ydim>1) {
+                ## then below right values
+                vshift <- seq(2*sg$xdim,by=4*sg$xdim,length=sg$ydim-1) +
+                    rep(c(0,1),length=sg$ydim-1)
+                index.br <- rep(seq(1,by=2,length=sg$xdim),sg$ydim-1) +
+                    rep(vshift,each=sg$xdim)
+                index.br <- index.br[-seq(2*sg$xdim,by=2*sg$xdim,length=sg$ydim%/%2)]
+                values[index.br] <- pdist[!is.na(pdist[,2]),2]
+                ## then below left values
+                vshift <- seq(2*sg$xdim,by=4*sg$xdim,length=sg$ydim-1) +
+                    rep(c(1,0),length=sg$ydim-1)
+                index.bl <- rep(seq(1,by=2,length=sg$xdim),sg$ydim-1) +
+                    rep(vshift,each=sg$xdim)
+                index.bl <- index.bl[-seq(sg$xdim,by=2*sg$xdim,length=sg$ydim%/%2)]
+                values[index.bl] <- pdist[!is.na(pdist[,3]),3]
+
+            }
+            plotsg <- somgrid(2*sg$xdim,2*sg$ydim-1,topo="hexa",
+                              with.dist=FALSE)
+        }
+    }
+    args$mode <- NULL
+    do.call("plot",c(list(x=plotsg,colorValues=values),args))
+}
+
+as.matrix.sompdist <- function(x, extended = TRUE,...) {
+    sg <- x$somgrid
+    pdist <- x$pdist
+    result <- matrix(NA,ncol=sg$size,nrow=sg$size)
+    diag(result) <- 0
+    if(sg$topo=="rectangular") {
+        delta <- c(1,sg$xdim+1,sg$xdim,sg$xdim-1)
+        delta <- c(delta,-delta)
+        baseindex <- 1:sg$size
+        for(d in 1:8) {
+            tofill <- !is.na(pdist[,d])
+            index <- baseindex[tofill]
+            result[cbind(index,index+delta[d])]=pdist[tofill,d]
+        }
+    } else {
+        delta <- c(1,sg$xdim,sg$xdim-1,-1,-sg$xdim-1,-sg$xdim)
+        baseindex <- 1:sg$size
+        ## easy part
+        for(d in c(1,4)) {
+            tofill <- !is.na(pdist[,d])
+            index <- baseindex[tofill]
+            result[cbind(index,index+delta[d])]=pdist[tofill,d]
+        }
+        ## slightly more complex
+        for(d in c(2,3,5,6)) {
+            dec <- rep(delta[d],sg$size)+rep(rep(c(0,1),each=sg$xdim),length.out=sg$size)
+            tofill <- !is.na(pdist[,d])
+            index <- baseindex[tofill]
+            result[cbind(index,index+dec[index])]=pdist[tofill,d]
+        }
+    }
+    if(extended) {
+        paths <- allShortestPaths(result)
+        result <- paths$length
+    }
+    result
+}
+
+as.dist.sompdist <- function(x,FUN=NULL) {
+    as.dist(as.matrix(x,extended=TRUE))
+}

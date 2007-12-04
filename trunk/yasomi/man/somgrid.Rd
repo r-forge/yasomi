@@ -9,6 +9,8 @@
 }
 \usage{
 somgrid(xdim, ydim, topo = c("rectangular", "hexagonal"),with.dist = TRUE)
+\method{print}{somgrid}(x, ...)
+\method{summary}{somgrid}(object, ...)
 }
 \arguments{
   \item{xdim}{the horizontal dimension of the grid}
@@ -16,9 +18,12 @@ somgrid(xdim, ydim, topo = c("rectangular", "hexagonal"),with.dist = TRUE)
   \item{topo}{the topology of the grid}
   \item{with.dist}{logical. If \code{TRUE} the result object will
     contain a \code{dist} component (see below for details)}
+  \item{x,object}{an object of class \code{"somgrid"}}
+  \item{\dots}{not used}
 }
 \value{
-  An object of class \code{"somgrid"}, a list with components
+  \code{somgrid} returns an object of class \code{"somgrid"}, a list
+  with components:
   \item{pts}{a two-column matrix giving locations for the points of the
     prior structure}
   \item{dist}{if called with \code{with.dist=TRUE}, a matrix containing
@@ -29,6 +34,12 @@ somgrid(xdim, ydim, topo = c("rectangular", "hexagonal"),with.dist = TRUE)
 
 }
 \author{Fabrice Rossi}
+\note{
+  A short description of the prior structure can be obtained via the
+  \code{print} or the \code{summary} methods. The
+  \code{\link{plot.somgrid}} method provides graphical representation. 
+  }
+\seealso{ \code{\link{plot.somgrid}}}
 \examples{
 # display a rectangular grid
 plot(somgrid(10,7))

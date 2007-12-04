@@ -76,8 +76,28 @@ distance.grid(sompdist, mode = c("mean", "full"), nxo, nyo)
 \author{Fabrice Rossi}
 %\note{
 %}
-%\seealso{}
+\seealso{See \code{\link{prototype.distances}} for computing the
+ distances and \code{\link{umatrix}} for a simpler visualisation of the
+ same data.}
 \examples{
+data(iris)
+# scaling
+data <- scale(iris[1:4])
+
+# a large hexagonal grid
+sg <- somgrid(xdim=15,ydim=15,topo="hex")
+
+# fit the SOM
+som <- batchsom(sg,data)
+
+# compute prototype distances
+pdist <- prototype.distances(som)
+
+# display them via interpolation
+pdist.grid <- distance.grid(pdist,mode="mean",nxo=30,nyo=30)
+
+# and contour lines
+filled.contour(pdist.grid)
 }
 \keyword{cluster}
 

@@ -17,5 +17,19 @@
 }
 \author{Fabrice Rossi}
 \seealso{\code{\link{batchsom}}}
+\examples{
+data(iris)
+# scaling
+data <- scale(iris[1:4])
+
+# a small hexagonal grid
+sg <- somgrid(xdim=5,ydim=5,topo="hex")
+
+# fit the SOM
+som <- batchsom(sg,data)
+
+# summary
+print(som)
+}
 \keyword{cluster}
 

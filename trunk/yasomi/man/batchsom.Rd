@@ -54,7 +54,9 @@ perform better in general.
 % ~Make other sections like Warning with \section{Warning }{....} ~
 %}
 \seealso{See \code{\link{som.tune}} for the optimisation of some magic
-  parameters (such as the radii). }
+  parameters (such as the radii), \code{\link{umatrix}} and
+  \code{\link{distance.grid}} for visual analysis of the distances
+  between the prototypes.}
 \examples{
 data(iris)
 # scaling

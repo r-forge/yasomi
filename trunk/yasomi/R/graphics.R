@@ -55,118 +55,14 @@ hitMap <- function(som,border=NA,with.cells=TRUE,...) {
     do.call("plot",c(list(x=som$somgrid,size=sizes),args))
 }
 
-protoDist <- function(som,i,j,k,l) {
-    from <- som$prototypes[i+(j-1)*som$somgrid$xdim,]
-    to <- som$prototypes[k+(l-1)*som$somgrid$xdim,]
-    sqrt(sum((from-to)^2))
-}
-
-hexNeighbor <- function(somgrid,i,j) {
-    decY <- c(0,1,1,0,-1,-1)
-    if(j%%2==1) {
-        decX <- c(1,0,-1,-1,-1,0)
-    } else {
-        decX <- c(1,1,0,-1,0,1)
-    }
-    icand <- i+decX
-    icand[icand<=0 | icand>somgrid$xdim] <- NA
-    jcand <- j+decY
-    jcand[jcand<=0 | jcand>somgrid$ydim] <- NA
-    result <- cbind(icand,jcand)
-    result[!is.na(result[,1])&!is.na(result[,2]),]
-}
-
 umatrix <- function(som,...) {
     args <- list(...)
     if(is.null(args$border)) {
         args$border <- NA
     }
-    sg <- som$somgrid
-    if(sg$topo=="rectangular") {
-        ## "easy" case
-        distances <- matrix(NA,ncol=2*sg$xdim-1,nrow=2*sg$ydim-1)
-        ## first fill the matrix with prototype distances
-        for(i in 1:sg$xdim) {
-            for(j in 1:sg$ydim) {
-                ## below neighbor
-                if(j<sg$ydim) {
-                    distances[2*i-1,2*j] <- protoDist(som,i,j,i,j+1)
-                }
-                ## diagonal (lower right)
-                if(j<sg$ydim & i<sg$xdim) {
-                    distances[2*i,2*j] <- protoDist(som,i,j,i+1,j+1)
-                }
-                ## diagonal (lower left)
-                if(j<sg$ydim & i>1) {
-                    distances[2*i-2,2*j] <- protoDist(som,i,j,i-1,j+1)
-                }
-                ## right
-                if(i<sg$xdim) {
-                    distances[2*i,2*j-1] <- protoDist(som,i,j,i+1,j)
-                }
-            }
-        }
-        ## then smooth the distances
-        di <- c(-1,-1,-1,0,0,1,1,1)
-        dj <- c(-1,0,1,-1,1,-1,0,1)
-        for(i in 1:sg$xdim) {
-            for(j in 1:sg$ydim) {
-                ni <- (2*i-1)+di
-                nj <- (2*j-1)+dj
-                cond <- ni>0&ni<=2*sg$xdim-1&nj>0&nj<=2*sg$ydim-1
-                ni <- ni[cond]
-                nj <- nj[cond]
-                tmp <- 0
-                for(k in 1:length(ni)) {
-                    tmp <- tmp+distances[ni[k],nj[k]]
-                }
-                distances[2*i-1,2*j-1] <- tmp/length(ni)
-            }
-        }
-        ugrid <- somgrid(xdim=2*sg$xdim-1,ydim=2*sg$ydim-1,topo="rectangular",
-                         with.dist=FALSE)
-        do.call("plot",c(list(x=ugrid,colorValues=as.vector(distances)),args))
-        invisible(distances)
-    } else {
-        ## hard case (hexagonal)
-        distances <- matrix(NA,nrow=2*sg$xdim,ncol=2*sg$ydim-1)
-        for(i in 1:sg$xdim) {
-            for(j in 1:sg$ydim) {
-                ## right
-                if(i<sg$xdim) {
-                    distances[2*i+1-j%%2,2*j-1] <- protoDist(som,i,j,i+1,j)
-                }
-                if(j%%2==1) {
-                    if(j<sg$ydim) {
-                        ## below right neighbor
-                        distances[2*i-1,2*j] <- protoDist(som,i,j,i,j+1)
-                        ## below left neighbor
-                        if(i>1) {
-                            distances[2*i-2,2*j] <- protoDist(som,i,j,i-1,j+1)
-                        }
-                    }
-                } else {
-                    if(j<sg$ydim) {
-                        ## below left neighbor
-                        distances[2*i-1,2*j] <- protoDist(som,i,j,i,j+1)
-                        if(i<sg$xdim) {
-                            ## below right neighbor
-                            distances[2*i,2*j] <- protoDist(som,i,j,i+1,j+1)
-                        }
-                    }
-                }
-            }
-        }
-        ugrid <- somgrid(2*sg$xdim,2*sg$ydim-1,topo="hexa",with.dist=FALSE)
-        for(i in 1:sg$xdim) {
-            for(j in 1:sg$ydim) {
-                nn <- hexNeighbor(ugrid,2*i-j%%2,2*j-1)
-                distances[2*i-j%%2,2*j-1] <- mean(distances[nn],na.rm=TRUE)
-            }
-        }
-        do.call("plot",c(list(x=ugrid,colorValues=as.vector(distances)),args))
-        invisible(distances)
-    }
+    pdist <- prototype.distances(som)
+    do.call("plot",c(list(x=pdist),args))
+    invisible(pdist)
 }
 
 ## very basic version
