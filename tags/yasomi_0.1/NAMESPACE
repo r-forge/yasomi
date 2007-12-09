@@ -1,0 +1,22 @@
+# standard functions
+export(somgrid,batchsom,colorCode,mapToUnit,grid2lines,componentPlane,hitMap)
+export(umatrix,error.kaskilagus,error.quantisation,som.tune,som.tunecontrol)
+export(somPCAInit,prototype.distances,distance.grid)
+# somgrid S3 methods
+S3method(print,somgrid)
+S3method(summary,somgrid)
+S3method(plot,somgrid)
+# som S3 methods
+S3method(print,som)
+S3method(summary,som)
+S3method(plot,som)
+S3method(predict,som)
+# sompdist S3 methods
+S3method(plot,sompdist)
+S3method(as.matrix,sompdist)
+S3method(as.dist,sompdist)
+# C code
+useDynLib(yasomi)
+# imports
+importFrom(e1071,allShortestPaths)
+importFrom(proxy,dist)

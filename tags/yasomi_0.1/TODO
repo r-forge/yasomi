@@ -1,0 +1,74 @@
+- coding conventions
+- C implementation of slow functions:
+  - umatrix
+- batchsom
+  - handling of missing values
+  - handling of factors
+  - detect oscillatory behavior?
+  - save training information 
+- hitMap
+  - should perhaps return a value
+- tests of parameters
+- quality measures
+- smarter som.tune (no repetition of pca init)
+- torus topography?
+- classif or cluster in results?
+
++ graphics
+  - 3D umatrix (rgl)
+  - add key to plot.somgrid without layout or a similar solution (?)
+  - better version of plot.som
+  - add options to colorCode
+  - color mapping in CIE Lab space (cf colorspace package)
+  - variation over the u-matrix principle
+  - grid2lines should be applicable to any matrix with the correct number of rows 
+
++ simple functions to improve
+  - summary for som (maybe print)
+
++ heuristics:
+  - annealing based on the map size
+  - number of initial radii based on the map size
+
++ documentation to improve
+  - add original references in graphical methods (in addition to Vesanto's thesis) 
+  - componentPlane: add details
+  - error.kaskilagus: add details
+  - colorCode: add details
+  - batchSom: add references (and maybe details)
+  - hitMap: check references
+  - plot.som: add details after better implementation
+  - predict.som: add example
+  - plot.somgrid: add seealso and maybe references (umatrix ?)
+  - somPCAInit: add references
+  - grid2lines: add details
+  - mapToUnit: will be rewritten when the function is
+  - umatrix: add details
+  - prototype.distances: add details and examples
+  - distance.grid: add details and examples
+
+Done in version 0.1:
+- plots:
+  - generic (plot.somgrid) with key (via layout)
+  - prototypes and additional variables (plot.som)
+  - U-matrix:
+    - custom rendering
+    - grid based rendering
+  - component planes
+  - hit map
+- quality measures:
+  - first version of Kaski and Lagus measure
+- C implementation of slow functions:
+  - batchsom and bmu* functions have been implemented in C
+- lower level access to batch som
+- first version of the documentation
+- predict.som (very basic)
+- first implementation of coding conventions
+- print.som 
+- summary.som (quite basic)
+- removed somgrid$basesize 
+- use somgrid$size where needed
+- compute somgrid$dist only if needed (or asked to)
+- save some training parameters in the som structure
+- batchsom 
+  - avoids assignment recomputation when the temperature is changed
