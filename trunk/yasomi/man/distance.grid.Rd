@@ -88,7 +88,7 @@ data <- scale(iris[1:4])
 sg <- somgrid(xdim=15,ydim=15,topo="hex")
 
 # fit the SOM
-som <- batchsom(sg,data)
+som <- batchsom(data,sg)
 
 # compute prototype distances
 pdist <- prototype.distances(som)

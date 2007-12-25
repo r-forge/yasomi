@@ -34,7 +34,7 @@ data <- scale(iris[1:4])
 sg <- somgrid(xdim=7,ydim=7,topo="hex")
 
 # fit the SOM
-som <- batchsom(sg,data)
+som <- batchsom(data,sg)
 
 # map the class information and print the content of each cell
 print(mapToUnit(som,iris[[5]]))

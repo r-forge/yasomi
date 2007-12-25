@@ -7,11 +7,11 @@ optimising a specified error measure.  The prior structure is not
 optimised by this function.
 }
 \usage{
-som.tune(somgrid, data, control = som.tunecontrol(somgrid), verbose = FALSE)
+som.tune(data, somgrid, control = som.tunecontrol(somgrid), verbose = FALSE)
 }
 \arguments{
-  \item{somgrid}{an object of class 'somgrid'}
   \item{data}{a matrix or a data frame of observations}
+  \item{somgrid}{an object of class 'somgrid'}
   \item{control}{a control object which specifies the parameter to optimize}
   \item{verbose}{switch for tracing the tuning process}
 }
@@ -41,7 +41,7 @@ sg <- somgrid(xdim=15,ydim=15,topo="hex")
 
 # choose a good SOM via Kaski and Lagus' error measure
 tune.results <-
-  som.tune(sg,data,som.tunecontrol(sg,,criterion=error.kaskilagus))
+  som.tune(data,sg,som.tunecontrol(sg,criterion=error.kaskilagus))
 
 # plot errors
 plot(tune.results$errors,type="h")

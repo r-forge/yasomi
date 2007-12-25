@@ -43,7 +43,7 @@ data <- scale(iris[1:4])
 sg <- somgrid(xdim=7,ydim=7,topo="hex")
 
 # fit the SOM
-som <- batchsom(sg,data)
+som <- batchsom(data,sg)
 
 # display the hit map
 hitMap(som)

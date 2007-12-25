@@ -1,22 +1,27 @@
 \name{batchsom}
 \alias{batchsom}
+\alias{batchsom.default}
 \title{Fit a Self-Organising Map to some data}
 \description{
 \code{batchsom} is used to fit a Self-Organising Map to some data, using a
-batch algorithm.
+batch algorithm. This is a generic method with a default implementation
+for standard data.
 }
 \usage{
-batchsom(somgrid, data, prototypes=somPCAInit(somgrid,data),
+batchsom(data, somgrid, prototypes=sominit(data,somgrid),
          assignment = c("single", "heskes"),radii,nbRadii=30,
          maxiter = 75,kernel=c("gaussian","linear"),normalised,
-         cut = 1e-07, verbose = FALSE)
+         cut = 1e-07, verbose = FALSE,...)
+\method{batchsom}{default}
 }
 \arguments{
+  \item{data}{the data to which the SOM will be fitted. This can be,
+    e.g., a matrix or data frame of observations (which should be scaled), or a
+    distance matrix}
   \item{somgrid}{an object of class \code{"somgrid"} that specifies the prior
     structure of the Self-Organising Map: see \code{\link{somgrid}} }
-  \item{data}{a matrix or a data frame of observations}
   \item{prototypes}{a matrix of initial values for the
-    prototypes. Defaults to the PCA based initialization provided by \code{\link{somPCAInit}}}
+    prototypes. Defaults to the default initialization provided by \code{\link{sominit}}}
   \item{assignment}{the assignment method used to compute the best
     matching unit of an observation during training}
   \item{radii}{the radii of the neighbourhoods used during training. If
@@ -32,10 +37,13 @@ batchsom(somgrid, data, prototypes=somPCAInit(somgrid,data),
   \item{cut}{minimal value below wich neighbouring interactions are not
     take into account}
   \item{verbose}{switch for tracing the fitting process}
+  \item{...}{arguments to be passed to methods}
 }
 \details{
-It is recommended to use the \code{"single"} assignment method which seems to
-perform better in general. 
+The default method is the standard batch algorithm for Self-Organising
+Map. It applies to a matrix or a data frame of observations. In this
+case, it is recommended to use the \code{"single"} assignment method
+which seems to perform better in general. 
 }
 \value{
   An object of class \code{"som"}, a list with components
@@ -66,7 +74,7 @@ data <- scale(iris[1:4])
 sg <- somgrid(xdim=7,ydim=7,topo="hex")
 
 # fit the SOM
-som <- batchsom(sg,data)
+som <- batchsom(data,sg)
 
 # and display the prototypes
 plot(som)

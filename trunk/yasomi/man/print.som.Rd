@@ -26,7 +26,7 @@ data <- scale(iris[1:4])
 sg <- somgrid(xdim=5,ydim=5,topo="hex")
 
 # fit the SOM
-som <- batchsom(sg,data)
+som <- batchsom(data,sg)
 
 # summary
 print(som)

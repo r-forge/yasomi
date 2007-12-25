@@ -45,7 +45,7 @@ data <- scale(iris[1:4])
 sg <- somgrid(xdim=15,ydim=15,topo="hex")
 
 # choose a good SOM via Kaski and Lagus' error measure
-st <- som.tune(sg,data,som.tunecontrol(sg,,criterion=error.kaskilagus))
+st <- som.tune(data,sg,som.tunecontrol(sg,,criterion=error.kaskilagus))
 som <- st$best.som
 
 # display the umatrix

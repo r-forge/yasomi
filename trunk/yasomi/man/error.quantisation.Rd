@@ -32,13 +32,13 @@ data <- scale(iris[1:4])
 sg <- somgrid(xdim=7,ydim=7,topo="hex")
 
 # fit the SOM
-som <- batchsom(sg,data)
+som <- batchsom(data,sg)
 
 print(error.quantisation(som,data))
 
 # a larger grid should in general give a lower quantisation error
 sg <- somgrid(xdim=12,ydim=12,topo="hex")
-som <- batchsom(sg,data)
+som <- batchsom(data,sg)
 print(error.quantisation(som,data))
 }
 \keyword{cluster}

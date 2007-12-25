@@ -1,15 +1,15 @@
-\name{predict.som}
-\alias{predict.som}
+\name{predict.somnum}
+\alias{predict.somnum}
 \title{Map new data to a fitted Self-Organising Map}
 \description{
 Map new data to a fitted Self-Organising Map, i.e., compute the best
 matching unit for each given observation. 
 }
 \usage{
-\method{predict}{som}(object, newdata, ...)
+\method{predict}{somnum}(object, newdata, ...)
 }
 \arguments{
-  \item{object}{an object of class \code{"som"}}
+  \item{object}{an object of class \code{"somnum"}}
   \item{newdata}{a matrix or a data frame of data compatible with the data
     used to fit the \code{object} Self-Organising Map (that is with
     identical dimension)}
@@ -38,7 +38,7 @@ data.train <- data[train,]
 sg <- somgrid(xdim=5,ydim=5,topo="hex")
 
 # fit the SOM
-som <- batchsom(sg,data)
+som <- batchsom(data,sg)
 
 # map remaining data
 results <- predict(som,data[-train,])

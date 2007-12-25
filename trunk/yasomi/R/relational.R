@@ -1,0 +1,238 @@
+# relational SOM
+
+sominit.dist <- function(data,somgrid,
+                         method=c("prototypes","random","cluster"),...) {
+    method <- match.arg(method)
+    dim <- nrow(d)
+    nb <- somgrid$size
+    if(method=="prototypes" || (method=="cluster" && nb>=dim)) {
+        protos <- matrix(0,ncol=dim,nrow=nb)
+        protos[cbind(1:nb,sample(1:dim,size=nb,replace=nb>dim))] <- 1
+    } else if(method=="random") {
+        protos <- matrix(runif(dim*nb),ncol=dim,nrow=nb)
+        protos <- sweep(protos,1,rowSums(protos),"/")
+    } else {
+        ## nb <dim
+        clusters <- cut(sample(1:dim),nb,labels=FALSE,include.lowest=TRUE)
+        protos <- matrix(0,ncol=dim,nrow=nb)
+        protos[cbind(clusters,1:dim)] <- 1
+        protos <- sweep(protos,1,rowSums(protos),"/")
+    }
+    protos
+}
+
+relationalsomPCAInit <- function(d,somgrid) {
+    ## we need to do the PCA of the distance matrix d
+    ## cmdscale provides the calculation but doesn't send back the eigenvectors
+    ## so we partially replicate its code here (in pure R)
+
+    ## from cmdscale
+    x <- as.matrix(d^2,diag=0)
+    n <- nrow(x)
+    if(n != ncol(x)) {
+        stop("distances must be result of 'dist' or a square matrix")
+    }
+    ## double centering
+    x.rowmeans <- rowMeans(x)
+    x.mean <- mean(x.rowmeans)
+    x <- x + x.mean - outer(x.rowmeans,x.rowmeans,"+")
+    ## eigen analysis
+    e <- eigen(-x/2, symmetric = TRUE)
+    ## end of the copied code
+
+    sdev <- sqrt(e$values[1:2])
+
+    ## the more detailled axis is assigned to the first eigenvector
+    if (somgrid$xdim>=somgrid$ydim) {
+        x.ev <- 1
+        y.ev <- 2
+    } else {
+        x.ev <- 2
+        y.ev <- 1
+    }
+    if(somgrid$topo=="hexagonal") {
+        xspan <- somgrid$xdim - 1
+        if(somgrid$ydim>1) {
+            xspan <- xspan+0.5
+        }
+        x <- seq(from=-2*sdev[x.ev],by=4*sdev[x.ev]/xspan,length.out=somgrid$xdim)
+    } else {
+        x <- seq(from=-2*sdev[x.ev],to=2*sdev[x.ev],length.out=somgrid$xdim)
+    }
+    y <- seq(from=2*sdev[y.ev],to=-2*sdev[y.ev],length.out=somgrid$ydim)
+    base <- as.matrix(expand.grid(x = x, y = y))
+    ## correction for hexagonal grids
+    if(somgrid$topo=="hexagonal") {
+        base[,1] <- base[,1]+rep(c(0,2*sdev[x.ev]/xspan),each=somgrid$xdim,length.out=nrow(base))
+    }
+    ## map back the grid to the dissimilarity space
+    ## FIXME: this is not the correct way to do that
+    mapped <- tcrossprod(base,e$vectors[,c(x.ev,y.ev)])
+    mapped
+}
+
+fastRelationalBMU.R <- function(cluster,nclust,diss,nv) {
+    ps <- partialSums(cluster,nclust,diss)
+    csize <- table(factor(cluster,levels=1:nclust))
+    normed <- nv%*%csize
+    nvnormed <- sweep(nv,1,normed,"/")
+    Dalpha <- nvnormed%*%ps$ps
+    interm <- tcrossprod(ps$bips,nvnormed)
+    nf <- double(nclust)
+    for(i in 1:nclust) {
+        nf[i] <- 0.5*c(nvnormed[i,]%*%interm[,i])
+    }
+    ## the alternate C version is barely faster
+    ## nf <- 0.5*nfPS(ps$bips,nvnormed,nclust)
+    distances <- sweep(Dalpha,1,nf,"-")
+    bmu <- apply(distances,2,which.min)
+    error <- sum(distances[cbind(bmu,1:length(bmu))])
+    list(clusters=bmu,error=error,Dalpha=Dalpha,nf=nf)
+}
+
+partialSums <- function(cluster,nclust,diss) {
+    datasize <- as.integer(length(cluster))
+    ## partial_sums modifies only the bisums parameter: DUP=FALSE is safe here
+    result <- .C("partial_sums",
+                 as.integer(cluster-1),
+                 datasize,
+                 as.integer(nclust),
+                 as.double(diss),
+                 sums=double(nclust*datasize),
+                 bisums=double(nclust^2),DUP=FALSE)
+    list(ps=matrix(result$sums,nrow=nclust,ncol=datasize),
+         bips=matrix(result$bisums,nrow=nclust,ncol=nclust))
+}
+
+nfPS <- function(bips,nvnormed,nclust) {
+    ## th_bips_h modifies only the nf parameter: DUP=FALSE is safe here
+    .C("th_bips_h",as.double(bips),as.double(nvnormed),as.integer(nclust),
+       nf=double(nclust),DUP=FALSE)$nf
+}
+
+relationalsecondbmu.R <- function(prototypes,diss) {
+    ## first compute the base distances
+    Dalpha <- tcrossprod(diss,prototypes)
+    ## then the normalisation factor
+    ## suboptimal
+    nf <- 0.5*diag(prototypes%*%Dalpha)
+    distances <- sweep(Dalpha,2,nf,"-")
+    ## very suboptimal
+    ordered <- apply(distances,1,order)
+    winners <- t(ordered[1:2,])
+    error <- distances[cbind(1:nrow(winners),winners[,1])]
+    list(winners=winners,error=error)
+}
+
+fastRelationalsom.lowlevel.R <- function(somgrid,diss,prototypes,
+                                     assignment,radii,maxiter,kernel,
+                                     normalised,cut,verbose) {
+    oldClassif <- rep(NA,nrow(diss))
+    errors <- vector("list",length(radii))
+    nv <- neighborhood(somgrid,radii[1],kernel,normalised=normalised)
+    ## a round of initialisation is needed
+    bmus <- relationalbmu.R(prototypes,diss)
+    classif <- bmus$clusters
+    errors[[1]] <- bmus$error
+    if(verbose) {
+        print(paste(1,1,bmus$error))
+    }
+    for(i in 1:length(radii)) {
+        if(i==1) {
+            iterations <- 2:maxiter
+        } else {
+            iterations <- 1:maxiter
+        }
+        for(j in iterations) {
+            ## assignment
+            if(assignment == "single") {
+                bmus <- fastRelationalBMU.R(classif,somgrid$size,diss,nv)
+            } else {
+                stop(paste(assignment,"is not implemented for relational SOM"))
+            }
+            nclassif <- bmus$clusters
+            noChange <- identical(classif,nclassif)
+            hasLoop <- identical(oldClassif,nclassif)
+            oldClassif <- classif
+            classif <- nclassif
+            error <- bmus$error
+            if(verbose) {
+                print(paste(i,j,error))
+            }
+            errors[[i]] <- c(errors[[i]],error)
+            ## there is no representation phase!
+            if(noChange || hasLoop) {
+                if(verbose) {
+                    if(noChange) {
+                        print(paste("radius:",radii[i],"iteration",j,
+                                    "is stable, decreasing radius"))
+                    } else {
+                        print(paste("radius:",radii[i],"iteration",j,
+                                    "oscillation detected, decreasing radius"))
+                    }
+                }
+                if(i<length(radii)) {
+                    ## preparing the loop with the next radius
+                    nv <- neighborhood(somgrid,radii[i+1],kernel,
+                                       normalised=normalised)
+                }
+                break;
+            }
+        }
+        if(!noChange && verbose) {
+            print(paste("warning: can't reach a stable configuration with radius",i))
+        }
+    }
+    ## for latter use
+    weights <- nv[,classif]
+    normed <- rowSums(weights)
+    prototypes <- sweep(weights,1,normed,"/")
+    Dalpha <- bmus$Dalpha
+    nf <- bmus$nf
+    res <- list(somgrid=somgrid,prototypes=prototypes,classif=classif,
+                errors=unlist(errors),Dalpha=t(Dalpha),nf=nf)
+    class(res) <- c("som","relationalsom")
+    res
+}
+
+batchsom.dist <- function(data,somgrid,
+                          prototypes=sominit(data,somgrid),
+                          assignment=c("single","heskes"),radii,nbRadii,
+                          maxiter=75,
+                          kernel=c("gaussian","linear"),normalised,
+                          cut=1e-7,verbose=FALSE,
+                          lowlevel=fastRelationalsom.lowlevel.R,...) {
+    ## process parameters
+    if(verbose) {
+        print(match.call())
+    }
+    assignment <- match.arg(assignment)
+    if(missing(normalised)) {
+        normalised <- assignment=="heskes"
+    }
+    kernel <- match.arg(kernel)
+    theKernel <- switch(kernel,"gaussian"=kernel.gaussian,"linear"=kernel.linear)
+    diss <- as.matrix(data^2,diag=0)
+    ## perform a few sanity checks
+    if(ncol(prototypes)!=ncol(diss)) {
+        stop("'prototypes' and 'diss' have different dimensions")
+    }
+    if(class(somgrid)!="somgrid") {
+        stop("'somgrid' is not of somgrid class")
+    }
+    ## distances?
+    if(is.null(somgrid$dist)) {
+        somgrid$dist <- as.matrix(dist(somgrid$pts,method="Euclidean"),diag=0)
+    }
+    ## compute radii
+    if(missing(radii)) {
+        if(kernel=="gaussian") {
+            minRadius <- 0.5
+        } else {
+            minRadius <- 1
+        }
+        radii <- radius.exp(minRadius,max(minRadius,somgrid$diam/3*2),nbRadii)
+    }
+    lowlevel(somgrid,diss,prototypes,assignment,radii,maxiter,theKernel,
+             normalised,cut,verbose)
+}

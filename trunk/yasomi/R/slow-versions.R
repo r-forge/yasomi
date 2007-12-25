@@ -25,7 +25,7 @@ kernel.linear <- function(x) {
 bmu.R <- function(prototypes,data) {
     result=rep(0,nrow(data))
     for(i in 1:length(result)) {
-        result[i]=which.min(rowSums(sweep(prototypes,2,data[i,],"-")^2))
+        result[i] <- which.min(rowSums(sweep(prototypes,2,data[i,],"-")^2))
     }
     result
 }
@@ -33,12 +33,12 @@ bmu.R <- function(prototypes,data) {
 bmu.heskes.R <- function(prototypes,data,nv) {
     result=rep(0,nrow(data))
     for(i in 1:length(result)) {
-        result[i]=which.min(nv%*%rowSums(sweep(prototypes,2,data[i,],"-")^2))
+        result[i] <- which.min(nv%*%rowSums(sweep(prototypes,2,data[i,],"-")^2))
     }
     result
 }
 
-batchsom.R <- function(somgrid,data,prototypes=somPCAInit(somgrid,data),
+batchsom.R <- function(data,somgrid,prototypes=sominit(data,somgrid),
                        assignment=c("single","heskes"),radii,nbRadii,
                        maxiter=75,
                        kernel=c("gaussian","linear"),normalised,
@@ -113,7 +113,7 @@ batchsom.lowlevel.R <- function(somgrid,data,prototypes,
     }
     res <- list(somgrid=somgrid,prototypes=prototypes,classif=classif,
                 errors=unlist(errors))
-    class(res) <- "som"
+    class(res) <- c("som","somnum")
     res
 }
 

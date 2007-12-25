@@ -1,0 +1,115 @@
+2007-12-24  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* TODO: demos are ok
+
+	* R/generic.R (batchsom): fixed interface which is now minimal (data and somgrid)
+
+	* R/tune.R (som.tune): fixed a bug in the parameter order 
+
+2007-12-16  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* demo/som-two-dim.R: fix parameter order
+
+	* demo/som-iris.R: fix parameter order
+
+	* man/predict.somnum.Rd: replaces predict.som.Rd (updated content)
+
+	* man/componentPlane.Rd: doc and example update for the new code
+
+	* man/distance.grid.Rd: example update for the new code
+
+	* man/error.quantisation.Rd: example update for the new code
+
+	* man/error.kaskilagus.Rd: example update for the new code
+
+	* man/grid2lines.Rd: example update for the new code
+
+	* man/hitMap.Rd: example update for the new code
+
+	* man/mapToUnit.Rd: example update for the new code
+
+	* man/plot.somgrid.Rd: example update for the new code
+
+	* man/plot.somnum.Rd: example update for the new code
+
+	* man/print.som.Rd: example update for the new code
+
+	* man/plot.sompdist.Rd: example update for the new code
+
+	* man/prototype.distances.Rd: example update for the new code
+
+	* man/sominit.default.Rd: replaces the somInitPCA documentation
+
+	* man/sominit.Rd: new documentation file for the generic initialisation method
+
+	* man/som.tunecontrol.Rd: doc update for the new code
+
+	* man/som.tune.Rd: example and doc update for the new code
+
+	* man/umatrix.Rd: example update for the new code
+
+	* R/som.R (batchsom.default): default batchsom (standard data)
+
+	* R/relational.R (batchsom.dist): batchsom for the dist class
+
+	* R/som.R (colorCode): fixed to use the new batchsom interface
+
+	* R/relational.R (sominit.dist): default initialisation for dissimilarity data
+
+	* R/som.R (sominit.default): pca initialisation for standard data
+	(predict.somnum): specific for numerical som (for now)
+
+	* R/generic.R (batchsom): generic method
+	(sominit): generic method
+	(protoDist): generic method
+	(KaskiLagus): generic method
+
+2007-12-15  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/umatrix.R (protoDist.somnum): this function applies only to numerical SOM
+
+	* R/som.R (batchsom.lowlevel): returns an object with both classes som and somnum
+
+	* R/slow-versions.R (batchsom.lowlevel.R): returns an object with both classes som and somnum
+
+	* R/slow-relational.R (relationalsom.lowlevel.R): returns an object with both classes som and relationalsom
+
+	* R/relational.R (fastRelationalsom.lowlevel.R): returns an object with both classes som and relationalsom
+
+	* R/quality.R (KaskiLagus.somnum): this function applies only to numerical SOM
+
+	* R/graphics.R (plot.somnum): this function applies only to numerical SOM
+
+	* man/plot.somnum.Rd: renamed according to the new class for numerical SOM
+
+2007-12-07  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/slow-relational.R: new file with slow versions of relational som related functions
+
+	* R/relational.R (fastRelationalsom.lowlevel.R): faster version of the relational SOM, using the partial sum trick
+
+	* src/relational.c (partial_sums): C implementation of partial sums (way faster)
+
+	* R/relational.R (relationalSomRandomInit): a new random initialisation method for relation SOM
+	(partialSum.R): partial sums implementation in pure R (very slow!)
+
+2007-12-06  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/relational.R (KaskiLagus.relationalsom): relational som version (should be redesigned)
+
+	* R/quality.R (KaskiLagus): generic version to be usable with relational SOM
+
+	* R/relational.R (relationalsom.lowlevel.R): added oscillation detection (rudimentary)
+
+	* R/graphics.R (grid2lines): added the possibility of building a grid on arbitrary data points
+
+2007-12-05  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/umatrix.R (protoDist): generic version of protoDist to be usable with relational SOM
+
+	* R/relational.R: started the implementation of the relational SOM
+
+	* demo/som-iris.R: updated this demo to use the distance.grid function
+
+	* R/som.R (somPCAInit): fixed a small bug in the eigenvector attribution 
+

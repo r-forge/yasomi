@@ -49,7 +49,7 @@ sg <- somgrid(xdim=15,ydim=15,topo="hex")
 plot(sg)
 
 # choose a good SOM
-som <- som.tune(sg,data)$best.som
+som <- som.tune(data,sg)$best.som
 
 # color based on the first coordinate (sepal length), size on the second
 # (sepal width) of the prototypes

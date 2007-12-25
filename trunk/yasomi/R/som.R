@@ -1,4 +1,4 @@
-somPCAInit <- function(somgrid,data) {
+sominit.default <- function(data,somgrid,...) {
     ## we don't scale the data
     data.pca <- prcomp(data)
     ## the more detailled axis is assigned to the first eigenvector
@@ -6,8 +6,8 @@ somPCAInit <- function(somgrid,data) {
         x.ev <- 1
         y.ev <- 2
     } else {
-        x.ev <- 1
-        y.ev <- 2
+        x.ev <- 2
+        y.ev <- 1
     }
     if(somgrid$topo=="hexagonal") {
         xspan <- somgrid$xdim - 1
@@ -30,7 +30,7 @@ somPCAInit <- function(somgrid,data) {
     sweep(mapped,2,data.pca$center,"+")
 }
 
-somRandomInit <- function(somgrid,data) {
+somRandomInit <- function(data,somgrid) {
     data <- as.matrix(data)
     if(nrow(data)>=somgrid$size) {
         data[sample(1:nrow(data),size=somgrid$size),]
@@ -101,12 +101,12 @@ radius.lin <- function(min,max,steps) {
     seq(max,min,length.out=steps)
 }
 
-batchsom <- function(somgrid,data,prototypes=somPCAInit(somgrid,data),
+batchsom.default <- function(data,somgrid,prototypes=sominit(data,somgrid),
                      assignment=c("single","heskes"),radii,nbRadii=30,
                      maxiter=75,
                      kernel=c("gaussian","linear"),
                      normalised,
-                     cut=1e-7,verbose=FALSE) {
+                     cut=1e-7,verbose=FALSE,...) {
     ## process parameters
     assignment <- match.arg(assignment)
     if(missing(normalised)) {
@@ -171,25 +171,16 @@ batchsom.lowlevel <- function(somgrid,data,prototypes,
                 prototypes=prototypes,
                 classif=result$cluster+1,
                 errors=result$errors[result$errors>=0])
-    class(res) <- "som"
+    class(res) <- c("som","somnum")
     res
 }
 
 
 colorCode <- function(data,nbcolor) {
     onedimgrid <- somgrid(xdim=nbcolor,ydim=1,topo="rectangular")
-    colorsom <- batchsom(onedimgrid,data,nbRadii=20)
+    colorsom <- batchsom(data,onedimgrid,nbRadii=20)
     colorsom$classif
 }
-
-##mapToUnit <- function(som,values) {
-##  values <- as.matrix(values)
-##  result <- vector("list",nrow(som$prototypes))
-##  for(i in 1:length(som$classif)) {
-##    result[[som$classif[i]]] <- rbind(result[[som$classif[i]]],values[i,])
-##  }
-##  result
-##}
 
 mapToUnit <- function(som,values) {
     if(length(values)!=length(som$classif)) {
@@ -226,7 +217,7 @@ mapFactorToUnit <- function(som,values) {
 }
 
 
-predict.som <- function(object,newdata,...) {
+predict.somnum <- function(object,newdata,...) {
     som <- object
     newdata <- as.matrix(newdata)
     if(ncol(newdata)!=ncol(som$prototypes)) {

@@ -19,7 +19,8 @@ som.tunecontrol <- function(somgrid,init="pca",ninit=1,
 }
 
 
-som.tune <- function(somgrid,data,control=som.tunecontrol(somgrid),verbose=FALSE) {
+som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),
+                     verbose=FALSE) {
     nbconf <- length(control$init)*control$ninit*length(control$assignment)*length(control$radii)*length(control$annealing)*length(control$kernel)
     bestSOM <- NULL
     performances <- rep(NA,nbconf)
@@ -45,9 +46,9 @@ som.tune <- function(somgrid,data,control=som.tunecontrol(somgrid),verbose=FALSE
                     ## initializations
                     for(i in 1:control$ninit) {
                         if(init=="pca") {
-                            prototypes=somPCAInit(somgrid,data)
+                            prototypes=sominit(data,somgrid)
                         } else {
-                            prototypes=somRandomInit(somgrid,data)
+                            prototypes=somRandomInit(data,somgrid)
                         }
                         ## radii
                         for(radius in control$radii) {
@@ -57,7 +58,7 @@ som.tune <- function(somgrid,data,control=som.tunecontrol(somgrid),verbose=FALSE
                             radii <- switch(annealing,
                                             "linear"=radius.lin(minRadius,radius,control$innernradii),
                                             "power"=radius.exp(minRadius,radius,control$innernradii))
-                            som <- batchsom(somgrid,data,prototypes,assignment,radii,
+                            som <- batchsom(data,somgrid,prototypes,assignment,radii,
                                             maxiter=control$maxiter,kernel=kernel)
                             performances[confIndex] <- control$criterion(som,data)
                             if(performances[confIndex]<bestPerfSoFar) {

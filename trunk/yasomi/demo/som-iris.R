@@ -8,7 +8,7 @@ sg <- somgrid(xdim=15,ydim=15,topo="hex")
 
 # training the SOM
 
-somT <- som.tune(sg,data,som.tunecontrol(sg,radii=c(2,sg$diam),nradii=20,criterion=error.kaskilagus),verbose=T)
+somT <- som.tune(data,sg,som.tunecontrol(sg,radii=c(2,sg$diam),nradii=20,criterion=error.kaskilagus),verbose=T)
 
 # and displaying the results
 
@@ -34,5 +34,11 @@ par(spar)
 hitMap(som,col="blue")
 
 umatrix(som)
+
+pdist <- prototype.distances(som)
+
+pgrid <- distance.grid(pdist)
+
+filled.contour(pgrid)
 
 par(opar)

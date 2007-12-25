@@ -1,6 +1,14 @@
+BUGS or problems:
+- KaskiLagus should not use a data parameter
+- predict.somnum should be easy to extend to relationalsom
+- componentPlane should not be aplicable to relationasom
+- somtune must become more generic
+- fix parameter order in lowlevel functions
+- batchsom.Rd must be updated
+
 - coding conventions
 - C implementation of slow functions:
-  - umatrix
+  - prototype.distances 
 - batchsom
   - handling of missing values
   - handling of factors
@@ -14,14 +22,19 @@
 - torus topography?
 - classif or cluster in results?
 
++ relational SOM
+  - use an object oriented approach where possible
+  - initialisation method
+  - documentation
+
 + graphics
+  - more options for distance.grid (mean, full but also neighbors and partial)
   - 3D umatrix (rgl)
   - add key to plot.somgrid without layout or a similar solution (?)
   - better version of plot.som
   - add options to colorCode
   - color mapping in CIE Lab space (cf colorspace package)
   - variation over the u-matrix principle
-  - grid2lines should be applicable to any matrix with the correct number of rows 
 
 + simple functions to improve
   - summary for som (maybe print)
@@ -38,14 +51,20 @@
   - batchSom: add references (and maybe details)
   - hitMap: check references
   - plot.som: add details after better implementation
-  - predict.som: add example
   - plot.somgrid: add seealso and maybe references (umatrix ?)
   - somPCAInit: add references
   - grid2lines: add details
   - mapToUnit: will be rewritten when the function is
   - umatrix: add details
-  - prototype.distances: add details and examples
-  - distance.grid: add details and examples
+  - prototype.distances: add details (?)
+  - distance.grid: add details (?)
+
++ Move to S4 classes?
+
+Done in version 0.2:
+- relational SOM (first version with optimal algorithm but no implementation tricks)
+- grid2lines is now applicable to any matrix with the correct number of rows 
+- generic (S3) functions for batchsom, sominit and protoDist: most of the analysis and display functions can be used form standard SOM and for relational SOM
 
 Done in version 0.1:
 - plots:

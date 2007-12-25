@@ -1,7 +1,13 @@
-protoDist <- function(som,i,j,k,l) {
+protoDist.somnum <- function(som,i,j,k,l) {
     from <- som$prototypes[i+(j-1)*som$somgrid$xdim,]
     to <- som$prototypes[k+(l-1)*som$somgrid$xdim,]
     sqrt(sum((from-to)^2))
+}
+
+protoDist.relationalsom <- function(som,i,j,k,l) {
+    from <- i+(j-1)*som$somgrid$xdim
+    to <- k+(l-1)*som$somgrid$xdim
+    c(sqrt(som$prototypes[from,]%*%som$Dalpha[,to]-som$nf[from]-som$nf[to]))
 }
 
 prototype.distances <- function(som) {

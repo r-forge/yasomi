@@ -11,7 +11,7 @@ associated prototype.
 componentPlane(som, dim = 1, ...)
 }
 \arguments{
-  \item{som}{an object of class \code{"som"}}
+  \item{som}{an object of class \code{"somnum"}}
   \item{dim}{the coordinate to display}
   \item{\dots}{additional parameters transmitted to the low level plot
     function \code{\link{plot.somgrid}}} 
@@ -35,7 +35,7 @@ data <- scale(iris[1:4])
 sg <- somgrid(xdim=15,ydim=15,topo="hex")
 
 # choose a good SOM
-som <- som.tune(sg,data)$best.som
+som <- som.tune(data,sg)$best.som
 
 # display the component planes
 spar <- par(mfrow=c(2,2))
