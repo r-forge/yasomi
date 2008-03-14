@@ -1,10 +1,10 @@
 BUGS or problems:
-- KaskiLagus should not use a data parameter
-- predict.somnum should be easy to extend to relationalsom
 - componentPlane should not be aplicable to relationasom
 - somtune must become more generic
 - fix parameter order in lowlevel functions
 - batchsom.Rd must be updated
+- fix the content of som$errors: make sure the last value is always the final quantisation error
+- unify initialization methods
 
 - coding conventions
 - C implementation of slow functions:
@@ -17,7 +17,7 @@ BUGS or problems:
 - hitMap
   - should perhaps return a value
 - tests of parameters
-- quality measures
+- add new quality measures
 - smarter som.tune (no repetition of pca init)
 - torus topography?
 - classif or cluster in results?
@@ -25,16 +25,28 @@ BUGS or problems:
 + relational SOM
   - use an object oriented approach where possible
   - initialisation method
-  - documentation
+  - documentation:
+    - write new documentation
+    - adapt existing ones
+  - extend functions to relation SOM:
+    - error.quantisation
+    - predict.somnum
 
 + graphics
+  - colormap options in u-matrix and component planes (via plot.somgrid)
+  - use nice color map when adapted packages are available (e.g. color brewer)
   - more options for distance.grid (mean, full but also neighbors and partial)
   - 3D umatrix (rgl)
   - add key to plot.somgrid without layout or a similar solution (?)
-  - better version of plot.som
+  - better version of plot.som:
+    - use star glyh for low dimension
+    - allow parallel coordinates
+    - maybe bargraph for factors
   - add options to colorCode
   - color mapping in CIE Lab space (cf colorspace package)
   - variation over the u-matrix principle
+  - smooth colormap
+  - fix the legend in plot.somtune
 
 + simple functions to improve
   - summary for som (maybe print)
@@ -43,7 +55,9 @@ BUGS or problems:
   - annealing based on the map size
   - number of initial radii based on the map size
 
-+ documentation to improve
++ documentation
+  - use \dots instead of ...
+  - write a vignette or an introduction
   - add original references in graphical methods (in addition to Vesanto's thesis) 
   - componentPlane: add details
   - error.kaskilagus: add details
@@ -65,6 +79,10 @@ Done in version 0.2:
 - relational SOM (first version with optimal algorithm but no implementation tricks)
 - grid2lines is now applicable to any matrix with the correct number of rows 
 - generic (S3) functions for batchsom, sominit and protoDist: most of the analysis and display functions can be used form standard SOM and for relational SOM
+- the original data are saved in the batchsom result
+- introduction to the package via a vignette
+- som.tune returns now an object that can be plotted in some simple situations (only one parameter is modified during tuning)
+
 
 Done in version 0.1:
 - plots:

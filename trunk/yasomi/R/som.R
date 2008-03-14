@@ -106,7 +106,7 @@ batchsom.default <- function(data,somgrid,prototypes=sominit(data,somgrid),
                      maxiter=75,
                      kernel=c("gaussian","linear"),
                      normalised,
-                     cut=1e-7,verbose=FALSE,...) {
+                     cut=1e-7,verbose=FALSE,keepdata=TRUE,...) {
     ## process parameters
     assignment <- match.arg(assignment)
     if(missing(normalised)) {
@@ -141,6 +141,9 @@ batchsom.default <- function(data,somgrid,prototypes=sominit(data,somgrid),
     pre$kernel <- kernel
     pre$normalised <- normalised
     pre$radii <- radii
+    if(keepdata) {
+        pre$data  <- data
+    }
     pre
 }
 

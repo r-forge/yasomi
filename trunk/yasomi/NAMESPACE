@@ -22,6 +22,8 @@ S3method(batchsom,dist)
 S3method(plot,sompdist)
 S3method(as.matrix,sompdist)
 S3method(as.dist,sompdist)
+# somtune S3 method
+S3method(plot,somtune)
 # C code
 useDynLib(yasomi)
 # imports

@@ -3,7 +3,7 @@
 sominit.dist <- function(data,somgrid,
                          method=c("prototypes","random","cluster"),...) {
     method <- match.arg(method)
-    dim <- nrow(d)
+    dim <- nrow(data)
     nb <- somgrid$size
     if(method=="prototypes" || (method=="cluster" && nb>=dim)) {
         protos <- matrix(0,ncol=dim,nrow=nb)
@@ -200,7 +200,7 @@ batchsom.dist <- function(data,somgrid,
                           assignment=c("single","heskes"),radii,nbRadii,
                           maxiter=75,
                           kernel=c("gaussian","linear"),normalised,
-                          cut=1e-7,verbose=FALSE,
+                          cut=1e-7,verbose=FALSE,keepdata=TRUE,
                           lowlevel=fastRelationalsom.lowlevel.R,...) {
     ## process parameters
     if(verbose) {
@@ -233,6 +233,10 @@ batchsom.dist <- function(data,somgrid,
         }
         radii <- radius.exp(minRadius,max(minRadius,somgrid$diam/3*2),nbRadii)
     }
-    lowlevel(somgrid,diss,prototypes,assignment,radii,maxiter,theKernel,
-             normalised,cut,verbose)
+    pre <- lowlevel(somgrid,diss,prototypes,assignment,radii,maxiter,theKernel,
+                    normalised,cut,verbose)
+    if(keepdata) {
+        pre$data  <- data
+    }
+    pre
 }

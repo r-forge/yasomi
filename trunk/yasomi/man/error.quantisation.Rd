@@ -7,16 +7,20 @@ this is the mean of the squared Euclidean distance between each
 observation and the prototype of its best matching unit.
 }
 \usage{
-error.quantisation(som, data)
+error.quantisation(som, newdata)
 }
 \arguments{
   \item{som}{an object of class \code{"som"}}
-  \item{data}{a matrix or a data frame of observations}
+  \item{newdata}{an optional matrix or a data frame of observations
+    compatible with the fitted som}
 }
 %\details{
 %}
 \value{
-  The quantisation error.
+  If \code{newdata} is not given, the function returns the quantisation
+  error made by the fitted som on the data used to fit it. When
+  \code{newdata} is specified, the function returns the quantisation of the
+  fitted som on the corresponding data.
 }
 %\references{}
 \author{Fabrice Rossi}
@@ -34,11 +38,11 @@ sg <- somgrid(xdim=7,ydim=7,topo="hex")
 # fit the SOM
 som <- batchsom(data,sg)
 
-print(error.quantisation(som,data))
+print(error.quantisation(som))
 
 # a larger grid should in general give a lower quantisation error
 sg <- somgrid(xdim=12,ydim=12,topo="hex")
 som <- batchsom(data,sg)
-print(error.quantisation(som,data))
+print(error.quantisation(som))
 }
 \keyword{cluster}

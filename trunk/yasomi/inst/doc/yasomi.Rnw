@@ -1,0 +1,120 @@
+% \VignetteIndexEntry{An introduction to YASOMI}
+% \VignetteDepends{e1071, proxy}
+% \VignetteKeyword{Self Organising Map}
+% \VignetteKeyword{Self Organizing Map}
+% \VignetteKeyword{Clustering}
+
+\documentclass[a4paper]{article}
+
+\begin{document}
+\title{Yet Another Self Organising Map Implementation}
+\author{Fabrice Rossi}
+
+\maketitle
+
+\section{Introduction}
+The yasomi package aims at providing a complete implementation of Self Organising Maps (SOMs) adapted to both standard numerical data and to more complex data described via a dissimilarity matrix or a kernel matrix. Yasomi tries to include a broad selection of SOM based state of the art visualisation methods. It also provides automated data driven construction methods for SOMs.
+
+\section{A simple demonstration}
+The following example provide a demonstration of the main features of yasomi. The SOM algorithm is based on the Euclidean norm and assumes therefore isotropy in the data space. As a consequence, it is advisable to scale the data under analysis, unless some prior knowledge suggests to emphasise one or several variables.
+<<>>=
+library(yasomi)
+data <- scale(iris[1:4])
+@
+This example uses the Iris dataset for which a SOM is constructed using only
+the numerical attributes of the plants.
+
+The SOM algorithm fits a grid of
+prototypes to the data. The grid topology (prior arrangement of the
+prototypes) is under user control. In this example a rather standard hexagonal
+based grid is chosen.
+<<>>=
+sg <- somgrid(xdim=10,ydim=10,topo="hexagonal")
+@
+\begin{figure}[htbp]
+  \centering
+<<fig=TRUE,echo=TRUE>>=
+plot(sg)
+@
+  \caption{The prior structure imposed on the prototypes}
+  \label{figure:grid}
+\end{figure}
+This grid can be plotted (see Figure \ref{figure:grid}), even if this representation alone is not very useful. The main advantage the grid is to provide a support for visualisation: each cell in Figure \ref{figure:grid} is associated to a prototype and close cells correspond to close prototypes. By filling the cells with colors and/or glyphs computed from the data, some insights on the structure of the dataset can be obtained, as shown in the following figures.
+
+The SOM tuning process can be controlled via some parameters. In this example, one of the parameter (an initial radius which specifies the influence of the prototypes on each other) is automatically chosen by minimising a distortion measure.
+<<>>=
+somtuning <- som.tune(data,sg,
+                      som.tunecontrol(sg,radii=c(2,sg$diam),nradii=20,
+                                      criterion=error.kaskilagus))
+som <- somtuning$best.som
+@
+The quality of the SOM as measured by the chosen criterion (Kaski and Lagus' distorsion measure) depends on the initial value of the influence radius, as shown on Figure \ref{figure:quality} (lower values correspond to higher quality).
+\begin{figure}[htbp]
+  \centering
+<<fig=TRUE,echo=TRUE>>=
+plot(somtuning)
+@
+  \caption{Dependency between the distorsion of the final map and the initial influence radius}
+  \label{figure:quality}
+\end{figure}
+The best SOM according to the chosen quality measure is kept (in general, the quantisation error of a SOM that represent correctly the topology of the data will be higher than the one of a SOM that provide poor topology preservation). The evolution of its quantisation error during the fitting process is depicted on Figure \ref{figure:error}.
+\begin{figure}[htbp]
+  \centering
+<<fig=TRUE,echo=FALSE>>=
+plot(som$errors,type="l",xlab="Iteration",ylab="Quantisation error")
+@
+  \caption{Evolution of the quantisation error during the fitting process}
+  \label{figure:error}
+\end{figure}
+Yasomi provides numerous visualisation methods that can be used to display the fitted SOM. The simplest method consists in displaying the prototypes arranged according to the prior structure (a.k.a., the grid). As the prototypes are generally high dimensional vectors, they are displayed using star glyphs, as shown on Figure \ref{figure:starplot}.
+\begin{figure}[htbp]
+  \centering
+<<fig=TRUE,echo=TRUE>>=
+plot(som)
+@
+  \caption{Star glyphs of the prototypes of the fitted SOM}
+  \label{figure:starplot}
+\end{figure}
+The Figure displays an example of the well known ordering property of the SOM algorithm. The surface of the glyph increase from left to right and from top to bottom. There are clearly two classes of glyphs (elongated thin ones on the left and more symetric ones on the right).
+
+Star glyphs are not always easy to read, especially when dealing with high dimensional data. In some situations, a color coded display of a selection of the variables might provide more insight on the data. This can be obtained via component planes for a SOM, as shown on Figure \ref{figure:component}. Each of the sub-figure displays the values taken by one of the variable over the prototypes of the SOM. Petal variables (lower row) show very strong correlation as well as a clear separation between two classes (consistent with the one observed in Figure \ref{figure:starplot}). The sepal width seams also somewhat negatively correlated with the petal variables.
+
+\begin{figure}[htbp]
+  \centering
+<<fig=TRUE,echo=TRUE>>=
+spar <- par(mfrow=c(2,2))
+for(i in 1:ncol(data)) {
+  componentPlane(som,i)
+}
+par(spar)
+@
+  \caption{Component planes of the prototypes of the fitted SOM}
+  \label{figure:component}
+\end{figure}
+
+While the SOM algorithm induces a clustering over the data, some prototypes might end up with a associated empty cluster. Displaying the size of each cluster gives sometimes an idea of the topology of the data set by emphasising dense or empty area. Figure \ref{figure:hitmap} gives an example of such a display.
+\begin{figure}[htbp]
+  \centering
+<<fig=TRUE,echo=TRUE>>=
+hitMap(som,col="blue")
+@
+  \caption{Size of the clusters associated to each prototype}
+  \label{figure:hitmap}
+\end{figure}
+While two classes where quite obvious in the previous figures, the picture is not so clear here. It seems that the left class might be quite dense and separated from the right one by many empty cells (prototypes with empty cluster) but the right class seem also to have a substructure that what not clear on the other figures.
+
+Another very interesting source of information on the original data is distribution of distances between prototypes in the fitted SOM. The u-matrix and its numerous variations gives a visual representation of this distribution, as shown on Figure \ref{figure:smoothumatrix}.
+\begin{figure}[htbp]
+  \centering
+<<fig=TRUE,echo=TRUE>>=
+pdist <- prototype.distances(som)
+pgrid <- distance.grid(pdist)
+filled.contour(pgrid)
+@
+  \caption{A type of U-matrix}
+  \label{figure:smoothumatrix}
+\end{figure}
+This representation confirms the existence of two classes in the data and also the presence of some sub-structure in the largest class (on the right part of all figures).
+
+\end{document}
+

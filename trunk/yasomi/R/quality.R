@@ -1,10 +1,26 @@
-error.kaskilagus <- function(som,data) {
-    pre <- KaskiLagus(som,data)
+error.kaskilagus <- function(som,newdata) {
+    if(missing(newdata)) {
+        if(is.null(som$data)) {
+            stop("cannot compute the quality measure without saved data or new data")
+        }
+        newdata <- som$data
+    }
+    pre <- KaskiLagus(som,newdata)
     mean(pre$quant+pre$path)
 }
 
-error.quantisation <- function(som,data) {
-    bmu(som$prototypes,data)$error
+## works partially for relationSOM
+error.quantisation <- function(som,newdata) {
+    if(missing(newdata)) {
+        som$errors[length(som$errors)]
+    } else {
+        newdata <- as.matrix(newdata)
+        ## this is also verified in bmu
+        if(ncol(newdata) != ncol(som$prototypes)) {
+            stop("'newdata' and 'som$prototypes' have different dimensions")
+        }
+        bmu(som$prototypes,newdata)$error
+    }
 }
 
 ## numerical SOM

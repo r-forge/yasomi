@@ -1,3 +1,32 @@
+2008-03-12  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* NAMESPACE: added plot.somtune S3 method
+
+	* R/tune.R (som.tune): som.tune now returns an object of class "somtune" which contains a copy of its control parameter, as well as the quantisation error made by the algorithm and copies of the parameters used to fit the SOM
+	(plot.somtune): rudimentary plotting functions from som.tune result
+
+2008-03-11  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* inst/doc/yasomi.Rnw: started to write on an introduction to Yasomi
+
+	* man/batchsom.Rd: fixed a small documentation problem
+
+	* man/error.kaskilagus.Rd: documention updated according to the new semantic for newdata
+
+	* R/quality.R (error.kaskilagus): the second parameter is now newdata and is used to specify generalisation data. If missing data saved in the som object are used (if available).
+
+	* man/error.quantisation.Rd: documention updated according to the new semantic for newdata
+
+	* R/quality.R (error.quantisation): the second parameter is now newdata and is used to specify generalisation data
+
+2008-03-10  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/relational.R (batchsom.dist): save the data in the result list
+
+	* man/batchsom.Rd: the data is saved if keepdata=TRUE
+
+	* R/som.R (batchsom.default): save the data in the result list
+
 2007-12-24  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
 
 	* TODO: demos are ok

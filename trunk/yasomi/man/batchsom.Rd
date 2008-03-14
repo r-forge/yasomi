@@ -8,11 +8,11 @@ batch algorithm. This is a generic method with a default implementation
 for standard data.
 }
 \usage{
-batchsom(data, somgrid, prototypes=sominit(data,somgrid),
+batchsom(data, somgrid, \dots)
+\method{batchsom}{default}(data, somgrid, prototypes=sominit(data,somgrid),
          assignment = c("single", "heskes"),radii,nbRadii=30,
          maxiter = 75,kernel=c("gaussian","linear"),normalised,
-         cut = 1e-07, verbose = FALSE,...)
-\method{batchsom}{default}
+         cut = 1e-07, verbose = FALSE, keepdata = TRUE, \dots)
 }
 \arguments{
   \item{data}{the data to which the SOM will be fitted. This can be,
@@ -37,6 +37,8 @@ batchsom(data, somgrid, prototypes=sominit(data,somgrid),
   \item{cut}{minimal value below wich neighbouring interactions are not
     take into account}
   \item{verbose}{switch for tracing the fitting process}
+  \item{keepdata}{if \code{TRUE}, the original data are returned as
+    part of the result object}
   \item{...}{arguments to be passed to methods}
 }
 \details{
@@ -46,7 +48,7 @@ case, it is recommended to use the \code{"single"} assignment method
 which seems to perform better in general. 
 }
 \value{
-  An object of class \code{"som"}, a list with components
+  An object of class \code{"som"}, a list with components including
   \item{somgrid}{as in the arguments to \code{batchsom}}
   \item{prototypes}{a matrix containing the coordinates of the
     prototypes (also called the code book vectors)}
@@ -54,6 +56,8 @@ which seems to perform better in general.
     observation has been assigned}
   \item{errors}{a vector containing the evolution of the quantisation
     error during the fitting process}
+  \item{data}{the original data if the function is called with
+    \code{keepdata = TRUE}}
 }
 %\references{ ~put references to the literature/web site here ~ }
 \author{Fabrice Rossi}

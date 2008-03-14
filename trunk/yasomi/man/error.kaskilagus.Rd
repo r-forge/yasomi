@@ -9,16 +9,21 @@ quantisation error and a type of continuity (i.e., close observations
 in the original space should be mapped to close units in the grid).
 }
 \usage{
-error.kaskilagus(som, data)
+error.kaskilagus(som, newdata)
 }
 \arguments{
   \item{som}{an object of class \code{"som"}}
-  \item{data}{a matrix or a data frame of observations}
+  \item{newdata}{an optional matrix or a data frame of observations}
 }
 %\details{
 %}
 \value{
-  The value of the error.
+  If \code{newdata} is not given, the function returns the error made by
+  the fitted som on the data used to fit it. Those data must have been
+  saved in the som object (this is the default behavior of
+  \code{\link{batchsom}}). When \code{newdata} is specified, the
+  function returns the error made by the fitted som on the corresponding
+  data.
 }
 \references{
   Kaski, S. and Lagus, K. (1996) Comparing self-organizing maps, in:
@@ -38,7 +43,7 @@ data <- scale(iris[1:4])
 sg <- somgrid(xdim=15,ydim=15,topo="hex")
 
 # choose a good SOM via Kaski and Lagus' error measure
-st <- som.tune(data,sg,som.tunecontrol(sg,,criterion=error.kaskilagus))
+st <- som.tune(data,sg,som.tunecontrol(sg,criterion=error.kaskilagus))
 som <- st$best.som
 
 # and display the prototypes
