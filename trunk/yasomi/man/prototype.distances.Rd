@@ -10,7 +10,7 @@ Self-Organising Map (SOM) for neighbouring units in the prior structure.
 }
 \usage{
 prototype.distances(som)
-\method{as.matrix}{sompdist}(x, extended = TRUE, ...)
+\method{as.matrix}{sompdist}(x, extended = TRUE, \dots)
 \method{as.dist}{sompdist}(x, FUN = NULL)
 }
 \arguments{

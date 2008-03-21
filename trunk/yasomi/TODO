@@ -1,10 +1,9 @@
 BUGS or problems:
-- componentPlane should not be aplicable to relationasom
+- componentPlane should not be aplicable to relationalsom
 - somtune must become more generic
 - fix parameter order in lowlevel functions
-- batchsom.Rd must be updated
+- batchsom.Rd must splitted into batchsom.Rd and batchsom.default.Rd
 - fix the content of som$errors: make sure the last value is always the final quantisation error
-- unify initialization methods
 
 - coding conventions
 - C implementation of slow functions:
@@ -22,9 +21,11 @@ BUGS or problems:
 - torus topography?
 - classif or cluster in results?
 
++ initialisation methods
+  - add randomness in PCA initialisation
+
 + relational SOM
   - use an object oriented approach where possible
-  - initialisation method
   - documentation:
     - write new documentation
     - adapt existing ones
@@ -56,8 +57,11 @@ BUGS or problems:
   - number of initial radii based on the map size
 
 + documentation
-  - use \dots instead of ...
-  - write a vignette or an introduction
+  - write vignettes:
+    - general introduction
+    - dissimilarity som
+    - graphical methods
+  - add a package doc
   - add original references in graphical methods (in addition to Vesanto's thesis) 
   - componentPlane: add details
   - error.kaskilagus: add details
@@ -77,11 +81,13 @@ BUGS or problems:
 
 Done in version 0.2:
 - relational SOM (first version with optimal algorithm but no implementation tricks)
+- relational SOM can be initialised via a PCA like method
 - grid2lines is now applicable to any matrix with the correct number of rows 
 - generic (S3) functions for batchsom, sominit and protoDist: most of the analysis and display functions can be used form standard SOM and for relational SOM
 - the original data are saved in the batchsom result
 - introduction to the package via a vignette
 - som.tune returns now an object that can be plotted in some simple situations (only one parameter is modified during tuning)
+- unified initialisation interface via two generic methods (sominit.pca and sominit.random)
 
 
 Done in version 0.1:

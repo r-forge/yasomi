@@ -6,7 +6,7 @@ Plot a glyph based rendering of the prototypes of a Self-Organising Map.
 Each glyph is positioned thanks to the prior structure. 
 }
 \usage{
-\method{plot}{somnum}(x,y,...)
+\method{plot}{somnum}(x, y, \dots)
 }
 \arguments{
   \item{x}{an object of class \code{"somnum"}}

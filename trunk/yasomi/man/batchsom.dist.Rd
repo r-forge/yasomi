@@ -1,28 +1,26 @@
-\name{batchsom}
-\alias{batchsom}
-\alias{batchsom.default}
-\title{Fit a Self-Organising Map to some data}
+\name{batchsom.dist}
+\alias{batchsom.dist}
+\title{Fit a Self-Organising Map to dissimilarity data}
 \description{
-\code{batchsom} is used to fit a Self-Organising Map to some data, using a
-batch algorithm. This is a generic method with a default implementation
-for standard data.
+\code{batchsom.dist} is used to fit a Self-Organising Map to
+dissimilarity data.
 }
 \usage{
-batchsom(data, somgrid, prototypes, \dots)
-\method{batchsom}{default}(data, somgrid, prototypes,
+\method{batchsom}{dist}(data, somgrid, prototypes,
          assignment = c("single", "heskes"),radii,nbRadii=30,
          maxiter = 75,kernel=c("gaussian","linear"),normalised,
-         cut = 1e-07, verbose = FALSE, keepdata = TRUE, \dots)
+         cut = 1e-07, verbose = FALSE, keepdata = TRUE,
+         lowlevel=fastRelationalsom.lowlevel.R,\dots)
 }
 \arguments{
-  \item{data}{the data to which the SOM will be fitted. This can be,
-    e.g., a matrix or data frame of observations (which should be scaled), or a
-    distance matrix}
+  \item{data}{the data to which the SOM will be fitted represented by a
+    dissimilarity matrix (an object of class \code{"dist"} from the
+    \code{proxy} package) with all pairwise dissimilarities between the
+    observations.}
   \item{somgrid}{an object of class \code{"somgrid"} that specifies the prior
     structure of the Self-Organising Map: see \code{\link{somgrid}} }
   \item{prototypes}{a matrix of initial values for the
-    prototypes. If missing, initial prototypes are chosen according via
-    a default method that depends on the data type (see details)}
+    prototypes. If missing chosen by \code{\link{sominit.random.dist}}}
   \item{assignment}{the assignment method used to compute the best
     matching unit of an observation during training}
   \item{radii}{the radii of the neighbourhoods used during training. If
@@ -40,29 +38,29 @@ batchsom(data, somgrid, prototypes, \dots)
   \item{verbose}{switch for tracing the fitting process}
   \item{keepdata}{if \code{TRUE}, the original data are returned as
     part of the result object}
-  \item{\dots}{arguments to be passed to methods}
+  \item{lowlevel}{the underlying low level implementation of the method
+    (don't use this parameter, it's here only during the development process)}
+  \item{\dots}{not used}
 }
 \details{
-The default method is the standard batch algorithm for Self-Organising
-Map. It applies to a matrix or a data frame of observations. In this
-case, it is recommended to use the \code{"single"} assignment method
-which seems to perform better in general. If the initial value of
-\code{prototypes} is not provided, it is obtained by a call to
-\code{\link{sominit.pca.default}}. 
+  This function implements the relational Self-Organising Map algorithm
+  in which virtual linear combination of the original data are used to
+  represent the prototypes. 
 }
 \value{
-  An object of class \code{"som"}, a list with components including
+  An object of class \code{"som"} and of class \code{"relationalsom"}, a
+  list with components including 
   \item{somgrid}{as in the arguments to \code{batchsom}}
-  \item{prototypes}{a matrix containing the coordinates of the
-    prototypes (also called the code book vectors)}
+  \item{prototypes}{a matrix containing the virtual coordinates of the
+    prototypes: each row of the matrix sums to one and can be
+    interpreted as the coefficients of a linear combination of the
+    original observations.}
   \item{classif}{a vector of integer indicating to which unit each
     observation has been assigned}
   \item{errors}{a vector containing the evolution of the quantisation
     error during the fitting process}
   \item{data}{the original data if the function is called with
     \code{keepdata = TRUE}}
-  In addition, for the default method, the object is also of class
-  \code{"somnum"}. 
 }
 %\references{ ~put references to the literature/web site here ~ }
 \author{Fabrice Rossi}
@@ -70,7 +68,8 @@ which seems to perform better in general. If the initial value of
 %
 % ~Make other sections like Warning with \section{Warning }{....} ~
 %}
-\seealso{See \code{\link{sominit.pca}} and \code{\link{sominit.random}}
+\seealso{See \code{\link{sominit.pca.dist}} and
+  \code{\link{sominit.random.dist}} 
   for some control on the initial configuration of the prototypes, \code{\link{som.tune}} for the optimisation of some magic
   parameters (such as the radii), \code{\link{umatrix}} and
   \code{\link{distance.grid}} for visual analysis of the distances
@@ -78,7 +77,7 @@ which seems to perform better in general. If the initial value of
 \examples{
 data(iris)
 # scaling
-data <- scale(iris[1:4])
+data <- dist(scale(iris[1:4]))
 
 # a small hexagonal grid
 sg <- somgrid(xdim=7,ydim=7,topo="hex")
@@ -86,7 +85,7 @@ sg <- somgrid(xdim=7,ydim=7,topo="hex")
 # fit the SOM
 som <- batchsom(data,sg)
 
-# and display the prototypes
-plot(som)
+# and display the umatrix
+umatrix(som)
 }
 \keyword{cluster}

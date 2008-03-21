@@ -6,7 +6,7 @@ Map new data to a fitted Self-Organising Map, i.e., compute the best
 matching unit for each given observation. 
 }
 \usage{
-\method{predict}{somnum}(object, newdata, ...)
+\method{predict}{somnum}(object, newdata, \dots)
 }
 \arguments{
   \item{object}{an object of class \code{"somnum"}}

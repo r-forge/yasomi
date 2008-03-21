@@ -38,24 +38,28 @@ bmu.heskes.R <- function(prototypes,data,nv) {
     result
 }
 
-batchsom.R <- function(data,somgrid,prototypes=sominit(data,somgrid),
+batchsom.R <- function(data,somgrid,prototypes,
                        assignment=c("single","heskes"),radii,nbRadii,
                        maxiter=75,
                        kernel=c("gaussian","linear"),normalised,
                        cut=1e-7,verbose=FALSE) {
-    ## process parameters
+    ## process parameters and perform a few sanity checks
     assignment <- match.arg(assignment)
     if(missing(normalised)) {
         normalised <- assignment=="heskes"
     }
     kernel <- match.arg(kernel)
     theKernel <- switch(kernel,"gaussian"=kernel.gaussian,"linear"=kernel.linear)
-    ## perform a few sanity checks
-    if(ncol(prototypes)!=ncol(data)) {
-        stop("'prototypes' and 'data' have different dimensions")
-    }
     if(class(somgrid)!="somgrid") {
         stop("'somgrid' is not of somgrid class")
+    }
+    if(missing(prototypes)) {
+        ## default initialisation is based on pca
+        prototypes <- sominit.pca(data,somgrid)
+    } else {
+        if(ncol(prototypes)!=ncol(data)) {
+            stop("'prototypes' and 'data' have different dimensions")
+        }
     }
     ## distances?
     if(is.null(somgrid$dist)) {

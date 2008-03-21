@@ -10,10 +10,14 @@ protoDist <- function(som,i,j,k,l) {
 
 ## in som.R (slow-versions.R) and relational.R (slow-relational.R)
 
-sominit <- function(data,somgrid,...) {
-    UseMethod("sominit")
+sominit.pca <- function(data,somgrid,...) {
+    UseMethod("sominit.pca")
 }
 
-batchsom <- function(data,somgrid,...) {
+sominit.random <- function(data,somgrid,method=c("prototypes","random","cluster"),...) {
+    UseMethod("sominit.random")
+}
+
+batchsom <- function(data,somgrid,prototypes,...) {
     UseMethod("batchsom")
 }

@@ -8,8 +8,8 @@
   fitted to a dataset.  
 }
 \usage{
-\method{print}{som}(x, ...)
-\method{summary}{som}(object, ...)
+\method{print}{som}(x, \dots)
+\method{summary}{som}(object, \dots)
 }
 \arguments{
   \item{x,object}{an object of class \code{"som"}}

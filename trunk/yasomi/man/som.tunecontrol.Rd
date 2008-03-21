@@ -16,8 +16,8 @@ som.tunecontrol(somgrid, init = "pca", ninit = 1, assignment = "single",
   \item{init}{prototypes initialization method. Valid values are \code{"pca"}
     and \code{"random"}. The former 
     corresponds to principal component based initialization (see
-    \code{\link{sominit.default}}), while the latter uses randomly selected
-  observations as initial values for the prototypes}
+    \code{\link{sominit.pca}}), while the latter uses randomly selected
+  observations as initial values for the prototypes (see \code{\link{sominit.random}})}
   \item{ninit}{number of initial prototype values to test (only relevant
   for \code{init="random"})}
   \item{assignment}{assignment method with valid values \code{"single"} and

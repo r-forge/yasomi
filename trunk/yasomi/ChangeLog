@@ -1,3 +1,81 @@
+2008-03-16  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/sominit.pca.default.Rd: new documentation for the default implementation
+
+	* man/sominit.pca.Rd: describe only the method
+
+	* man/sominit.pca.dist.Rd: new documentation for the specific case of relational SOM pca based initialisation
+
+	* R/relational.R (sominit.pca.dist): Added a pca (mds) based initialisation for relational SOMs
+
+	* inst/doc/yasomi.Rnw: Added a comparison with PCA and additional visual based on PCA
+
+2008-03-15  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/batchsom.dist.Rd: new documentation for the relational som
+
+	* demo/som-two-dim.R: used the somtune plot method
+
+	* demo/som-iris.R: used the somtune plot method
+
+	* inst/doc/yasomi.Rnw: added an example of additional variable plotting
+
+	* R/slow-versions.R (batchsom.R): used the new initialisation method
+
+	* man/umatrix.Rd: \dots rather than ...
+
+	* man/sominit.random.Rd: updated documentation to follow the new code
+
+	* man/som.tunecontrol.Rd: fixed link to initialisation method
+
+	* man/somgrid.Rd: \dots rather than ...
+
+	* man/prototype.distances.Rd: \dots rather than ...
+
+	* man/print.som.Rd: \dots rather than ...
+
+	* man/predict.somnum.Rd: \dots rather than ...
+
+	* man/plot.sompdist.Rd: \dots rather than ...
+
+	* man/plot.somnum.Rd: \dots rather than ...
+
+	* man/plot.somgrid.Rd: \dots rather than ...
+
+	* man/hitMap.Rd: \dots rather than ...
+
+	* man/componentPlane.Rd: \dots rather than ...
+
+	* man/batchsom.Rd: updated to follow the new code
+
+	* R/som.R (sominit.random.default): extended to provide similar options as the relational one
+
+	* man/sominit.pca.Rd: updated documentation for the PCA based initialisation method
+
+	* R/tune.R (som.tune): new names for initialisation methods
+
+2008-03-14  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/relational.R (batchsom.dist): prototypes is now a parameter with no default value
+
+	* R/som.R (sominit.random.default): new name
+
+	* R/generic.R (sominit.random): sominit.random is now a generic function
+
+	* R/relational.R (sominit.random.dist): new name
+
+	* NAMESPACE: sominit.random is now a generic function
+
+	* R/som.R (sominit.random.default): renamed somRandomInit to sominit.random
+
+	* NAMESPACE: renamed sominit to sominit.pca
+
+	* R/generic.R (sominit.pca): renamed sominit to sominit.pca
+
+	* R/relational.R (sominit.pca.dist): renamed sominit to sominit.pca
+
+	* R/som.R (sominit.pca.default): renamed sominit to sominit.pca
+
 2008-03-12  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
 
 	* NAMESPACE: added plot.somtune S3 method

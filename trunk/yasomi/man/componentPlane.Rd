@@ -8,7 +8,7 @@ colored according to the value of the chosen coordinate of the
 associated prototype.  
 }
 \usage{
-componentPlane(som, dim = 1, ...)
+componentPlane(som, dim = 1, \dots)
 }
 \arguments{
   \item{som}{an object of class \code{"somnum"}}

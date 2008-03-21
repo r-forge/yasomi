@@ -6,7 +6,7 @@
   between prototypes of neighbouring units of a fitted Self-Organising Map.
 }
 \usage{
-\method{plot}{sompdist}(x, mode=c("mean","full"), ...)
+\method{plot}{sompdist}(x, mode=c("mean","full"), \dots)
 }
 
 \arguments{
@@ -67,7 +67,7 @@ data <- scale(iris[1:4])
 sg <- somgrid(xdim=15,ydim=15,topo="hex")
 
 # choose a good SOM via Kaski and Lagus' error measure
-st <- som.tune(data,sg,som.tunecontrol(sg,,criterion=error.kaskilagus))
+st <- som.tune(data,sg,som.tunecontrol(sg,criterion=error.kaskilagus))
 som <- st$best.som
 
 # compute the distance

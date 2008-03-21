@@ -1,4 +1,4 @@
-sominit.default <- function(data,somgrid,...) {
+sominit.pca.default <- function(data,somgrid,...) {
     ## we don't scale the data
     data.pca <- prcomp(data)
     ## the more detailled axis is assigned to the first eigenvector
@@ -30,12 +30,29 @@ sominit.default <- function(data,somgrid,...) {
     sweep(mapped,2,data.pca$center,"+")
 }
 
-somRandomInit <- function(data,somgrid) {
+sominit.random.default <- function(data,somgrid,
+                                   method=c("prototypes","random","cluster"),...) {
+    method <- match.arg(method)
     data <- as.matrix(data)
-    if(nrow(data)>=somgrid$size) {
-        data[sample(1:nrow(data),size=somgrid$size),]
+    dim <- nrow(data)
+    nb <- somgrid$size
+    if(method=="prototypes" || (method=="cluster" && nb>=dim)) {
+        data[sample(1:nrow(data),size=somgrid$size,replace=nb>dim),]
+    } else if(method=="random") {
+        result <- matrix(0,ncol=ncol(data),nrow=nb)
+        for(i in 1:ncol(data)) {
+            therange <- range(data[,i])
+            result[,i] <- runif(nb,min=therange[1],max=therange[2])
+        }
+        result
     } else {
-        data[sample(1:nrow(data),size=somgrid$size,replace=TRUE),]
+        ## nb <dim
+        clusters <- cut(sample(1:dim),nb,labels=FALSE,include.lowest=TRUE)
+        result <- matrix(0,ncol=ncol(data),nrow=nb)
+        for(i in 1:nb) {
+            result[i,] <- colMeans(data[clusters==i,])
+        }
+        result
     }
 }
 
@@ -101,13 +118,13 @@ radius.lin <- function(min,max,steps) {
     seq(max,min,length.out=steps)
 }
 
-batchsom.default <- function(data,somgrid,prototypes=sominit(data,somgrid),
+batchsom.default <- function(data,somgrid,prototypes,
                      assignment=c("single","heskes"),radii,nbRadii=30,
                      maxiter=75,
                      kernel=c("gaussian","linear"),
                      normalised,
                      cut=1e-7,verbose=FALSE,keepdata=TRUE,...) {
-    ## process parameters
+    ## process parameters and perform a few sanity checks
     assignment <- match.arg(assignment)
     if(missing(normalised)) {
         normalised <- assignment=="heskes"
@@ -115,12 +132,16 @@ batchsom.default <- function(data,somgrid,prototypes=sominit(data,somgrid),
     theRule <- switch(assignment,"single"=0,"heskes"=1)
     kernel <- match.arg(kernel)
     kernelType <- switch(kernel,"gaussian"=0,"linear"=1)
-    ## perform a few sanity checks
-    if(ncol(prototypes)!=ncol(data)) {
-        stop("'prototypes' and 'data' have different dimensions")
-    }
     if(class(somgrid)!="somgrid") {
         stop("'somgrid' is not of somgrid class")
+    }
+    if(missing(prototypes)) {
+        ## default initialisation is based on pca
+        prototypes <- sominit.pca(data,somgrid)
+    } else {
+        if(ncol(prototypes)!=ncol(data)) {
+            stop("'prototypes' and 'data' have different dimensions")
+        }
     }
     ## distances?
     if(is.null(somgrid$dist)) {

@@ -7,7 +7,7 @@ The prior structure is represented by a regular grid of hexagons or
 squares.  The surface of each element is proportional to the square root of the number of observations assigned to the corresponding unit in the SOM.
 }
 \usage{
-hitMap(som,border=NA,with.cells=TRUE, ...)
+hitMap(som,border=NA,with.cells=TRUE, \dots)
 }
 \arguments{
   \item{som}{an object of class \code{"som"}}

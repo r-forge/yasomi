@@ -1,7 +1,7 @@
 # relational SOM
 
-sominit.dist <- function(data,somgrid,
-                         method=c("prototypes","random","cluster"),...) {
+sominit.random.dist <- function(data,somgrid,
+                                method=c("prototypes","random","cluster"),...) {
     method <- match.arg(method)
     dim <- nrow(data)
     nb <- somgrid$size
@@ -21,28 +21,15 @@ sominit.dist <- function(data,somgrid,
     protos
 }
 
-relationalsomPCAInit <- function(d,somgrid) {
-    ## we need to do the PCA of the distance matrix d
-    ## cmdscale provides the calculation but doesn't send back the eigenvectors
-    ## so we partially replicate its code here (in pure R)
+sominit.pca.dist <- function(data, somgrid, nbsupport=3,
+                             type=c("closest","random"),...) {
+    type <- match.arg(type)
+    ## the distance matrix PCA is implemented in cmdscale
+    data.cmd <- cmdscale(data)
+    sdev <- sd(data.cmd)
 
-    ## from cmdscale
-    x <- as.matrix(d^2,diag=0)
-    n <- nrow(x)
-    if(n != ncol(x)) {
-        stop("distances must be result of 'dist' or a square matrix")
-    }
-    ## double centering
-    x.rowmeans <- rowMeans(x)
-    x.mean <- mean(x.rowmeans)
-    x <- x + x.mean - outer(x.rowmeans,x.rowmeans,"+")
-    ## eigen analysis
-    e <- eigen(-x/2, symmetric = TRUE)
-    ## end of the copied code
-
-    sdev <- sqrt(e$values[1:2])
-
-    ## the more detailled axis is assigned to the first eigenvector
+    ## the more detailled axis is assigned to the axis with the largest
+    ## standard deviation
     if (somgrid$xdim>=somgrid$ydim) {
         x.ev <- 1
         y.ev <- 2
@@ -66,9 +53,30 @@ relationalsomPCAInit <- function(d,somgrid) {
         base[,1] <- base[,1]+rep(c(0,2*sdev[x.ev]/xspan),each=somgrid$xdim,length.out=nrow(base))
     }
     ## map back the grid to the dissimilarity space
-    ## FIXME: this is not the correct way to do that
-    mapped <- tcrossprod(base,e$vectors[,c(x.ev,y.ev)])
-    mapped
+    ## this done by finding a barycentric representation for each point of the
+    ## grid (this is slow but still very quick compared to cmscale)
+    if(type=="closest") {
+        dbd <- dist(base,data.cmd)
+        winners <- t(apply(dbd,1,order))[,1:nbsupport]
+    }
+    prototypes <- matrix(0,ncol=nrow(data.cmd),nrow=nrow(base))
+    for(i in 1:nrow(base)) {
+        target <- matrix(c(base[i,],1),ncol=1)
+        if(type=="closest") {
+            winner <- winners[i,]
+        } else {
+            winner <- sample(1:(nrow(data.cmd)),size=nbsupport)
+        }
+        H <- rbind(t(data.cmd[winner,]),rep(1,nbsupport))
+        if(nbsupport==3) {
+            weights <- solve(H,target)
+        } else {
+            H.svd <- svd(H)
+            weights <- H.svd$v%*%diag(1/H.svd$d)%*%crossprod(H.svd$u,target)
+        }
+        prototypes[i,winner] <- weights
+    }
+    prototypes
 }
 
 fastRelationalBMU.R <- function(cluster,nclust,diss,nv) {
@@ -195,14 +203,13 @@ fastRelationalsom.lowlevel.R <- function(somgrid,diss,prototypes,
     res
 }
 
-batchsom.dist <- function(data,somgrid,
-                          prototypes=sominit(data,somgrid),
-                          assignment=c("single","heskes"),radii,nbRadii,
+batchsom.dist <- function(data,somgrid,prototypes,
+                          assignment=c("single","heskes"),radii,nbRadii=30,
                           maxiter=75,
                           kernel=c("gaussian","linear"),normalised,
                           cut=1e-7,verbose=FALSE,keepdata=TRUE,
                           lowlevel=fastRelationalsom.lowlevel.R,...) {
-    ## process parameters
+    ## process parameters and perform a few sanity checks
     if(verbose) {
         print(match.call())
     }
@@ -212,13 +219,17 @@ batchsom.dist <- function(data,somgrid,
     }
     kernel <- match.arg(kernel)
     theKernel <- switch(kernel,"gaussian"=kernel.gaussian,"linear"=kernel.linear)
-    diss <- as.matrix(data^2,diag=0)
-    ## perform a few sanity checks
-    if(ncol(prototypes)!=ncol(diss)) {
-        stop("'prototypes' and 'diss' have different dimensions")
-    }
     if(class(somgrid)!="somgrid") {
         stop("'somgrid' is not of somgrid class")
+    }
+    diss <- as.matrix(data^2,diag=0)
+    if(missing(prototypes)) {
+        ## default initialisation is random based
+        prototypes <- sominit.random(data,somgrid)
+    } else {
+        if(ncol(prototypes)!=ncol(diss)) {
+            stop("'prototypes' and 'diss' have different dimensions")
+        }
     }
     ## distances?
     if(is.null(somgrid$dist)) {

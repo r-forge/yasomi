@@ -12,7 +12,7 @@ somT <- som.tune(data,sg,som.tunecontrol(sg,radii=c(2,sg$diam),nradii=20,criteri
 
 # and displaying the results
 
-plot(somT$errors,type="h")
+plot(somT)
 
 som <- somT$best.som
 

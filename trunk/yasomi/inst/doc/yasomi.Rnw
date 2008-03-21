@@ -7,16 +7,14 @@
 \documentclass[a4paper]{article}
 
 \begin{document}
-\title{Yet Another Self Organising Map Implementation}
+\title{An introduction to YASOMI (Yet Another Self Organising Map Implementation)}
 \author{Fabrice Rossi}
 
 \maketitle
 
-\section{Introduction}
 The yasomi package aims at providing a complete implementation of Self Organising Maps (SOMs) adapted to both standard numerical data and to more complex data described via a dissimilarity matrix or a kernel matrix. Yasomi tries to include a broad selection of SOM based state of the art visualisation methods. It also provides automated data driven construction methods for SOMs.
 
-\section{A simple demonstration}
-The following example provide a demonstration of the main features of yasomi. The SOM algorithm is based on the Euclidean norm and assumes therefore isotropy in the data space. As a consequence, it is advisable to scale the data under analysis, unless some prior knowledge suggests to emphasise one or several variables.
+The following example provides a demonstration of the main features of yasomi. The SOM algorithm is based on the Euclidean norm and assumes therefore isotropy in the data space. As a consequence, it is advisable to scale the data under analysis, unless some prior knowledge suggests to emphasise one or several variables.
 <<>>=
 library(yasomi)
 data <- scale(iris[1:4])
@@ -103,7 +101,44 @@ hitMap(som,col="blue")
 \end{figure}
 While two classes where quite obvious in the previous figures, the picture is not so clear here. It seems that the left class might be quite dense and separated from the right one by many empty cells (prototypes with empty cluster) but the right class seem also to have a substructure that what not clear on the other figures.
 
-Another very interesting source of information on the original data is distribution of distances between prototypes in the fitted SOM. The u-matrix and its numerous variations gives a visual representation of this distribution, as shown on Figure \ref{figure:smoothumatrix}.
+Other cluster based information can be displayed, for instance the distribution of the values taken by a variable in each of the clusters defined by the SOM. This is especially interesting if the variable was not used to build the SOM. In the present example, the Species variable of the Iris dataset was not used. When the distribution of this variable in each cluster is concentrated (in the best case, the variable has a constant value in each cluster), the SOM has managed to follow the class distribution using only the numerical characteristics of the flowers. This is roughly the case in the optimal SOM, has shown on Figure \ref{figure:class}. One of the cluster identified in the previous analysis corresponds to one of the original class, while the second cluster is the union of the two other classes. Those two classes appear quite well separated except for a few clusters.
+\begin{figure}[htbp]
+  \centering
+<<fig=TRUE,echo=TRUE>>=
+plot(som,iris[[5]])
+@
+  \caption{Distribution of an additional variable (here the Species variable of the Iris dataset)}
+  \label{figure:class}
+\end{figure}
+
+As a comparison, Figure \ref{figure:pca} shows a related analysis conducted via principal component analysis (PCA). More precisely, a PCA is conducted on the Iris data using the numerical variables only while the Species variable is used to colour the projected points. While the results are quite comparable, especially regarding the presence of two clearly separated clusters and the near separability between the two classes that form the second cluster, a few differences can be spotted. All in one, the SOM seems to give more weight to the idea that the three classes can be separated easily than the PCA. There is some interleaving in the classes in the SOM (especially a small blue cluster in the middle of green clusters) while the PCA shows a more complex boundary between the two classes. As the PCA projects the observations, it introduces spurious neighbourhood relationships between some points. The SOM generally respects more the original topology. In this particular example, the SOM is therefore able to give a better picture of the original structure of the dataset.
+\begin{figure}[htbp]
+  \centering
+<<fig=TRUE,echo=TRUE>>=
+iris.pca <- prcomp(data)
+plot(iris.pca$x,pch=20,
+     col=c("red","green","blue")[unclass(iris[[5]])])
+@
+  \caption{Principal Component Analysis applied to the Iris dataset}
+  \label{figure:pca}
+\end{figure}
+
+Another way of viewing the results of the SOM is to compute a PCA on the prototypes obtained by the SOM and to use it to display both the data and the prototypes (one can also use a non linear projection method). Figure \ref{figure:pcavssom} is obtained with this approach. The black dots are the prototypes and the lines between them display the direct neighbourhood relationship enforced by the prior structure.
+\begin{figure}[htbp]
+  \centering
+<<fig=TRUE,echo=TRUE>>=
+som.pca <- prcomp(som$prototypes)
+data.pca <- predict(som.pca,data)
+plot(data.pca,pch=20,xlim=range(data.pca[,1],som.pca$x[,1]),
+     ylim=range(data.pca[,2],som.pca$x[,2]),
+     col=c("red","green","blue")[unclass(iris[[5]])])
+lines(grid2lines(som,som.pca$x),type="b",pch=20)
+@
+  \caption{Principal Component Analysis display of the prototypes of the fitted SOM}
+  \label{figure:pcavssom}
+\end{figure}
+
+One limitation of the grid based display of the SOM is that the distances between clusters in those representations are arbitrary while the distances between prototypes in the original space provide insights on the relation between those clusters. The u-matrix and its numerous variations gives a visual representation of the distribution of those distances, as shown on Figure \ref{figure:smoothumatrix}.
 \begin{figure}[htbp]
   \centering
 <<fig=TRUE,echo=TRUE>>=

@@ -9,8 +9,8 @@
 }
 \usage{
 somgrid(xdim, ydim, topo = c("rectangular", "hexagonal"),with.dist = TRUE)
-\method{print}{somgrid}(x, ...)
-\method{summary}{somgrid}(object, ...)
+\method{print}{somgrid}(x, \dots)
+\method{summary}{somgrid}(object, \dots)
 }
 \arguments{
   \item{xdim}{the horizontal dimension of the grid}
