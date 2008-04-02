@@ -18,6 +18,6 @@ sominit.random <- function(data,somgrid,method=c("prototypes","random","cluster"
     UseMethod("sominit.random")
 }
 
-batchsom <- function(data,somgrid,prototypes,...) {
+batchsom <- function(data,somgrid,init,prototypes,...) {
     UseMethod("batchsom")
 }

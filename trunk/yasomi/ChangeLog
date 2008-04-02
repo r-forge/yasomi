@@ -1,3 +1,47 @@
+2008-04-02  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/batchsom.default.Rd: renamed from batchsom.Rd to batchsom.default.Rd, and started to fix the documentation according to the new initialisation scheme
+
+	* man/batchsom.dist.Rd: started to fix the documentation according to the new initialisation scheme
+
+	* R/relational.R (batchsom.dist): moved to the new initialisation scheme
+
+	* R/slow-versions.R (batchsom.R): fixed a few inconsistancies between the slow pure R version and the optimized one
+
+	* R/som.R (sominit.random.default): fixed a small bug when a cluster contains only one member
+	(batchsom.default): moved to the new initialisation scheme
+
+	* R/generic.R (batchsom): new parameter init to specify the initialisation method rather than the initial prototypes
+
+2008-03-27  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/som.R (as.dist.somnum): distance matrice between the prototypes
+
+	* R/relational.R (as.dist.relationalsom): distance matrice between the prototypes
+
+	* man/yasomi.Rd (Depends): fixed a small bug preventing latex compilation
+
+	* man/plot.som.Rd: renamed from plot.somnum.Rd to plot.som.Rd (content must be updated).
+
+	* R/graphics.R (componentPlane): applicable only to numerical SOMs
+	(plot.som): extended to relationalsom when a second parameter is given
+
+	* R/som.R (print.somnum, summary.somnum): new methods (which delegate to the standard ones)
+
+	* R/relational.R (summary.relationalsom, print.relationalsom): new methods (which delegate to the standard ones)
+
+	* R/slow-relational.R (relationalsom.lowlevel.R): correct order for classes
+
+	* R/relational.R (fastRelationalsom.lowlevel.R): correct order for classes
+
+	* R/som.R (batchsom.lowlevel): correct order for classes
+
+	* R/slow-versions.R (batchsom.lowlevel.R): correct order for classes
+
+	* inst/doc/introduction.Rnw: renamed yasomi.Rnw to introduction.Rnw
+
+	* R/relational.R (batchsom.dist): saved more information
+
 2008-03-16  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
 
 	* man/sominit.pca.default.Rd: new documentation for the default implementation

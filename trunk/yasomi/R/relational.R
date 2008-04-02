@@ -54,7 +54,7 @@ sominit.pca.dist <- function(data, somgrid, nbsupport=3,
     }
     ## map back the grid to the dissimilarity space
     ## this done by finding a barycentric representation for each point of the
-    ## grid (this is slow but still very quick compared to cmscale)
+    ## grid (this is slow but still very quick compared to cmdscale)
     if(type=="closest") {
         dbd <- dist(base,data.cmd)
         winners <- t(apply(dbd,1,order))[,1:nbsupport]
@@ -199,11 +199,11 @@ fastRelationalsom.lowlevel.R <- function(somgrid,diss,prototypes,
     nf <- bmus$nf
     res <- list(somgrid=somgrid,prototypes=prototypes,classif=classif,
                 errors=unlist(errors),Dalpha=t(Dalpha),nf=nf)
-    class(res) <- c("som","relationalsom")
+    class(res) <- c("relationalsom","som")
     res
 }
 
-batchsom.dist <- function(data,somgrid,prototypes,
+batchsom.dist <- function(data,somgrid,init=c("pca","random"),prototypes,
                           assignment=c("single","heskes"),radii,nbRadii=30,
                           maxiter=75,
                           kernel=c("gaussian","linear"),normalised,
@@ -224,8 +224,13 @@ batchsom.dist <- function(data,somgrid,prototypes,
     }
     diss <- as.matrix(data^2,diag=0)
     if(missing(prototypes)) {
-        ## default initialisation is random based
-        prototypes <- sominit.random(data,somgrid)
+        ## initialisation based on the value of init
+        init <- match.arg(init)
+        args <- list(...)
+        params <- c(list(data=data,somgrid=somgrid),list(...))
+        prototypes <- switch(init,
+                             "pca"=do.call("sominit.pca",params),
+                             "random"=do.call("sominit.random",params))
     } else {
         if(ncol(prototypes)!=ncol(diss)) {
             stop("'prototypes' and 'diss' have different dimensions")
@@ -246,8 +251,37 @@ batchsom.dist <- function(data,somgrid,prototypes,
     }
     pre <- lowlevel(somgrid,diss,prototypes,assignment,radii,maxiter,theKernel,
                     normalised,cut,verbose)
+    pre$assignment <- assignment
+    pre$kernel <- kernel
+    pre$normalised <- normalised
+    pre$radii <- radii
     if(keepdata) {
         pre$data  <- data
     }
     pre
+}
+
+summary.relationalsom <- function(object,...)
+{
+    cat("\nRelational Self-Organising Map\n\n")
+    NextMethod()
+}
+
+print.relationalsom <- function(x,...)
+{
+    cat("\nRelational Self-Organising Map\n\n")
+    NextMethod()
+}
+
+
+as.dist.relationalsom <- function(x,FUN=NULL) {
+    predist <- x$prototypes%*%x$Dalpha
+    thedist <- sweep(predist,1,x$nf,"-")
+    thedist <- sweep(thedist,2,x$nf,"-")
+    themin <- min(thedist)
+    if(themin < -sqrt(.Machine$double.eps)) {
+        warning(paste("Non negligible negative minimal values (",themin,") removed",sep=""))
+    }
+    thedist[thedist<0] <- 0
+    as.dist(sqrt(thedist))
 }

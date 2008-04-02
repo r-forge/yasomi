@@ -98,6 +98,9 @@ som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),
                             if(performances[confIndex]<bestPerfSoFar) {
                                 bestSOM <- som
                                 bestPerfSoFar <- performances[confIndex]
+                                if(verbose) {
+                                    print(paste("Best configuration so far",confIndex,"with error",bestPerfSoFar))
+                                }
                             }
                             if(!is.null(quantisation)) {
                                 quantisation[confIndex] <- error.quantisation(som)

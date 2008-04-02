@@ -90,7 +90,7 @@ relationalsom.lowlevel.R <- function(somgrid,diss,prototypes,
     nf <- 0.5*diag(prototypes%*%Dalpha)
     res <- list(somgrid=somgrid,prototypes=prototypes,classif=classif,
                 errors=unlist(errors),Dalpha=Dalpha,nf=nf)
-    class(res) <- c("som","relationalsom")
+    class(res) <- c("relationalsom","som")
     res
 }
 

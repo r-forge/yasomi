@@ -36,6 +36,9 @@ grid2lines <- function(som,prototypes) {
 }
 
 componentPlane <- function(som,dim=1,...) {
+    if(!inherits(som,"somnum")) {
+        stop("'som' is not a standard numerical SOM")
+    }
     args <- list(...)
     if(is.null(args$main)) {
         main <- as.character(dim)
@@ -74,8 +77,11 @@ umatrix <- function(som,...) {
 }
 
 ## very basic version
-plot.somnum <- function(x,y,...) {
+plot.som <- function(x,y,...) {
     if(missing(y)) {
+        if(!inherits(x,"somnum")) {
+            stop("'x' is not a standard numerical SOM")
+        }
         stars(x$prototypes,locations=x$somgrid$pts,len=0.5,radius=F,...)
     } else {
         if(is.factor(y)) {
@@ -86,3 +92,4 @@ plot.somnum <- function(x,y,...) {
         }
     }
 }
+

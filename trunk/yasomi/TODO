@@ -1,9 +1,12 @@
 BUGS or problems:
-- componentPlane should not be aplicable to relationalsom
 - somtune must become more generic
 - fix parameter order in lowlevel functions
 - batchsom.Rd must splitted into batchsom.Rd and batchsom.default.Rd
 - fix the content of som$errors: make sure the last value is always the final quantisation error
+
++ Long term R goals:
+  - move to S4 classes
+  - grid graphics
 
 - coding conventions
 - C implementation of slow functions:
@@ -58,7 +61,7 @@ BUGS or problems:
 
 + documentation
   - write vignettes:
-    - general introduction
+    - general introduction (in progress)
     - dissimilarity som
     - graphical methods
   - add a package doc
@@ -77,13 +80,13 @@ BUGS or problems:
   - prototype.distances: add details (?)
   - distance.grid: add details (?)
 
-+ Move to S4 classes?
-
 Done in version 0.2:
-- relational SOM (first version with optimal algorithm but no implementation tricks)
-- relational SOM can be initialised via a PCA like method
+- relational SOM (first version with optimal algorithm but no implementation tricks) :
+  - generic (S3) functions for batchsom, sominit and protoDist: most of the analysis and display functions can be used for both standard SOM and relational SOM
+  - PCA like initialisation method
+  - print and summary support
+  - basic plot support
 - grid2lines is now applicable to any matrix with the correct number of rows 
-- generic (S3) functions for batchsom, sominit and protoDist: most of the analysis and display functions can be used form standard SOM and for relational SOM
 - the original data are saved in the batchsom result
 - introduction to the package via a vignette
 - som.tune returns now an object that can be plotted in some simple situations (only one parameter is modified during tuning)

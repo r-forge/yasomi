@@ -50,7 +50,7 @@ sominit.random.default <- function(data,somgrid,
         clusters <- cut(sample(1:dim),nb,labels=FALSE,include.lowest=TRUE)
         result <- matrix(0,ncol=ncol(data),nrow=nb)
         for(i in 1:nb) {
-            result[i,] <- colMeans(data[clusters==i,])
+            result[i,] <- colMeans(as.matrix(data[clusters==i,],ncol=ncol(data)))
         }
         result
     }
@@ -118,7 +118,7 @@ radius.lin <- function(min,max,steps) {
     seq(max,min,length.out=steps)
 }
 
-batchsom.default <- function(data,somgrid,prototypes,
+batchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
                      assignment=c("single","heskes"),radii,nbRadii=30,
                      maxiter=75,
                      kernel=c("gaussian","linear"),
@@ -136,8 +136,13 @@ batchsom.default <- function(data,somgrid,prototypes,
         stop("'somgrid' is not of somgrid class")
     }
     if(missing(prototypes)) {
-        ## default initialisation is based on pca
-        prototypes <- sominit.pca(data,somgrid)
+        ## initialisation based on the value of init
+        init <- match.arg(init)
+        args <- list(...)
+        params <- c(list(data=data,somgrid=somgrid),list(...))
+        prototypes <- switch(init,
+                             "pca"=do.call("sominit.pca",params),
+                             "random"=do.call("sominit.random",params))
     } else {
         if(ncol(prototypes)!=ncol(data)) {
             stop("'prototypes' and 'data' have different dimensions")
@@ -195,7 +200,7 @@ batchsom.lowlevel <- function(somgrid,data,prototypes,
                 prototypes=prototypes,
                 classif=result$cluster+1,
                 errors=result$errors[result$errors>=0])
-    class(res) <- c("som","somnum")
+    class(res) <- c("somnum","som")
     res
 }
 
@@ -253,7 +258,6 @@ predict.somnum <- function(object,newdata,...) {
 
 print.som <- function(x,...)
 {
-    cat("\nSelf-Organising Map\n\n")
     cat("Parameters:\n")
     cat("       grid: ",x$somgrid$topo," grid of size ",x$somgrid$xdim,"x",
         x$somgrid$ydim," with diameter ",x$somgrid$diam,"\n",sep="")
@@ -270,10 +274,15 @@ print.som <- function(x,...)
     invisible(x)
 }
 
+print.somnum <- function(x,...)
+{
+    cat("\nSelf-Organising Map\n\n")
+    NextMethod()
+}
+
 
 summary.som <- function(object,...)
 {
-    cat("\nSelf-Organising Map\n\n")
     cat("Quantisation error: ",object$errors[length(object$errors)],"\n\n",
         sep="")
     cat("Parameters:\n")
@@ -286,4 +295,15 @@ summary.som <- function(object,...)
     cat(" assignment:",object$assignment,"\n")
     cat("      radii:",object$radii,"\n")
     invisible()
+}
+
+summary.somnum <- function(object,...)
+{
+    cat("\nSelf-Organising Map\n\n")
+    NextMethod()
+}
+
+as.dist.somnum <- function(x,FUN=NULL) {
+    ## the default Euclidean distance is what we want
+    dist(x$prototypes)
 }

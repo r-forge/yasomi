@@ -38,11 +38,11 @@ bmu.heskes.R <- function(prototypes,data,nv) {
     result
 }
 
-batchsom.R <- function(data,somgrid,prototypes,
-                       assignment=c("single","heskes"),radii,nbRadii,
+batchsom.R <- function(data,somgrid,init=c("pca","random"),prototypes,
+                       assignment=c("single","heskes"),radii,nbRadii=30,
                        maxiter=75,
                        kernel=c("gaussian","linear"),normalised,
-                       cut=1e-7,verbose=FALSE) {
+                       cut=1e-7,verbose=FALSE,keepdata=TRUE,...) {
     ## process parameters and perform a few sanity checks
     assignment <- match.arg(assignment)
     if(missing(normalised)) {
@@ -54,8 +54,13 @@ batchsom.R <- function(data,somgrid,prototypes,
         stop("'somgrid' is not of somgrid class")
     }
     if(missing(prototypes)) {
-        ## default initialisation is based on pca
-        prototypes <- sominit.pca(data,somgrid)
+        ## initialisation based on the value of init
+        init <- match.arg(init)
+        args <- list(...)
+        params <- c(list(data=data,somgrid=somgrid),list(...))
+        prototypes <- switch(init,
+                             "pca"=do.call("sominit.pca",params),
+                             "random"=do.call("sominit.random",params))
     } else {
         if(ncol(prototypes)!=ncol(data)) {
             stop("'prototypes' and 'data' have different dimensions")
@@ -74,8 +79,16 @@ batchsom.R <- function(data,somgrid,prototypes,
         }
         radii <- radius.exp(minRadius,max(minRadius,somgrid$diam/3*2),nbRadii)
     }
-    batchsom.lowlevel.R(somgrid,data,prototypes,assignment,radii,
-                        maxiter,theKernel,normalised,cut,verbose)
+    pre <- batchsom.lowlevel.R(somgrid,data,prototypes,assignment,radii,
+                               maxiter,theKernel,normalised,cut,verbose)
+    pre$assignment <- assignment
+    pre$kernel <- kernel
+    pre$normalised <- normalised
+    pre$radii <- radii
+    if(keepdata) {
+        pre$data  <- data
+    }
+    pre
 }
 
 batchsom.lowlevel.R <- function(somgrid,data,prototypes,
@@ -117,7 +130,7 @@ batchsom.lowlevel.R <- function(somgrid,data,prototypes,
     }
     res <- list(somgrid=somgrid,prototypes=prototypes,classif=classif,
                 errors=unlist(errors))
-    class(res) <- c("som","somnum")
+    class(res) <- c("somnum","som")
     res
 }
 

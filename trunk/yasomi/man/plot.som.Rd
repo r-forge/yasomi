@@ -1,15 +1,15 @@
-\name{plot.somnum}
-\alias{plot.somnum}
+\name{plot.som}
+\alias{plot.som}
 \title{Plot a Self-Organising Map}
 \description{
 Plot a glyph based rendering of the prototypes of a Self-Organising Map.
 Each glyph is positioned thanks to the prior structure. 
 }
 \usage{
-\method{plot}{somnum}(x, y, \dots)
+\method{plot}{som}(x, y, \dots)
 }
 \arguments{
-  \item{x}{an object of class \code{"somnum"}}
+  \item{x}{an object of class \code{"som"}}
   \item{y}{a matrix or a data frame of data associated to the som's prototypes}
   \item{\dots}{additional parameters transmitted to the low level plot function}
 }

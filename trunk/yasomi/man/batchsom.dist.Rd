@@ -6,7 +6,7 @@
 dissimilarity data.
 }
 \usage{
-\method{batchsom}{dist}(data, somgrid, prototypes,
+\method{batchsom}{dist}(data, somgrid, init=c("pca","random"), prototypes,
          assignment = c("single", "heskes"),radii,nbRadii=30,
          maxiter = 75,kernel=c("gaussian","linear"),normalised,
          cut = 1e-07, verbose = FALSE, keepdata = TRUE,
@@ -20,12 +20,14 @@ dissimilarity data.
   \item{somgrid}{an object of class \code{"somgrid"} that specifies the prior
     structure of the Self-Organising Map: see \code{\link{somgrid}} }
   \item{prototypes}{a matrix of initial values for the
-    prototypes. If missing chosen by \code{\link{sominit.random.dist}}}
+    prototypes. If missing chosen via
+    the method specified by the \code{init} parameter (see details)}
+  \item{init}{the initialisation method (see details)}
   \item{assignment}{the assignment method used to compute the best
     matching unit of an observation during training}
   \item{radii}{the radii of the neighbourhoods used during training. If
     missing, \code{nbRadii} radii are computed starting from a radius of 2/3
-    of the diameter of the prior strucure and ending with a radius small
+    of the diameter of the prior structure and ending with a radius small
     enough to prevent any influence of a node on its neighbours}
   \item{nbRadii}{the number of radii to generate if 'radii' is missing}
   \item{maxiter}{the maximum number of of iteration performed for each
@@ -40,7 +42,7 @@ dissimilarity data.
     part of the result object}
   \item{lowlevel}{the underlying low level implementation of the method
     (don't use this parameter, it's here only during the development process)}
-  \item{\dots}{not used}
+  \item{\dots}{additional arguments to be passed to the initialisation method}
 }
 \details{
   This function implements the relational Self-Organising Map algorithm

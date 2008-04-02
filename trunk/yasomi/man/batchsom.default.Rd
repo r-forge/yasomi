@@ -8,8 +8,8 @@ batch algorithm. This is a generic method with a default implementation
 for standard data.
 }
 \usage{
-batchsom(data, somgrid, prototypes, \dots)
-\method{batchsom}{default}(data, somgrid, prototypes,
+batchsom(data, somgrid, init, prototypes, \dots)
+\method{batchsom}{default}(data, somgrid, init=c("pca","random"), prototypes,
          assignment = c("single", "heskes"),radii,nbRadii=30,
          maxiter = 75,kernel=c("gaussian","linear"),normalised,
          cut = 1e-07, verbose = FALSE, keepdata = TRUE, \dots)
@@ -21,13 +21,14 @@ batchsom(data, somgrid, prototypes, \dots)
   \item{somgrid}{an object of class \code{"somgrid"} that specifies the prior
     structure of the Self-Organising Map: see \code{\link{somgrid}} }
   \item{prototypes}{a matrix of initial values for the
-    prototypes. If missing, initial prototypes are chosen according via
-    a default method that depends on the data type (see details)}
+    prototypes. If missing, initial prototypes are chosen via
+    the method specified by the \code{init} parameter (see details)}
+  \item{init}{the initialisation method (see details)}
   \item{assignment}{the assignment method used to compute the best
     matching unit of an observation during training}
   \item{radii}{the radii of the neighbourhoods used during training. If
     missing, \code{nbRadii} radii are computed starting from a radius of 2/3
-    of the diameter of the prior strucure and ending with a radius small
+    of the diameter of the prior structure and ending with a radius small
     enough to prevent any influence of a node on its neighbours}
   \item{nbRadii}{the number of radii to generate if 'radii' is missing}
   \item{maxiter}{the maximum number of of iteration performed for each
@@ -40,7 +41,7 @@ batchsom(data, somgrid, prototypes, \dots)
   \item{verbose}{switch for tracing the fitting process}
   \item{keepdata}{if \code{TRUE}, the original data are returned as
     part of the result object}
-  \item{\dots}{arguments to be passed to methods}
+  \item{\dots}{additional arguments to be passed to the initialisation method}
 }
 \details{
 The default method is the standard batch algorithm for Self-Organising
