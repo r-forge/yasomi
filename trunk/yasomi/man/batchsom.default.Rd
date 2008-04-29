@@ -1,14 +1,11 @@
-\name{batchsom}
-\alias{batchsom}
+\name{batchsom.default}
 \alias{batchsom.default}
-\title{Fit a Self-Organising Map to some data}
+\title{Fit a Self-Organising Map to vector data}
 \description{
-\code{batchsom} is used to fit a Self-Organising Map to some data, using a
-batch algorithm. This is a generic method with a default implementation
-for standard data.
+\code{batchsom.default} is used to fit a Self-Organising Map to vector
+data, using a batch algorithm. 
 }
 \usage{
-batchsom(data, somgrid, init, prototypes, \dots)
 \method{batchsom}{default}(data, somgrid, init=c("pca","random"), prototypes,
          assignment = c("single", "heskes"),radii,nbRadii=30,
          maxiter = 75,kernel=c("gaussian","linear"),normalised,
@@ -16,8 +13,7 @@ batchsom(data, somgrid, init, prototypes, \dots)
 }
 \arguments{
   \item{data}{the data to which the SOM will be fitted. This can be,
-    e.g., a matrix or data frame of observations (which should be scaled), or a
-    distance matrix}
+    a matrix or data frame of observations (which should be scaled)}
   \item{somgrid}{an object of class \code{"somgrid"} that specifies the prior
     structure of the Self-Organising Map: see \code{\link{somgrid}} }
   \item{prototypes}{a matrix of initial values for the
@@ -44,12 +40,18 @@ batchsom(data, somgrid, init, prototypes, \dots)
   \item{\dots}{additional arguments to be passed to the initialisation method}
 }
 \details{
-The default method is the standard batch algorithm for Self-Organising
-Map. It applies to a matrix or a data frame of observations. In this
-case, it is recommended to use the \code{"single"} assignment method
+This methods implements the standard batch algorithm for Self-Organising
+Map. It applies to a matrix or a data frame of observations. It is
+recommended to use the \code{"single"} assignment method 
 which seems to perform better in general. If the initial value of
 \code{prototypes} is not provided, it is obtained by a call to
-\code{\link{sominit.pca.default}}. 
+a function specified by the \code{init} parameter. If its value is
+\code{"pca"} proprototypes are obtained by a call to 
+\code{\link{sominit.pca.default}} (this is also the case when
+\code{init} is not specified), while
+\code{\link{sominit.random.default}} is called when \code{init} is
+\code{"random"}. In both case, the additional parameters submitted to
+the method are transmitted to the initialisation method. 
 }
 \value{
   An object of class \code{"som"}, a list with components including
@@ -62,7 +64,7 @@ which seems to perform better in general. If the initial value of
     error during the fitting process}
   \item{data}{the original data if the function is called with
     \code{keepdata = TRUE}}
-  In addition, for the default method, the object is also of class
+  The object is also of class
   \code{"somnum"}. 
 }
 %\references{ ~put references to the literature/web site here ~ }
@@ -71,11 +73,7 @@ which seems to perform better in general. If the initial value of
 %
 % ~Make other sections like Warning with \section{Warning }{....} ~
 %}
-\seealso{See \code{\link{sominit.pca}} and \code{\link{sominit.random}}
-  for some control on the initial configuration of the prototypes, \code{\link{som.tune}} for the optimisation of some magic
-  parameters (such as the radii), \code{\link{umatrix}} and
-  \code{\link{distance.grid}} for visual analysis of the distances
-  between the prototypes.}
+%\seealso{}
 \examples{
 data(iris)
 # scaling
@@ -84,8 +82,8 @@ data <- scale(iris[1:4])
 # a small hexagonal grid
 sg <- somgrid(xdim=7,ydim=7,topo="hex")
 
-# fit the SOM
-som <- batchsom(data,sg)
+# fit the SOM with random initial prototypes
+som <- batchsom(data,sg,init="random")
 
 # and display the prototypes
 plot(som)

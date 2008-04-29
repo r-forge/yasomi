@@ -1,12 +1,12 @@
 BUGS or problems:
 - somtune must become more generic
-- fix parameter order in lowlevel functions
-- batchsom.Rd must splitted into batchsom.Rd and batchsom.default.Rd
 - fix the content of som$errors: make sure the last value is always the final quantisation error
+- add check for sum to one in the relational som method
 
 + Long term R goals:
   - move to S4 classes
   - grid graphics
+  - unit tests
 
 - coding conventions
 - C implementation of slow functions:
@@ -39,6 +39,7 @@ BUGS or problems:
 + graphics
   - colormap options in u-matrix and component planes (via plot.somgrid)
   - use nice color map when adapted packages are available (e.g. color brewer)
+    - bidule=suppressWarnings(suppressPackageStartupMessages(require("something")))
   - more options for distance.grid (mean, full but also neighbors and partial)
   - 3D umatrix (rgl)
   - add key to plot.somgrid without layout or a similar solution (?)
@@ -60,6 +61,7 @@ BUGS or problems:
   - number of initial radii based on the map size
 
 + documentation
+  - document missing functions (methods!)
   - write vignettes:
     - general introduction (in progress)
     - dissimilarity som
@@ -86,6 +88,7 @@ Done in version 0.2:
   - PCA like initialisation method
   - print and summary support
   - basic plot support
+  - basic documentation for the relational method
 - grid2lines is now applicable to any matrix with the correct number of rows 
 - the original data are saved in the batchsom result
 - introduction to the package via a vignette

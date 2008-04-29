@@ -128,7 +128,7 @@ choose.depth <- function(size) {
     }
 }
 
-distance.grid <- function(sompdist,mode=c("mean","full"),nxo,nyo) {
+distance.grid <- function(sompdist,mode=c("mean","full"),nxo,nyo,outer=FALSE) {
     pdist <- sompdist$pdist
     sg <- sompdist$somgrid
     mode <- match.arg(mode)
@@ -140,7 +140,7 @@ distance.grid <- function(sompdist,mode=c("mean","full"),nxo,nyo) {
             distances <- matrix(means[reorder],ncol=sg$ydim)
             x <- seq(from=1,by=1,length.out=sg$xdim)
             y <- seq(from=1,by=1,length.out=sg$ydim)
-            radius <- 1
+            radius <- 1.1
         } else {
             distances <- rep(NA,(2*sg$xdim-1)*(2*sg$ydim-1))
             pindex <- 1:sg$size
@@ -176,9 +176,9 @@ distance.grid <- function(sompdist,mode=c("mean","full"),nxo,nyo) {
             distances <- matrix(distances,ncol=2*sg$ydim-1)
             x <- seq(from=1,to=sg$xdim,length.out=2*sg$xdim-1)
             y <- seq(from=1,to=sg$ydim,length.out=2*sg$ydim-1)
-            radius <- 0.5
+            radius <- 0.6
         }
-        if(!missing(nxo) || !missing(nyo)) {
+        if(outer || !missing(nxo) || !missing(nyo)) {
             ## interpolation asked
             if(missing(nxo)) {
                 xo <- x
@@ -189,6 +189,10 @@ distance.grid <- function(sompdist,mode=c("mean","full"),nxo,nyo) {
                 yo <- y
             } else {
                 yo <- seq(from=1,to=max(y),length.out=nyo)
+            }
+            if(outer) {
+                xo <- c(min(xo)-0.5,xo,max(xo)+0.5)
+                yo <- c(min(yo)-0.5,yo,max(yo)+0.5)
             }
             depth <- choose.depth(nrow(distances))
             model <- terrainInterp(expand.grid(x,y),distances,depth,radius)
@@ -211,7 +215,7 @@ distance.grid <- function(sompdist,mode=c("mean","full"),nxo,nyo) {
             }
             distances <- means
             grid <- sg$pts
-            radius <- 1
+            radius <- 1.1
         } else {
             distances <- rep(NA,sg$size+(sg$xdim-1)*sg$ydim+
                              sg$xdim*(sg$ydim-1)+(sg$xdim-1)*(sg$ydim-1))
@@ -249,7 +253,7 @@ distance.grid <- function(sompdist,mode=c("mean","full"),nxo,nyo) {
             if(missing(nyo)) {
                 nyo <- 4*sg$ydim+1
             }
-            radius <- 0.5
+            radius <- 0.6
         }
         depth <- choose.depth(length(distances))
         model <- terrainInterp(grid,distances,depth,radius)
@@ -257,6 +261,10 @@ distance.grid <- function(sompdist,mode=c("mean","full"),nxo,nyo) {
         ylim <- range(sg$pts[,2])
         x <- seq(xlim[1],xlim[2],length.out=nxo)
         y <- seq(ylim[1],ylim[2],length.out=nyo)
+        if(outer) {
+            x <- c(min(x)-0.5,x,max(x)+0.5)
+            y <- c(min(y)-0.5,y,max(y)+0.5)
+        }
         interpDist <- matrix(predict(model,expand.grid(x,y)),ncol=length(y))
         list(x=x,y=y,z=interpDist)
     }
@@ -271,13 +279,15 @@ plot.sompdist <- function(x,mode=c("mean","full"),...) {
     pdist <- x$pdist
     sg <- x$somgrid
     if(sg$topo=="rectangular") {
-        values <- as.vector(distance.grid(x,mode=args$mode)$z)
+        basevalues <- distance.grid(x,mode=args$mode)$z
         if(args$mode=="full") {
             plotsg <- somgrid(xdim=2*sg$xdim-1,ydim=2*sg$ydim-1,
                               topo="rectangular",with.dist=FALSE)
         } else {
             plotsg <- sg
         }
+        values <- basevalues[cbind(rep(1:plotsg$xdim,plotsg$ydim),
+                                   rep(plotsg$ydim:1,each=plotsg$xdim))]
     } else {
         if(args$mode=="mean") {
             values <- rowMeans(pdist,na.rm=T)

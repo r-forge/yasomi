@@ -16,7 +16,7 @@ plot(somT)
 
 som <- somT$best.som
 
-plot(som$error,type="l")
+plot(som)
 
 code <- colorCode(data,50)
 pairs(data,bg=rainbow(50)[code],pch=21)

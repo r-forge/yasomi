@@ -23,14 +23,23 @@ most quantisation related error measures will decrease with the size of
 the grid.
 }
 \value{
-  A list with components
-  \item{errors}{the error for each configuration}
+  An object of class \code{"somtune"}, a list with components
   \item{best.som}{the best SOM according to the chosen error criterion}
+  \item{errors}{the error for each configuration}
+  \item{quantisation}{the quantisation error for each configuration}
+  \item{isquant}{\code{TRUE} if the best SOM was chosen according to the
+    quantisation error}
+  \item{control}{the control object used by this call}
+  \item{dimensions}{a list of strings with the names of the parameters
+    that were varied by the function}
+  \item{init,assignement,radii,annealing,kernel}{5 vectors containing
+    the parameters used by each tested configuration}
+  \item{best.index}{the index of the configuration used by the best SOM}
 }
 \author{Fabrice Rossi}
 \note{this function is modelled after David Mayer's \link[e1071]{tune} function.
 }
-\seealso{\code{\link{som.tunecontrol}}}
+\seealso{\code{\link{som.tunecontrol}} and \code{\link{plot.somtune}}}
 \examples{
 data(iris)
 # scaling
@@ -43,8 +52,8 @@ sg <- somgrid(xdim=15,ydim=15,topo="hex")
 tune.results <-
   som.tune(data,sg,som.tunecontrol(sg,criterion=error.kaskilagus))
 
-# plot errors
-plot(tune.results$errors,type="h")
+# umatrix of the best SOM
+umatrix(tune.results$best.som)
 }
 \keyword{cluster}
 

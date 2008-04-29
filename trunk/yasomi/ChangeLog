@@ -1,3 +1,36 @@
+2008-04-29  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/distance.grid.Rd: updated to document the new outer parameter
+
+	* R/umatrix.R (distance.grid): extended to allow (very limited) extrapolation
+
+	* demo/som-iris.R: used the adapted ploting function
+
+2008-04-28  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/umatrix.R (plot.sompdist): Fix a serious bug in the umatrix like code (row inversion in the matrix)
+
+2008-04-25  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* NAMESPACE: exported some new methods
+
+	* R/relational.R (as.matrix.relationalsom): new method that gives the distances between the prototypes directely as a matrix
+
+	* R/som.R (as.matrix.somnum): new method that gives the distances between the prototypes directely as a matrix
+
+	* man/plot.somtune.Rd: first rough documentation
+
+	* man/som.tune.Rd: use the plot.somtune method
+	more complete documentation of the function
+
+	* R/tune.R (som.tune): updated the call to som to the new initialisation approach
+
+	* man/batchsom.dist.Rd: fix to better describe initialisation
+
+	* man/batchsom.default.Rd: fix for specificity to numerical values
+
+	* man/batchsom.Rd: fix the documentation for genericity
+
 2008-04-02  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
 
 	* man/batchsom.default.Rd: renamed from batchsom.Rd to batchsom.default.Rd, and started to fix the documentation according to the new initialisation scheme

@@ -8,7 +8,7 @@
   U-matrix principle. 
 }
 \usage{
-distance.grid(sompdist, mode = c("mean", "full"), nxo, nyo)
+distance.grid(sompdist, mode = c("mean", "full"), nxo, nyo,outer=FALSE)
 }
 
 \arguments{
@@ -17,6 +17,9 @@ distance.grid(sompdist, mode = c("mean", "full"), nxo, nyo)
   generate the surface (see Details) }
   \item{nxo}{horizontal resolution of the generated surface}
   \item{nyo}{vertical resolution of the generated surface}
+  \item{outer}{specifies whether generated surface is slightly extended
+  by extrapolation outside of the boundaries of the prior structure or
+  not (the default case)}
 }
 \details{
   There are two modes for generating the surface, \code{"mean"} and

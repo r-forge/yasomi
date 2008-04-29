@@ -43,6 +43,7 @@ som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),
     }
     bestSOM <- NULL
     performances <- rep(NA,nbconf)
+    betsIndex <- NA
     comp.init <- rep("",nbconf)
     comp.assign <- rep("",nbconf)
     comp.radii <- rep(NA,nbconf)
@@ -87,7 +88,8 @@ som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),
                             radii <- switch(annealing,
                                             "linear"=radius.lin(minRadius,radius,control$innernradii),
                                             "power"=radius.exp(minRadius,radius,control$innernradii))
-                            som <- batchsom(data,somgrid,prototypes,assignment,radii,
+                            som <- batchsom(data,somgrid,prototypes=prototypes,
+                                            assignement=assignment,radii=radii,
                                             maxiter=control$maxiter,kernel=kernel)
                             performances[confIndex] <- control$criterion(som,data)
                             comp.init[confIndex] <- init
@@ -98,6 +100,7 @@ som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),
                             if(performances[confIndex]<bestPerfSoFar) {
                                 bestSOM <- som
                                 bestPerfSoFar <- performances[confIndex]
+                                bestIndex <- confIndex
                                 if(verbose) {
                                     print(paste("Best configuration so far",confIndex,"with error",bestPerfSoFar))
                                 }
@@ -121,7 +124,7 @@ som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),
     res <- list(best.som=bestSOM,quantisation=quantisation,errors=performances,
                 isquant=isquant,control=control,dimensions=dimensions,
                 init=comp.init,assignement=comp.assign,radii=comp.radii,
-                annealing=comp.anneal,kernel=comp.kernel)
+                annealing=comp.anneal,kernel=comp.kernel,best.index=bestIndex)
     class(res) <- "somtune"
     res
 }

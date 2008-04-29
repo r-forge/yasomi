@@ -307,3 +307,8 @@ as.dist.somnum <- function(x,FUN=NULL) {
     ## the default Euclidean distance is what we want
     dist(x$prototypes)
 }
+
+as.matrix.somnum <- function(x, ...) {
+    ## the default Euclidean distance is what we want
+    as.matrix(dist(x$prototypes),diag=0)
+}

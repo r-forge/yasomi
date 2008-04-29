@@ -47,7 +47,15 @@ dissimilarity data.
 \details{
   This function implements the relational Self-Organising Map algorithm
   in which virtual linear combination of the original data are used to
-  represent the prototypes. 
+  represent the prototypes. If the initial value of
+\code{prototypes} is not provided, it is obtained by a call to
+a function specified by the \code{init} parameter. If its value is
+\code{"pca"} proprototypes are obtained by a call to 
+\code{\link{sominit.pca.dist}} (this is also the case when
+\code{init} is not specified), while
+\code{\link{sominit.random.dist}} is called when \code{init} is
+\code{"random"}. In both case, the additional parameters submitted to
+the method are transmitted to the initialisation method. 
 }
 \value{
   An object of class \code{"som"} and of class \code{"relationalsom"}, a
@@ -84,8 +92,8 @@ data <- dist(scale(iris[1:4]))
 # a small hexagonal grid
 sg <- somgrid(xdim=7,ydim=7,topo="hex")
 
-# fit the SOM
-som <- batchsom(data,sg)
+# fit the SOM (random initialisation)
+som <- batchsom(data,sg,init="random",method="cluster")
 
 # and display the umatrix
 umatrix(som)

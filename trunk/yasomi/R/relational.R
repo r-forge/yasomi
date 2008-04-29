@@ -274,7 +274,7 @@ print.relationalsom <- function(x,...)
 }
 
 
-as.dist.relationalsom <- function(x,FUN=NULL) {
+as.matrix.relationalsom <- function(x,...) {
     predist <- x$prototypes%*%x$Dalpha
     thedist <- sweep(predist,1,x$nf,"-")
     thedist <- sweep(thedist,2,x$nf,"-")
@@ -283,5 +283,9 @@ as.dist.relationalsom <- function(x,FUN=NULL) {
         warning(paste("Non negligible negative minimal values (",themin,") removed",sep=""))
     }
     thedist[thedist<0] <- 0
-    as.dist(sqrt(thedist))
+    sqrt(thedist)
+}
+
+as.dist.relationalsom <- function(x,FUN=NULL) {
+    as.dist(as.matrix(x))
 }
