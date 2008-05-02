@@ -1,6 +1,10 @@
 \name{print.som}
 \alias{print.som}
+\alias{print.somnum}
+\alias{print.relationalsom}
 \alias{summary.som}
+\alias{summary.somnum}
+\alias{summary.relationalsom}
 \title{Describe a fitted Self-Organising Map}
 \description{
   Print and summary methods for Self-Organising Maps. Gives some
@@ -9,14 +13,19 @@
 }
 \usage{
 \method{print}{som}(x, \dots)
+\method{print}{somnum}(x, \dots)
+\method{print}{relationalsom}(x, \dots)
 \method{summary}{som}(object, \dots)
+\method{summary}{somnum}(object, \dots)
+\method{summary}{relationalsom}(object, \dots)
 }
 \arguments{
   \item{x,object}{an object of class \code{"som"}}
   \item{\dots}{not used}
 }
 \author{Fabrice Rossi}
-\seealso{\code{\link{batchsom}}}
+\seealso{\code{\link{batchsom}} for fitting a SOM to some data,
+  \code{\link{plot.som}} for a graphical representation.}
 \examples{
 data(iris)
 # scaling

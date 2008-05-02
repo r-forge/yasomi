@@ -21,7 +21,7 @@ sominit.pca(data, somgrid, \dots)
 }
 \author{Fabrice Rossi}
 \seealso{\code{\link{sominit.pca.default}} and
-  \code{\link{sominit.pca.dist}} for implementation,
-and \code{\link{sominit.random}} for an alternative}
+  \code{\link{sominit.pca.dist}} for implementations,
+and \code{\link{sominit.random}} for an alternative.}
 \keyword{cluster}
 

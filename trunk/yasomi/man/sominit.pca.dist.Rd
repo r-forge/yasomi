@@ -41,16 +41,20 @@ data, then this method is equivalent to
 \author{Fabrice Rossi}
 \seealso{\code{\link{sominit.random}} and \code{\link{somgrid}}}
 \examples{
-X <- cbind(rnorm(500),rnorm(500))
+data(iris)
+
+X <- as.matrix(unique(iris[1:2]))
 
 sg <- somgrid(xdim=7,ydim=7,topo="rect")
 
-proto <- sominit.pca(dist(X),sg)
+proto <- sominit.pca(dist(X),sg,nbsupport=5)
 
-plot(X,pch="+",col="red",xlim=range(X[,1],proto[,1]),
-     ylim=range(X[,2],proto[,2]))
-points(proto\%*\%X,pch=20)
+proto.mapped <- proto\%*\%X
 
+plot(X,pch="+",col="red",xlim=range(X[,1],proto.mapped[,1]),
+     ylim=range(X[,2],proto.mapped[,2]))
+
+points(proto.mapped,pch=20)
 }
 \keyword{cluster}
 

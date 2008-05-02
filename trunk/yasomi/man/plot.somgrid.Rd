@@ -9,9 +9,8 @@ fixed (according to the prior structure) but glyph size and color can be
 used to encode different type of results. 
 }
 \usage{
-\method{plot}{somgrid}(x, col = NA, size = NA, add = FALSE, border =
-   NULL,colorValues = NA, sizeValues = NA,
-   colormap = 50,withkey=FALSE, \dots)
+\method{plot}{somgrid}(x, col = NA, size = NA, add = FALSE, border = NULL,
+   colorValues = NA, sizeValues = NA, colormap = 50, withkey=FALSE, \dots)
 }
 \arguments{
   \item{x}{an object of class \code{somgrid}}

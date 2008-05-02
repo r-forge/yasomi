@@ -10,7 +10,9 @@ random partition of the data, or as uniformly sampled random points in
 the hypercube spanned by the data.
 }
 \usage{
-sominit.random(data, somgrid, method=c("prototypes","random","cluster"), \dots)
+sominit.random(data, somgrid, method=c("prototypes","random","cluster"),\dots)
+\method{sominit.random}{default}(data, somgrid, method=c("prototypes","random","cluster"),\dots)
+\method{sominit.random}{dist}(data, somgrid, method=c("prototypes","random","cluster"),\dots)
 }
 \arguments{
   \item{data}{the data to which the SOM will be fitted. This can be,
@@ -39,7 +41,7 @@ sominit.random(data, somgrid, method=c("prototypes","random","cluster"), \dots)
   rows as the size of the grid) and with the data. 
 }
 \author{Fabrice Rossi}
-\seealso{\code{\link{sominit.pca}} for a PCA based initialisation for matrix data}
+\seealso{\code{\link{sominit.pca}} for a PCA based initialisation.}
 \examples{
 X <- cbind(rnorm(500),rnorm(500))
 

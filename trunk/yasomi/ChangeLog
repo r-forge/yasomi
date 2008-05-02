@@ -1,3 +1,49 @@
+2008-05-02  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/sominit.pca.dist.Rd: fixed the example code
+
+	* TODO: complete documentation status added
+
+	* DESCRIPTION (Suggests): MASS is used in some examples
+
+	* man/as.dist.relationalsom.Rd: new documentation
+
+	* man/as.dist.somnum.Rd: new documentation
+
+	* R/umatrix.R (protoDist.relationalsom): added a warning when negative values are produced
+
+	* man/prototype.distances.Rd: added a note about the case of the relational SOM
+
+	* man/batchsom.default.Rd: added some links
+
+	* man/sominit.pca.default.Rd: added details
+
+	* man/print.som.Rd: added some links and made more generic
+
+	* man/plot.somgrid.Rd: fixed presentation
+
+	* man/somgrid.Rd: added details
+
+	* man/sominit.random.Rd: more generic version
+
+	* man/sominit.pca.Rd: fixed typos
+
+	* man/distance.grid.Rd: fixed phrasing and typos
+
+	* man/prototype.distances.Rd: fixed references and reorganized the content
+
+	* man/som.tune.Rd: fixed phrasing
+
+2008-05-01  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/hitMap.Rd: fixed phrasing
+
+	* man/grid2lines.Rd: added some details
+
+	* man/mapToUnit.Rd: added link to the predict method
+
+	* R/som.R (mapToUnit): fixed the error message
+
 2008-04-29  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
 
 	* man/distance.grid.Rd: updated to document the new outer parameter

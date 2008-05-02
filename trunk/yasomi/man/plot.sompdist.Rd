@@ -2,7 +2,7 @@
 \alias{plot.sompdist}
 \title{Plot distances between prototypes of a fitted Self-Organising Map}
 \description{
-  Provide different type of visual representation of the distances
+  Provide a u-matrix like visual representation of the distances
   between prototypes of neighbouring units of a fitted Self-Organising Map.
 }
 \usage{
@@ -34,7 +34,7 @@ This function provides a simple U-matrix like visualisation method for
   between each unit and its direct neighbours in the original grid. As
   in the \code{"mean"} mode, each original unit displays via its colour
   the average of the distances between its prototype and the
-  neighbouring one. In addition, fake units displays (again with a colour
+  neighbouring one. In addition, fake units display (again with a colour
   code) the actual distance between a prototype and its neighbour. In
   the case of an hexagonal grid, this can be done exactly. In the case
   of a rectangular grid, only horizontal and vertical neighbours can be
@@ -53,8 +53,8 @@ The additional parameters given to the function can be used to control
   Neural Network Conference (INNC'90).
 }
 \author{Fabrice Rossi}
-\note{
-}
+%\note{
+%}
 \seealso{See \code{\link{prototype.distances}} to get the distance
   structure, \code{\link{umatrix}} for direct access to this type of
   display and \code{\link{distance.grid}} for possibly smoother plots.}

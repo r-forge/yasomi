@@ -19,7 +19,8 @@ components.
   A matrix containing appropriate initial prototypes
 }
 \author{Fabrice Rossi}
-\seealso{\code{\link{sominit.random}} and \code{\link{somgrid}}}
+\seealso{\code{\link{somgrid}} for specifying the prior structure and
+  \code{\link{sominit.random}} for random based initialisations.}
 \examples{
 X <- cbind(rnorm(500),rnorm(500))
 

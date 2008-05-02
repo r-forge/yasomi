@@ -17,9 +17,9 @@ som.tune(data, somgrid, control = som.tunecontrol(somgrid), verbose = FALSE)
 }
 \details{
 The optimisation is done via a simple grid search that fit a
-Self-Organising Map for each possible combination of the parameter to
+Self-Organising Map for each possible combination of the parameters to
 tune. The prior structure itself is excluded from the optimisation as
-most quantisation related error measures will decrease with the size of
+most quantisation related error measures decrease with the size of
 the grid.
 }
 \value{

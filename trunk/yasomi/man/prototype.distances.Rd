@@ -3,9 +3,9 @@
 \alias{prototype.distances}
 \alias{as.matrix.sompdist}
 \alias{as.dist.sompdist}
-\title{Compute distances between prototypes in a fitted Self-Organising Map}
+\title{Compute distances between neighbouring prototypes in a fitted Self-Organising Map}
 \description{
-Compute the Euclidean distances between the prototypes of a fitted
+Compute the distances between the prototypes of a fitted
 Self-Organising Map (SOM) for neighbouring units in the prior structure.
 }
 \usage{
@@ -24,20 +24,16 @@ prototype.distances(som)
 \item{FUN}{not used}
 }
 \details{
-  The distance matrix has one row for each prototype and 6 or 8 columns,
-  depending on the topology of the prior structure (6 for a hexagonal
-  grid and 8 for a rectangular one). When a prototype has not the
-  maximum number of neighbours because of its position in the grid,
-  the corresponding entries are encoded with \code{NA}.
-
   The \code{as.matrix} method can be used to convert a distance matrix
   (an object of class\code{"sompdist"}) into a classical distance matrix
   as obtained via the \code{as.matrix} applied to objects of class
   \code{"dist"} (see \code{\link{dist}}). \strong{However}, the distance
   matrix obtained this way \strong{is not} the matrix of the Euclidean
-  distances between the prototypes of the SOM. As explained above, only
+  distances between the prototypes of the SOM: only
   the distances between direct neighbours in the grid are
-  considered. There are used as edge lengths (or weights) for an
+  considered (see \code{\link{as.dist.somnum}} and
+  \code{\link{as.dist.relationalsom}} for all pairwise
+  distances between prototypes). There are used as edge lengths (or weights) for an
   undirected graph whose nodes are the units and which has edges only
   between direct neighbours. If the \code{as.matrix} method is called
   with \code{extended=TRUE} (the default value), then this graph is used
@@ -53,13 +49,19 @@ prototype.distances(som)
   used. 
 
   Visualisation of the obtained distance matrix can be done directly
-  with the \code{\link{plot.somgrid}} method or indirectly via the
+  with the \code{\link{plot.sompdist}} method or indirectly via the
   \code{\link{distance.grid}} function.
 }
 \value{
   \code{prototype.distances} returns an object of
   class\code{"sompdist"}, a list with components: 
-  \item{pdist}{a matrix containing the distances between prototypes. }
+  \item{pdist}{a matrix containing the distances between prototypes. It
+  has one row for each prototype and 6 or 8 columns, 
+  depending on the topology of the prior structure (6 for a hexagonal
+  grid and 8 for a rectangular one). When a prototype has not the
+  maximum number of neighbours because of its position in the grid,
+  the corresponding entries are encoded with \code{NA}.
+}
   \item{somgrid}{an object of class \code{"somgrid"}, the prior
     structure used for fitting the \code{som} object}
   \code{as.matrix} returns a square matrix and \code{as.dist} an object
@@ -73,14 +75,21 @@ prototype.distances(som)
   Science, Springer, pp. 809--814.
 }
 \author{Fabrice Rossi}
-%\note{
-%}
+\note{
+  This function applies to standard numerical Self-Organising Map but
+  also to relational SOM. In the first case, the distances between
+  prototypes is the standard Euclidean distance. In the second case, the
+  distance is obtained via the relational formula which can lead to
+  negative values. When such values are obtained, they are replaced by
+  zeros and a warning is generated. 
+}
 \seealso{See \code{\link{distance.grid}} for converting the prototypes
   distances into a grid of values that can be easily displayed,
-  \code{\link{plot.somgrid}} and \code{\link{umatrix}} for simple
+  \code{\link{plot.sompdist}} and \code{\link{umatrix}} for simple
   visualisations of those distances and 
   \code{\link{error.kaskilagus}} for an error measure based on
-  prototypes distances.} 
+  prototypes distances. See \code{\link{as.dist.somnum}} for all pairwise
+  distances between prototypes.} 
 \examples{
 data(iris)
 # scaling

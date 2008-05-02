@@ -18,7 +18,8 @@ grid2lines(som,prototypes)
 \code{prototypes} (or of the prototypes of a the fitted Self-Organising
 Map \code{som}).  It can be used with,
 e.g., \code{\link{lines}} to draw edges between prototypes that are
-direct neighbours in the prior structure. 
+direct neighbours in the prior structure (\code{NA} values are inserted
+to prevent draw edges between unconnected prototypes). 
 }
 \value{
 a matrix with the same number of columns as the original dataset used by

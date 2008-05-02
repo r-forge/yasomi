@@ -213,7 +213,7 @@ colorCode <- function(data,nbcolor) {
 
 mapToUnit <- function(som,values) {
     if(length(values)!=length(som$classif)) {
-        stop("'values' is not of the same size as data use to fit the 'som'")
+        stop("'values' is not of the same size as the data used to fit the 'som'")
     }
     result <- vector("list",nrow(som$prototypes))
     if(is.null(dim(values))) {

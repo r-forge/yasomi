@@ -27,7 +27,7 @@ distance.grid(sompdist, mode = c("mean", "full"), nxo, nyo,outer=FALSE)
   the mean distance between each prototype and all of its neighbours in
   the prior structure. Each value is associated to the position of the
   prototype in the two dimensional prior structure. In the
-  \code{"full"}, individual distances between neighbouring prototypes
+  \code{"full"} mode, individual distances between neighbouring prototypes
   are used. Each value is associated to the middle of the segment that
   links the positions of corresponding prototypes in the prior
   structure.
@@ -43,17 +43,17 @@ distance.grid(sompdist, mode = c("mean", "full"), nxo, nyo,outer=FALSE)
   neighbours have exact distances mapped on the surface.}
 \item{\code{"hexagonal"}}{hexagonal prior structures are not grids. The
   function must therefore interpolate the exact surface to evaluate it
-  on a regular grid}
+  on a regular grid.}
 }
 
     When \code{nxo} and/or \code{nyo} is specified, the function first
-  compute the original surface and then generate an interpolated surface
+  computes the original surface and then generates an interpolated surface
   that is evaluated on a regular grid with \code{nxo} vertical lines
   and \code{nyo} horizontal lines (when one of the value is missing, it is
-  generated from the underlying \code{somgrid}. The interpolation method
+  generated from the underlying \code{somgrid}). The interpolation method
   is based on Radial Basis Function and on a decomposition of the point
   set to avoid inverting large linear system. This a simplified version
-  of the algorithm given in Pouderoux et al. article cited in the
+  of the algorithm given in the Pouderoux et al. article cited in the
   References section.
 
   The result of the function uses the conventions of standard surface
@@ -80,8 +80,8 @@ distance.grid(sompdist, mode = c("mean", "full"), nxo, nyo,outer=FALSE)
 %\note{
 %}
 \seealso{See \code{\link{prototype.distances}} for computing the
- distances and \code{\link{umatrix}} for a simpler visualisation of the
- same data.}
+ distances. See \code{\link{plot.sompdist}} and \code{\link{umatrix}}
+ for a simpler visualisation of the same data.}
 \examples{
 data(iris)
 # scaling

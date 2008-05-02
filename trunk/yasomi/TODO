@@ -2,6 +2,8 @@ BUGS or problems:
 - somtune must become more generic
 - fix the content of som$errors: make sure the last value is always the final quantisation error
 - add check for sum to one in the relational som method
+- grid2lines can't work on relational som if prototypes is not provided
+- fix error.kaskilagus and error.quantisation for relational som
 
 + Long term R goals:
   - move to S4 classes
@@ -68,19 +70,50 @@ BUGS or problems:
     - graphical methods
   - add a package doc
   - add original references in graphical methods (in addition to Vesanto's thesis) 
-  - componentPlane: add details
-  - error.kaskilagus: add details
-  - colorCode: add details
-  - batchSom: add references (and maybe details)
-  - hitMap: check references
-  - plot.som: add details after better implementation
-  - plot.somgrid: add seealso and maybe references (umatrix ?)
-  - somPCAInit: add references
-  - grid2lines: add details
-  - mapToUnit: will be rewritten when the function is
-  - umatrix: add details
-  - prototype.distances: add details (?)
-  - distance.grid: add details (?)
+  - add also references in most of the methods
+  - add links to online references
+  - status (ordered as in NAMESPACE):
+    - somgrid: ok
+    - batchsom: ok
+    + colorCode: add details
+    - mapToUnit: ok
+    + grid2lines: add an example with something else than the prototypes
+    - componentPlane: ok
+    + hitMap: check references
+    - umatrix: ok
+    + error.kaskilagus: add details and warning about possible problems
+    + error.quantisation: add details and warning about possible problems
+    + som.tune: ok but lacks details
+    - som.tunecontrol: ok
+    - prototype.distances: ok
+    - distance.grid: ok
+    - sominit.pca: ok
+    + sominit.random: ok but might be more generic with specific details for the different datatypes
+    - print.somgrid: ok
+    - summary.somgrid: ok
+    - plot.somgrid: ok
+    - print.som: ok
+    - summary.som: ok
+    + plot.som: to be rewritten (with the method)
+    - print.somnum: ok
+    - summary.somnum: ok
+    - predict.somnum: ok
+    - as.dist.somnum: ok
+    - as.matrix.somnum: ok
+    - sominit.pca.default: ok
+    - sominit.random.default: ok
+    + batchsom.default: ok but details on the exact training algorithm might be needed
+    - print.relationalsom: ok
+    - summary.relationalsom: ok
+    - as.dist.relationalsom: ok
+    - as.matrix.relationalsom: ok
+    + sominit.pca.dist: ok but must be rewritten with the function
+    - sominit.random.dist: ok
+    + batchsom.dist: add references
+    - plot.sompdist: ok
+    - as.matrix,sompdist: ok
+    - as.dist.sompdist: ok
+    + plot.somtune: ok but will be improved when the method is
 
 Done in version 0.2:
 - relational SOM (first version with optimal algorithm but no implementation tricks) :

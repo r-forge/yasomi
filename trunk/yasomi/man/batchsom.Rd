@@ -16,18 +16,19 @@ batchsom(data, somgrid, init, prototypes, \dots)
     structure of the Self-Organising Map: see \code{\link{somgrid}} }
   \item{init}{the initialisation method (see details)}
   \item{prototypes}{Initial values for the
-    prototypes (the exact representation of the prototypes is
-    implementation dependent). If missing, initial prototypes are chosen via
+    prototypes (the exact representation of the prototypes depends on
+    the data type). If missing, initial prototypes are chosen via
     the method specified by the \code{init} parameter (see details)}
   \item{\dots}{additional arguments to be passed to methods}
 }
 \details{
 If the initial value of \code{prototypes} is not provided, it is
-obtained by a call to an implementation specific initialisation method
+obtained by a call to an initialisation method
 specified via the \code{init} parameter (of character type). All
-implementations should accept the \code{"random"} value for \code{init}
+\code{batchsom} methods accept the \code{"random"} value for \code{init}
 (see \code{\link{sominit.random}} for the corresponding
-generic random initialisation method). It is also recommend to accept
+generic random initialisation method). all
+\code{batchsom} methods accept also
 the \code{"pca"} which covers ordered initialisation methods inspired by
 principal component analysis in the standard vector case (see
 \code{\link{sominit.pca}} for the corresponding generic method). The
@@ -46,7 +47,8 @@ specified depends on the method.
   \item{data}{the original data if the function is called with
     \code{keepdata = TRUE}}
   The list will generally contain additional components specific to each
-  implementation. 
+  implementation. The returned object will also generally have another
+  class more specific than \code{"som"}. 
 }
 %\references{ ~put references to the literature/web site here ~ }
 \author{Fabrice Rossi}

@@ -15,7 +15,8 @@ mapToUnit(som, values)
 }
 \details{
 The goal of this function is not to assign new observations to a fitted
-SOM but rather to map additional variables.  The mapping is based only on the clustering result of the SOM: if observation number k was assigned to unit l at the end of the fitting process, then \code{values[k,]} is mapped to the l-th component of the resulting list. 
+SOM but rather to map additional variables (see
+\code{\link{predict.somnum}} for new observations assignment).  The mapping is based only on the clustering result of the SOM: if observation number k was assigned to unit l at the end of the fitting process, then \code{values[k,]} is mapped to the l-th component of the resulting list. 
 }
 \value{
 a list of length the number of units in the SOM. Each component contains the subset of \code{values} that is mapped to the corresponding unit. 
@@ -24,7 +25,7 @@ a list of length the number of units in the SOM. Each component contains the sub
 \author{Fabrice Rossi}
 %\note{
 %}
-%\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
+\seealso{\code{\link{predict.somnum}} for new observations assignment}
 \examples{
 data(iris)
 # scaling

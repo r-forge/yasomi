@@ -73,7 +73,10 @@ the method are transmitted to the initialisation method.
 %
 % ~Make other sections like Warning with \section{Warning }{....} ~
 %}
-%\seealso{}
+\seealso{code{\link{som.tune}} for the optimisation of some magic
+  parameters (such as the radii), \code{\link{umatrix}} and
+  \code{\link{distance.grid}} for visual analysis of the distances
+  between the prototypes.}
 \examples{
 data(iris)
 # scaling

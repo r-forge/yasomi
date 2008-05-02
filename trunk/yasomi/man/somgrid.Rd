@@ -39,7 +39,7 @@ somgrid(xdim, ydim, topo = c("rectangular", "hexagonal"),with.dist = TRUE)
   \code{print} or the \code{summary} methods. The
   \code{\link{plot.somgrid}} method provides graphical representation. 
   }
-\seealso{ \code{\link{plot.somgrid}}}
+\seealso{ \code{\link{plot.somgrid}} for graphical representation.}
 \examples{
 # display a rectangular grid
 plot(somgrid(10,7))

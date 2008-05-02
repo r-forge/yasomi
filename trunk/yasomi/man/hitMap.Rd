@@ -17,7 +17,8 @@ hitMap(som,border=NA,with.cells=TRUE, \dots)
   \item{with.cells}{logical. If \code{TRUE}, the hit map includes
     two cells for each unit: an enclosing cell of standard size (see
     \code{\link{plot.somgrid}}) and an internal cell whose surface
-    encode the cluster size. If \code{FALSE}, the internal cell only is drawn}
+    size encodes the cluster size. If \code{FALSE}, the internal cell
+    only is drawn} 
   \item{\dots}{additional parameters transmitted to the low level plot function \code{\link{plot.somgrid}}}
 }
 %\details{
