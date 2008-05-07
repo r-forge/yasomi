@@ -144,7 +144,7 @@ One limitation of the grid based display of the SOM is that the distances betwee
 <<fig=TRUE,echo=TRUE>>=
 pdist <- prototype.distances(som)
 pgrid <- distance.grid(pdist)
-filled.contour(pgrid)
+filled.contour(pgrid,color.palette=terrain.colors)
 @
   \caption{A type of U-matrix}
   \label{figure:smoothumatrix}

@@ -76,7 +76,7 @@ som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),
                     ## initializations
                     for(i in 1:control$ninit) {
                         if(init=="pca") {
-                            prototypes=sominit.pca(data,somgrid)
+                            prototypes=sominit.pca(data,somgrid)$prototypes
                         } else {
                             prototypes=sominit.random(data,somgrid)
                         }

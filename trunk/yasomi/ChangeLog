@@ -1,4 +1,27 @@
+2008-05-07  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* inst/doc/introduction.Rnw: used terrain.colors in filled.contour
+
+	* R/tune.R (som.tune): fixed to use the new return value of sominit.pca
+
+	* man/sominit.pca.dist.Rd: updated to reflect the new implementation.
+
+	* man/sominit.pca.default.Rd: updated to reflect the new result type.
+
+	* man/sominit.pca.Rd: updated to reflect the new result type.
+
+	* R/relational.R (double.centering): new internal function
+	(relationalbmu.R): moved from slow-relational.R to here
+	(extended.relationalbmu.R): new function when the prototypes' coefficients don't sum to one
+	(sominit.pca.dist): new version that does work as planned ;-)
+	(fastRelationalsom.lowlevel.R): support for extended prototypes
+	(batchsom.dist): support for extended prototypes
+
 2008-05-02  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/relational.R (batchsom.dist): added sanity check for prototypes
+
+	* R/som.R (batchsom.default): added a test for the number of rows of the prototype matrix
 
 	* man/sominit.pca.dist.Rd: fixed the example code
 

@@ -1,7 +1,6 @@
 BUGS or problems:
 - somtune must become more generic
 - fix the content of som$errors: make sure the last value is always the final quantisation error
-- add check for sum to one in the relational som method
 - grid2lines can't work on relational som if prototypes is not provided
 - fix error.kaskilagus and error.quantisation for relational som
 
@@ -23,7 +22,7 @@ BUGS or problems:
 - tests of parameters
 - add new quality measures
 - smarter som.tune (no repetition of pca init)
-- torus topography?
+- torus like topology?
 - classif or cluster in results?
 
 + initialisation methods
@@ -52,7 +51,7 @@ BUGS or problems:
   - add options to colorCode
   - color mapping in CIE Lab space (cf colorspace package)
   - variation over the u-matrix principle
-  - smooth colormap
+  - smooth componentMap
   - fix the legend in plot.somtune
 
 + simple functions to improve
@@ -65,7 +64,8 @@ BUGS or problems:
 + documentation
   - document missing functions (methods!)
   - write vignettes:
-    - general introduction (in progress)
+    - general introduction :
+      - add a standard u matrix
     - dissimilarity som
     - graphical methods
   - add a package doc
@@ -107,7 +107,7 @@ BUGS or problems:
     - summary.relationalsom: ok
     - as.dist.relationalsom: ok
     - as.matrix.relationalsom: ok
-    + sominit.pca.dist: ok but must be rewritten with the function
+    + sominit.pca.dist: need some details
     - sominit.random.dist: ok
     + batchsom.dist: add references
     - plot.sompdist: ok

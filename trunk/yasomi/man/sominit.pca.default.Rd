@@ -16,7 +16,10 @@ components.
   \item{\dots}{not used}
 }
 \value{
-  A matrix containing appropriate initial prototypes
+  A list with the following components
+  \item{prototype}{a matrix containing appropriate initial prototypes}
+  \item{data.pca}{the results of the PCA conducted on the data via a
+    call to \code{\link{prcomp}}}
 }
 \author{Fabrice Rossi}
 \seealso{\code{\link{somgrid}} for specifying the prior structure and
@@ -26,7 +29,7 @@ X <- cbind(rnorm(500),rnorm(500))
 
 sg <- somgrid(xdim=7,ydim=7,topo="rect")
 
-proto <- sominit.pca(X,sg)
+proto <- sominit.pca(X,sg)$prototypes
 
 plot(X,pch="+",col="red",xlim=range(X[,1],proto[,1]),
      ylim=range(X[,2],proto[,2]))

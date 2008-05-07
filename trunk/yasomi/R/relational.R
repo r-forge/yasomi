@@ -21,12 +21,30 @@ sominit.random.dist <- function(data,somgrid,
     protos
 }
 
-sominit.pca.dist <- function(data, somgrid, nbsupport=3,
-                             type=c("closest","random"),...) {
-    type <- match.arg(type)
-    ## the distance matrix PCA is implemented in cmdscale
-    data.cmd <- cmdscale(data)
-    sdev <- sd(data.cmd)
+double.centering <- function(D) {
+    D.rowmean <- rowMeans(D)
+    D.mean <- mean(D.rowmean)
+    sweep(sweep(D,1,D.rowmean,"-"),2,D.rowmean,"-")+D.mean
+}
+
+normsFromDist <- function(D) {
+    D.rowmean <- rowMeans(D)
+    D.mean <- mean(D.rowmean)
+    -0.5*(diag(D)+D.mean-2*D.rowmean)
+}
+
+sominit.pca.dist <- function(data, somgrid, ...) {
+    D <- as.matrix(data^2,diag=0)
+    ## we do something very close to MDS and kernel PCA
+    ## first double centering
+    D.c <- -0.5*double.centering(D)
+    ## then eigenanalysis
+    D.eigen <- eigen(D.c,symmetric=T)
+    ## normalize (positive eigen values only)
+    positive <- D.eigen$values>0
+    D.eigen$vectors[,positive]=sweep(D.eigen$vectors[,positive],2,sqrt(D.eigen$values[positive]),"/")
+    ## compute standard deviations
+    sdev <- sqrt(D.eigen$values[positive]/nrow(D))
 
     ## the more detailled axis is assigned to the axis with the largest
     ## standard deviation
@@ -53,30 +71,8 @@ sominit.pca.dist <- function(data, somgrid, nbsupport=3,
         base[,1] <- base[,1]+rep(c(0,2*sdev[x.ev]/xspan),each=somgrid$xdim,length.out=nrow(base))
     }
     ## map back the grid to the dissimilarity space
-    ## this done by finding a barycentric representation for each point of the
-    ## grid (this is slow but still very quick compared to cmdscale)
-    if(type=="closest") {
-        dbd <- dist(base,data.cmd)
-        winners <- t(apply(dbd,1,order))[,1:nbsupport]
-    }
-    prototypes <- matrix(0,ncol=nrow(data.cmd),nrow=nrow(base))
-    for(i in 1:nrow(base)) {
-        target <- matrix(c(base[i,],1),ncol=1)
-        if(type=="closest") {
-            winner <- winners[i,]
-        } else {
-            winner <- sample(1:(nrow(data.cmd)),size=nbsupport)
-        }
-        H <- rbind(t(data.cmd[winner,]),rep(1,nbsupport))
-        if(nbsupport==3) {
-            weights <- solve(H,target)
-        } else {
-            H.svd <- svd(H)
-            weights <- H.svd$v%*%diag(1/H.svd$d)%*%crossprod(H.svd$u,target)
-        }
-        prototypes[i,winner] <- weights
-    }
-    prototypes
+    prototypes <- tcrossprod(base,D.eigen$vectors[,c(x.ev,y.ev)])
+    list(prototypes=prototypes,D=D,D.c=D.c,D.eigen=D.eigen,sdev=sdev)
 }
 
 fastRelationalBMU.R <- function(cluster,nclust,diss,nv) {
@@ -118,6 +114,38 @@ nfPS <- function(bips,nvnormed,nclust) {
        nf=double(nclust),DUP=FALSE)$nf
 }
 
+relationalbmu.R <- function(prototypes,diss) {
+    ## first compute the base distances
+    Dalpha <- tcrossprod(diss,prototypes)
+    ## then the normalisation factor
+    ## can we do this faster?
+    nf <- double(nrow(prototypes))
+    for(i in 1:length(nf)) {
+        nf[i] <- 0.5*c(prototypes[i,]%*%Dalpha[,i])
+    }
+    distances <- sweep(Dalpha,2,nf,"-")
+    clusters <- apply(distances,1,which.min)
+    error <- sum(distances[cbind(1:length(clusters),clusters)])
+    list(clusters=clusters,error=error,Dalpha=Dalpha,nf=nf)
+}
+
+extended.relationalbmu.R <- function(prototypes,diss,norms) {
+    ## we use here the extended formula when rowSums(prototypes)!=1
+    Dalpha <- tcrossprod(diss,prototypes)
+    ## then the normalisation factor
+    ## can we do this faster?
+    nf <- double(nrow(prototypes))
+    for(i in 1:length(nf)) {
+        nf[i] <- 0.5*c(prototypes[i,]%*%Dalpha[,i])
+    }
+    sums <- 1-rowSums(prototypes)
+    protonorms <- prototypes%*%norms
+    distances <- sweep(Dalpha,2,nf+sums*protonorms,"-")+norms%o%sums
+    clusters <- apply(distances,1,which.min)
+    error <- sum(distances[cbind(1:length(clusters),clusters)])
+    list(clusters=clusters,error=error,Dalpha=Dalpha,nf=nf)
+}
+
 relationalsecondbmu.R <- function(prototypes,diss) {
     ## first compute the base distances
     Dalpha <- tcrossprod(diss,prototypes)
@@ -133,13 +161,18 @@ relationalsecondbmu.R <- function(prototypes,diss) {
 }
 
 fastRelationalsom.lowlevel.R <- function(somgrid,diss,prototypes,
-                                     assignment,radii,maxiter,kernel,
-                                     normalised,cut,verbose) {
+                                         assignment,radii,maxiter,kernel,
+                                         normalised,cut,verbose,extended,
+                                         data.norms) {
     oldClassif <- rep(NA,nrow(diss))
     errors <- vector("list",length(radii))
     nv <- neighborhood(somgrid,radii[1],kernel,normalised=normalised)
     ## a round of initialisation is needed
-    bmus <- relationalbmu.R(prototypes,diss)
+    if(extended) {
+        bmus <- extended.relationalbmu.R(prototypes,diss,data.norms)
+    } else {
+        bmus <- relationalbmu.R(prototypes,diss)
+    }
     classif <- bmus$clusters
     errors[[1]] <- bmus$error
     if(verbose) {
@@ -222,18 +255,37 @@ batchsom.dist <- function(data,somgrid,init=c("pca","random"),prototypes,
     if(class(somgrid)!="somgrid") {
         stop("'somgrid' is not of somgrid class")
     }
-    diss <- as.matrix(data^2,diag=0)
+    ## diss is initialized in this code
     if(missing(prototypes)) {
         ## initialisation based on the value of init
         init <- match.arg(init)
         args <- list(...)
         params <- c(list(data=data,somgrid=somgrid),list(...))
-        prototypes <- switch(init,
-                             "pca"=do.call("sominit.pca",params),
-                             "random"=do.call("sominit.random",params))
+        if(init=="random") {
+            prototypes <- do.call("sominit.random",params)
+            extended <- FALSE
+            diss <- as.matrix(data^2,diag=0)
+        } else {
+            initresults <- do.call("sominit.pca",params)
+            prototypes <- initresults$prototypes
+            extended <- TRUE
+            data.norms <- diag(initresults$D.c)
+            diss <- initresults$D
+        }
     } else {
+        diss <- as.matrix(data^2,diag=0)
         if(ncol(prototypes)!=ncol(diss)) {
             stop("'prototypes' and 'diss' have different dimensions")
+        }
+        if(nrow(prototypes)!=somgrid$size) {
+            stop("'prototypes' and 'somgrid' are not compatible")
+        }
+        if(!isTRUE(all.equal(rowSums(prototypes),rep(1,nrow(prototypes))))) {
+            if(verbose) {
+                print("'prototypes' rows do not sum to one, using extended relational formula")
+            }
+            extended <- TRUE
+            data.norms <- normsFromDist(diss)
         }
     }
     ## distances?
@@ -249,8 +301,13 @@ batchsom.dist <- function(data,somgrid,init=c("pca","random"),prototypes,
         }
         radii <- radius.exp(minRadius,max(minRadius,somgrid$diam/3*2),nbRadii)
     }
-    pre <- lowlevel(somgrid,diss,prototypes,assignment,radii,maxiter,theKernel,
-                    normalised,cut,verbose)
+    if(extended) {
+        pre <- lowlevel(somgrid,diss,prototypes,assignment,radii,maxiter,
+                        theKernel,normalised,cut,verbose,TRUE,data.norms)
+    } else {
+        pre <- lowlevel(somgrid,diss,prototypes,assignment,radii,maxiter,
+                        theKernel,normalised,cut,verbose,FALSE,NULL)
+    }
     pre$assignment <- assignment
     pre$kernel <- kernel
     pre$normalised <- normalised

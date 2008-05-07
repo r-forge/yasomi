@@ -27,7 +27,8 @@ sominit.pca.default <- function(data,somgrid,...) {
     ## map back the grid to the original space
     mapped <- tcrossprod(base,data.pca$rotation[,c(x.ev,y.ev)])
     ## decentering
-    sweep(mapped,2,data.pca$center,"+")
+    prototypes <- sweep(mapped,2,data.pca$center,"+")
+    list(prototypes=prototypes,data.pca=data.pca)
 }
 
 sominit.random.default <- function(data,somgrid,
@@ -141,11 +142,14 @@ batchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
         args <- list(...)
         params <- c(list(data=data,somgrid=somgrid),list(...))
         prototypes <- switch(init,
-                             "pca"=do.call("sominit.pca",params),
+                             "pca"=do.call("sominit.pca",params)$prototypes,
                              "random"=do.call("sominit.random",params))
     } else {
         if(ncol(prototypes)!=ncol(data)) {
             stop("'prototypes' and 'data' have different dimensions")
+        }
+        if(nrow(prototypes)!=somgrid$size) {
+            stop("'prototypes' and 'somgrid' are not compatible")
         }
     }
     ## distances?

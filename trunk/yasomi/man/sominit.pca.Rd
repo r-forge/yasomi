@@ -17,7 +17,10 @@ sominit.pca(data, somgrid, \dots)
   \item{\dots}{additional parameters to be passed to methods}
 }
 \value{
-  A matrix containing appropriate initial prototypes
+  A list with at least a component \code{prototypes} containing initial
+  prototypes. Different implementations of the function provide other
+  components, in particular the results of the PCA or the related method
+  used to compute the prototypes. 
 }
 \author{Fabrice Rossi}
 \seealso{\code{\link{sominit.pca.default}} and

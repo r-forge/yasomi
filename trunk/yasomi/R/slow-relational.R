@@ -7,21 +7,6 @@ partialSums.R <- function(cluster,nclust,diss) {
     list(ps=pre,bips=bipre)
 }
 
-relationalbmu.R <- function(prototypes,diss) {
-    ## first compute the base distances
-    Dalpha <- tcrossprod(diss,prototypes)
-    ## then the normalisation factor
-    ## can we do this faster?
-    nf <- double(nrow(prototypes))
-    for(i in 1:length(nf)) {
-        nf[i] <- 0.5*c(prototypes[i,]%*%Dalpha[,i])
-    }
-    distances <- sweep(Dalpha,2,nf,"-")
-    clusters <- apply(distances,1,which.min)
-    error <- sum(distances[cbind(1:length(clusters),clusters)])
-    list(clusters=clusters,error=error,Dalpha=Dalpha,nf=nf)
-}
-
 relationalsom.lowlevel.R <- function(somgrid,diss,prototypes,
                                      assignment,radii,maxiter,kernel,
                                      normalised,cut,verbose) {

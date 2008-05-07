@@ -59,7 +59,7 @@ batchsom.R <- function(data,somgrid,init=c("pca","random"),prototypes,
         args <- list(...)
         params <- c(list(data=data,somgrid=somgrid),list(...))
         prototypes <- switch(init,
-                             "pca"=do.call("sominit.pca",params),
+                             "pca"=do.call("sominit.pca",params)$prototypes,
                              "random"=do.call("sominit.random",params))
     } else {
         if(ncol(prototypes)!=ncol(data)) {
