@@ -149,7 +149,16 @@ filled.contour(pgrid,color.palette=terrain.colors)
   \caption{A type of U-matrix}
   \label{figure:smoothumatrix}
 \end{figure}
-This representation confirms the existence of two classes in the data and also the presence of some sub-structure in the largest class (on the right part of all figures).
+This representation confirms the existence of two classes in the data and also the presence of some sub-structure in the largest class (on the right part of all figures). Another u-matrix like representation is provided by the plotting method associated to the object that represents prototypes distances, as shown on Figure \ref{figure:discreteumatrix}.
+\begin{figure}[htbp]
+  \centering
+<<fig=TRUE,echo=TRUE>>=
+plot(pdist,color.palette=terrain.colors)
+@
+  \caption{A discrete type of U-matrix}
+  \label{figure:discreteumatrix}
+\end{figure}
+
 
 \end{document}
 

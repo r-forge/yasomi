@@ -1,6 +1,10 @@
 ## in quality.R
-KaskiLagus <- function(som,data) {
-    UseMethod("KaskiLagus")
+error.quantisation <- function(som,newdata,...) {
+    UseMethod("error.quantisation")
+}
+
+error.kaskilagus <- function(som,newdata,...) {
+    UseMethod("error.kaskilagus")
 }
 
 ## in umatrix.R

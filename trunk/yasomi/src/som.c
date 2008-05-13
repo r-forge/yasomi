@@ -57,7 +57,7 @@ void neighborhood(double *distances,double *nv,int nbUnit,double radius,
    cut: cuting value for updates
    verbose: verbose flag
    classif (ndata): clustering result
-   errors (nradii,maxiter): evolution of the quantization error
+   errors (nradii,maxiter): evolution of the quantisation error
  */
 
 void batch_som(double *proto,int *nproto,double *data,int *ndata,

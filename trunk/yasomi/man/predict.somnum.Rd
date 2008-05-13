@@ -1,8 +1,8 @@
 \name{predict.somnum}
 \alias{predict.somnum}
-\title{Map new data to a fitted Self-Organising Map}
+\title{Map new data to a fitted Self-Organising Map for vector data}
 \description{
-Map new data to a fitted Self-Organising Map, i.e., compute the best
+Map new vector data to a fitted Self-Organising Map, i.e., compute the best
 matching unit for each given observation. 
 }
 \usage{

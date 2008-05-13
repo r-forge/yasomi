@@ -39,7 +39,7 @@ data, then this method is equivalent to
 \examples{
 data(iris)
 
-X <- as.matrix(unique(iris[1:2]))
+X <- scale(as.matrix(unique(iris[1:2])))
 
 sg <- somgrid(xdim=7,ydim=7,topo="rect")
 

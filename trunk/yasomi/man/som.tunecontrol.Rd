@@ -45,7 +45,13 @@ value. In this case, all combinations are compared in
 \code{\link{som.tune}}. For instance, if all parameters have default
 values expect for \code{kernel=c("gaussian","linear")} then
 \code{\link{som.tune}} will fit 10 SOM with a gaussian kernel as well as
-10 SOM with a linear kernel and select the best one. 
+10 SOM with a linear kernel and select the best one.
+
+The error criterion is a function which takes a object returned by the
+appropriate \code{\link{batchsom}} method (e.g. a \code{"somnum"} object
+for standard vector data and a \code{"relationalsom"} object for
+dissimilarity data) and returns a numerical value. \code{som.tune}
+optimises for small values of this criterion.
 }
 \value{
   a list containing all the above parameters with one exception: 'radii'

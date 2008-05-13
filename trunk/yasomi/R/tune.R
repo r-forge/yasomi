@@ -20,7 +20,7 @@ som.tunecontrol <- function(somgrid,init="pca",ninit=1,
 
 
 som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),
-                     verbose=FALSE) {
+                     verbose=FALSE,internalVerbose=FALSE) {
     nbconf <- length(control$init)*control$ninit*length(control$assignment)*length(control$radii)*length(control$annealing)*length(control$kernel)
     dimensions <- character()
     if(length(control$init)>1) {
@@ -51,14 +51,20 @@ som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),
     comp.kernel <- rep("",nbconf)
     if(!identical(control$criterion,error.quantisation)) {
         quantisation <- rep(NA,nbconf)
+        isquant <- FALSE
     } else {
         quantisation <- NULL
+        isquant <- TRUE
     }
     bestPerfSoFar <- Inf
     confIndex <- 1
     ## compute distances if they are missing
     if(is.null(somgrid$dist)) {
         somgrid$dist <- as.matrix(dist(somgrid$pts,method="Euclidean"),diag=0)
+    }
+    ## compute PCA based initialisation if needed
+    if("pca" %in% control$init) {
+        pcainit <- sominit.pca(data,somgrid)
     }
     ## initialization method
     for(init in control$init) {
@@ -74,9 +80,15 @@ som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),
                 ## annealing
                 for(annealing in control$annealing) {
                     ## initializations
-                    for(i in 1:control$ninit) {
+                    if(init=="pca") {
+                        ## deterministic
+                        localninit=1
+                    } else {
+                        localninit=control$ninit
+                    }
+                    for(i in 1:localninit) {
                         if(init=="pca") {
-                            prototypes=sominit.pca(data,somgrid)$prototypes
+                            prototypes=pcainit$prototypes
                         } else {
                             prototypes=sominit.random(data,somgrid)
                         }
@@ -88,10 +100,13 @@ som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),
                             radii <- switch(annealing,
                                             "linear"=radius.lin(minRadius,radius,control$innernradii),
                                             "power"=radius.exp(minRadius,radius,control$innernradii))
+                            ## will always save the data
                             som <- batchsom(data,somgrid,prototypes=prototypes,
                                             assignement=assignment,radii=radii,
-                                            maxiter=control$maxiter,kernel=kernel)
-                            performances[confIndex] <- control$criterion(som,data)
+                                            maxiter=control$maxiter,kernel=kernel,
+                                            verbose=internalVerbose)
+                            ## the criterion must use only the som structure
+                            performances[confIndex] <- control$criterion(som)
                             comp.init[confIndex] <- init
                             comp.assign[confIndex] <- assignment
                             comp.radii[confIndex] <- radius
@@ -105,7 +120,7 @@ som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),
                                     print(paste("Best configuration so far",confIndex,"with error",bestPerfSoFar))
                                 }
                             }
-                            if(!is.null(quantisation)) {
+                            if(!isquant) {
                                 quantisation[confIndex] <- error.quantisation(som)
                             }
                             confIndex <- confIndex + 1
@@ -117,9 +132,6 @@ som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),
     }
     if(is.null(quantisation)) {
         quantisation <- performances
-        isquant <- TRUE
-    } else {
-        isquant <- FALSE
     }
     res <- list(best.som=bestSOM,quantisation=quantisation,errors=performances,
                 isquant=isquant,control=control,dimensions=dimensions,
@@ -171,4 +183,15 @@ plot.somtune <- function(x,relative=TRUE,...) {
     } else {
         stop("cannot plot an object of class 'somtune' with more than one dimension")
     }
+}
+
+print.somtune <- function(x,...) {
+    cat("\nSelf-Organising Map Tuning Result\n\n")
+    cat(length(x$quantisation),"configurations tested\n")
+    cat("\nBest SOM:\n")
+    if(!x$isquant) {
+        cat("      Error measure:",x$errors[x$best.index],"\n")
+    }
+    cat(" Quantisation Error:",x$quantisation[x$best.index],"\n")
+    print.som(x$best.som)
 }

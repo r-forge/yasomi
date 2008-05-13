@@ -1,4 +1,5 @@
 #include <R.h>
+#include <math.h>
 
 int bmu(double *proto,int *nproto,double *data,int *ndata,int *dim,
 	int *winner,double *error) 
@@ -27,7 +28,7 @@ int bmu(double *proto,int *nproto,double *data,int *ndata,int *dim,
 		bestSoFar = j;
 	    }
 	}
-	*error += bestDist;
+	*error += sqrt(bestDist);
 	if(bestSoFar != winner[i]) {
 	    winner[i] = bestSoFar;
 	    changed = 1;
@@ -117,7 +118,7 @@ int bmu_heskes_ext_mem(double *proto,double *neigh,int *nproto,double *data,
 		bestSoFar = j;
 	    }
 	}
-	*error += distances[bestSoFar];
+	*error += sqrt(distances[bestSoFar]);
 	if(bestSoFar != winner[i]) {
 	    winner[i] = bestSoFar;
 	    changed = 1;

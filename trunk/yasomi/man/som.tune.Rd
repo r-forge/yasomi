@@ -1,19 +1,28 @@
 \name{som.tune}
 \alias{som.tune}
+\alias{print.somtune}
 \title{Parameter tuning for Self-Organising Maps}
 \description{
 This function tunes some parameters of a Self-Organising Map by
-optimising a specified error measure.  The prior structure is not
+optimising a specified error measure. The prior structure is not
 optimised by this function.
 }
 \usage{
-som.tune(data, somgrid, control = som.tunecontrol(somgrid), verbose = FALSE)
+som.tune(data, somgrid, control = som.tunecontrol(somgrid),
+         verbose = FALSE, internalVerbose = FALSE)
+\method{print}{somtune}(x,\dots)
 }
 \arguments{
-  \item{data}{a matrix or a data frame of observations}
+  \item{data}{the data to which the SOM will be fitted. This can be,
+    e.g., a matrix or data frame of observations (which should be scaled), or a
+    distance matrix}
   \item{somgrid}{an object of class 'somgrid'}
   \item{control}{a control object which specifies the parameter to optimize}
   \item{verbose}{switch for tracing the tuning process}
+  \item{internalVerbose}{switch for tracing each call to
+    \code{\link{batchsom}}}
+  \item{x}{an object of class \code{"somtune"}}
+  \item{\dots}{not used}
 }
 \details{
 The optimisation is done via a simple grid search that fit a
@@ -51,6 +60,9 @@ sg <- somgrid(xdim=15,ydim=15,topo="hex")
 # choose a good SOM via Kaski and Lagus' error measure
 tune.results <-
   som.tune(data,sg,som.tunecontrol(sg,criterion=error.kaskilagus))
+
+# print the results
+print(tune.results)
 
 # umatrix of the best SOM
 umatrix(tune.results$best.som)

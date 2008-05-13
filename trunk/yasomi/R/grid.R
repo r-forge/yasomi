@@ -47,7 +47,7 @@ print.somgrid <- function(x,...) {
 
 plot.somgrid <- function(x,col=NA,size=NA,add=FALSE,border=NULL,
                          colorValues=NA,sizeValues=NA,colormap=50,
-                         withkey=FALSE,...) {
+                         withkey=FALSE,color.palette=heat.colors,...) {
     ## some additional error handling is needed
     args <- list(...)
     if(!add) {
@@ -75,7 +75,7 @@ plot.somgrid <- function(x,col=NA,size=NA,add=FALSE,border=NULL,
         if(is.numeric(colormap)) {
             ## minimum two colors
             nbcolors <- max(2,as.integer(colormap))
-            colormap <- heat.colors(nbcolors)
+            colormap <- color.palette(nbcolors)
         } else {
             nbcolors <- length(colormap)
         }

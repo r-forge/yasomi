@@ -86,7 +86,7 @@ the method are transmitted to the initialisation method.
   between the prototypes.}
 \examples{
 data(iris)
-# scaling
+# scaling and dissimilarity computation
 data <- dist(scale(iris[1:4]))
 
 # a small hexagonal grid

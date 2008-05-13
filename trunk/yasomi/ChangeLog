@@ -1,3 +1,69 @@
+2008-05-13  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/predict.relationalsom.Rd: new file for new function
+
+	* man/som.tunecontrol.Rd: added some details about the error criterion
+
+	* man/error.kaskilagus.relationalsom.Rd: relational case
+
+	* man/error.kaskilagus.somnum.Rd: numerical case
+
+	* man/error.kaskilagus.Rd: corresponds now to the generic case
+
+	* man/batchsom.dist.Rd: fixed a comment
+
+	* man/error.quantisation.relationalsom.Rd: relational case
+
+	* man/error.quantisation.somnum.Rd: numerical case
+
+	* man/error.quantisation.Rd: corresponds now to the generic case
+
+2008-05-12  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/tune.R (som.tune): modified to call the criterion only with the som parameter
+
+	* R/relational.R (predict.relationalsom): can return the second winner if needed
+	(relationalsecondbmu.R): new interface based on the data saved in the realtional som
+
+	* R/generic.R: removed KaskiLagus
+
+	* R/relational.R (relational.sqrt): new function that computes square roots and discards negative values
+	(relationalbmu.R): fixed to return distances rather then squared distances
+	(predict.relationalsom): as relationalbmu.R
+	(relationalsecondbmu.R): as relationalbmu.R
+	(fastRelationalBMU.R): as relationalbmu.R
+
+	* src/bmu.c (bmu): fixed to use the quantisation error, not the squared quantisation error
+	(bmu_heskes_ext_mem): as bmu
+
+2008-05-11  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/relational.R (predict.relationalsom): prediction for relational som (new function)
+
+	* R/quality.R (error.quantisation.som): generic version when no new data is used. 
+	(error.quantisation.somnum): numerical version
+	(error.quantisation.relationalsom): relational version
+
+	* R/generic.R (error.quantisation): moved to generic
+
+	* NEWS: new file with news.
+
+2008-05-10  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/plot.somgrid.Rd: fixed to document the new parameter
+
+	* R/grid.R (plot.somgrid): added a color.palette parameter for the simplest case of color palette specification
+
+	* man/som.tune.Rd: updated to reflect the extension to relational data
+
+	* R/tune.R (print.somtune): rudimentary printing function
+
+	* R/relational.R (relationalbmu.R): mean error rather than total error
+
+	* R/quality.R (error.quantisation): works only for numerical SOM in some circumstances
+
+	* R/tune.R (som.tune): only one pca based initialisation in a tuning call.
+
 2008-05-07  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
 
 	* inst/doc/introduction.Rnw: used terrain.colors in filled.contour

@@ -1,5 +1,14 @@
 # relational SOM
 
+relational.sqrt <- function(val,with.warning=TRUE) {
+    valmin <- min(val)
+    if(with.warning && valmin < -sqrt(.Machine$double.eps)) {
+        warning(paste("Non negligible negative minimal values (",valmin,") discared",sep=""))
+    }
+    val[val<0] <- 0
+    sqrt(val)
+}
+
 sominit.random.dist <- function(data,somgrid,
                                 method=c("prototypes","random","cluster"),...) {
     method <- match.arg(method)
@@ -42,7 +51,7 @@ sominit.pca.dist <- function(data, somgrid, ...) {
     D.eigen <- eigen(D.c,symmetric=T)
     ## normalize (positive eigen values only)
     positive <- D.eigen$values>0
-    D.eigen$vectors[,positive]=sweep(D.eigen$vectors[,positive],2,sqrt(D.eigen$values[positive]),"/")
+    D.eigen$vectors[,positive] <- sweep(D.eigen$vectors[,positive],2,sqrt(D.eigen$values[positive]),"/")
     ## compute standard deviations
     sdev <- sqrt(D.eigen$values[positive]/nrow(D))
 
@@ -90,7 +99,7 @@ fastRelationalBMU.R <- function(cluster,nclust,diss,nv) {
     ## nf <- 0.5*nfPS(ps$bips,nvnormed,nclust)
     distances <- sweep(Dalpha,1,nf,"-")
     bmu <- apply(distances,2,which.min)
-    error <- sum(distances[cbind(bmu,1:length(bmu))])
+    error <- mean(relational.sqrt(distances[cbind(bmu,1:length(bmu))]))
     list(clusters=bmu,error=error,Dalpha=Dalpha,nf=nf)
 }
 
@@ -125,9 +134,34 @@ relationalbmu.R <- function(prototypes,diss) {
     }
     distances <- sweep(Dalpha,2,nf,"-")
     clusters <- apply(distances,1,which.min)
-    error <- sum(distances[cbind(1:length(clusters),clusters)])
+    error <- mean(relational.sqrt(distances[cbind(1:length(clusters),clusters)]))
     list(clusters=clusters,error=error,Dalpha=Dalpha,nf=nf)
 }
+
+predict.relationalsom <- function(object,newdata,with.secondwinner=FALSE,...) {
+    if(!inherits(newdata,"crossdist")) {
+        stop("'newdata' is not a crossdist object")
+    }
+    if(nrow(newdata)!=ncol(object$prototypes)) {
+        stop("'newdata' and 'object$prototypes' have different dimensions")
+    }
+    rdist <- sweep(object$prototypes%*%(newdata^2),1,object$nf,"-")
+    if(with.secondwinner) {
+        ## very suboptimal
+        ordered <- apply(rdist,2,order)
+        winners <- t(ordered[1:2,])
+        clusters <- winners[,1]
+    } else {
+        clusters <- apply(rdist,2,which.min)
+    }
+    error <- mean(relational.sqrt(rdist[cbind(clusters,1:length(clusters))]))
+    if(with.secondwinner) {
+        list(classif=clusters,error=error,distances=rdist,winners=winners)
+    } else {
+        list(classif=clusters,error=error,distances=rdist)
+    }
+}
+
 
 extended.relationalbmu.R <- function(prototypes,diss,norms) {
     ## we use here the extended formula when rowSums(prototypes)!=1
@@ -142,21 +176,16 @@ extended.relationalbmu.R <- function(prototypes,diss,norms) {
     protonorms <- prototypes%*%norms
     distances <- sweep(Dalpha,2,nf+sums*protonorms,"-")+norms%o%sums
     clusters <- apply(distances,1,which.min)
-    error <- sum(distances[cbind(1:length(clusters),clusters)])
+    error <- mean(relational.sqrt(distances[cbind(1:length(clusters),clusters)]))
     list(clusters=clusters,error=error,Dalpha=Dalpha,nf=nf)
 }
 
-relationalsecondbmu.R <- function(prototypes,diss) {
-    ## first compute the base distances
-    Dalpha <- tcrossprod(diss,prototypes)
-    ## then the normalisation factor
-    ## suboptimal
-    nf <- 0.5*diag(prototypes%*%Dalpha)
+relationalsecondbmu.R <- function(Dalpha,nf) {
     distances <- sweep(Dalpha,2,nf,"-")
     ## very suboptimal
     ordered <- apply(distances,1,order)
     winners <- t(ordered[1:2,])
-    error <- distances[cbind(1:nrow(winners),winners[,1])]
+    error <- relational.sqrt(distances[cbind(1:nrow(winners),winners[,1])])
     list(winners=winners,error=error)
 }
 
@@ -335,12 +364,7 @@ as.matrix.relationalsom <- function(x,...) {
     predist <- x$prototypes%*%x$Dalpha
     thedist <- sweep(predist,1,x$nf,"-")
     thedist <- sweep(thedist,2,x$nf,"-")
-    themin <- min(thedist)
-    if(themin < -sqrt(.Machine$double.eps)) {
-        warning(paste("Non negligible negative minimal values (",themin,") removed",sep=""))
-    }
-    thedist[thedist<0] <- 0
-    sqrt(thedist)
+    relational.sqrt(thedist)
 }
 
 as.dist.relationalsom <- function(x,FUN=NULL) {
