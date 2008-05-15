@@ -2,6 +2,7 @@
 export(somgrid,batchsom,colorCode,mapToUnit,grid2lines,componentPlane,hitMap)
 export(umatrix,error.kaskilagus,error.quantisation,som.tune,som.tunecontrol)
 export(prototype.distances,distance.grid,sominit.pca,sominit.random)
+export(somradii)
 # somgrid S3 methods
 S3method(print,somgrid)
 S3method(summary,somgrid)

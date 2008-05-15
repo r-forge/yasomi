@@ -157,3 +157,35 @@ plot.somgrid <- function(x,col=NA,size=NA,add=FALSE,border=NULL,
     }
 }
 
+radius.exp <- function(min,max,steps) {
+    max*(min/max)^(seq(0,1,length.out=steps))
+}
+
+radius.lin <- function(min,max,steps) {
+    seq(max,min,length.out=steps)
+}
+
+somradii <- function(somgrid,min,max,nb,annealing=c("power","linear"),
+                     kernel=c("gaussian","linear")) {
+    annealing <- match.arg(annealing,c("power","linear"))
+    kernel <- match.arg(kernel,c("gaussian","linear"))
+    if(missing(max)) {
+        max <- 2/3*somgrid$diam+1
+    }
+    if(missing(min)) {
+        min <- switch(kernel,"gaussian"=0.5,"linear"=1)
+    }
+    if(max<=min) {
+        stop("max must be larger than min")
+    }
+    if(min<=0) {
+        stop("min must be positive")
+    }
+    if(missing(nb)) {
+        nb <- max(2,ceiling(2*max))
+    }
+    switch(annealing,
+           "linear"=radius.lin(min,max,nb),
+           "power"=radius.exp(min,max,nb))
+}
+

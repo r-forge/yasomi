@@ -1,3 +1,28 @@
+2008-05-15  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/batchsom.default.Rd: updated to reflect the interface change
+
+	* man/batchsom.dist.Rd: updated to reflect the interface change
+
+	* man/radii.Rd: new documentation for a new function
+
+	* R/grid.R (radius.lin): moved here
+	(radius.exp): ditto
+
+	* R/relational.R (batchsom.dist): using the radii function
+
+	* R/slow-versions.R (batchsom.R): using the radii function
+
+	* R/tune.R (som.tune): using the radii function
+
+	* R/som.R (batchsom.default): radii is obtained by a call to the radii function
+
+2008-05-14  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/grid.R (radii): new function for generating radii
+
+	* man/batchsom.default.Rd: fixed typo
+
 2008-05-13  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
 
 	* man/predict.relationalsom.Rd: new file for new function

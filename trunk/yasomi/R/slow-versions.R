@@ -39,7 +39,7 @@ bmu.heskes.R <- function(prototypes,data,nv) {
 }
 
 batchsom.R <- function(data,somgrid,init=c("pca","random"),prototypes,
-                       assignment=c("single","heskes"),radii,nbRadii=30,
+                       assignment=c("single","heskes"),radii=somradii(somgrid),
                        maxiter=75,
                        kernel=c("gaussian","linear"),normalised,
                        cut=1e-7,verbose=FALSE,keepdata=TRUE,...) {
@@ -69,15 +69,6 @@ batchsom.R <- function(data,somgrid,init=c("pca","random"),prototypes,
     ## distances?
     if(is.null(somgrid$dist)) {
         somgrid$dist <- as.matrix(dist(somgrid$pts,method="Euclidean"),diag=0)
-    }
-    ## compute radii
-    if(missing(radii)) {
-        if(kernel=="gaussian") {
-            minRadius <- 0.5
-        } else {
-            minRadius <- 1
-        }
-        radii <- radius.exp(minRadius,max(minRadius,somgrid$diam/3*2),nbRadii)
     }
     pre <- batchsom.lowlevel.R(somgrid,data,prototypes,assignment,radii,
                                maxiter,theKernel,normalised,cut,verbose)

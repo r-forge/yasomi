@@ -86,6 +86,7 @@ BUGS or problems:
     - distance.grid: ok
     - sominit.pca: ok
     + sominit.random: ok but might be more generic with specific details for the different datatypes
+    + radii: missing
     - print.somgrid: ok
     - summary.somgrid: ok
     - plot.somgrid: ok

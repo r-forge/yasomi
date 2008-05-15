@@ -72,11 +72,6 @@ som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),
         for(assignment in control$assignment) {
             ## kernel
             for(kernel in control$kernel) {
-                if(kernel=="gaussian") {
-                    minRadius <- 0.5
-                } else {
-                    minRadius <- 1
-                }
                 ## annealing
                 for(annealing in control$annealing) {
                     ## initializations
@@ -97,9 +92,7 @@ som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),
                             if(verbose) {
                                 print(paste("Configuration ",confIndex,"/",nbconf,sep=""))
                             }
-                            radii <- switch(annealing,
-                                            "linear"=radius.lin(minRadius,radius,control$innernradii),
-                                            "power"=radius.exp(minRadius,radius,control$innernradii))
+                            radii=somradii(somgrid,max=radius,nb=control$innernradii,annealing=annealing)
                             ## will always save the data
                             som <- batchsom(data,somgrid,prototypes=prototypes,
                                             assignement=assignment,radii=radii,

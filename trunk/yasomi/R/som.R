@@ -111,16 +111,8 @@ bmu.heskes <- function(prototypes,data,nv) {
     list(clusters=result$clusters+1,error=result$error)
 }
 
-radius.exp <- function(min,max,steps) {
-    max*(min/max)^(seq(0,1,length.out=steps))
-}
-
-radius.lin <- function(min,max,steps) {
-    seq(max,min,length.out=steps)
-}
-
 batchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
-                     assignment=c("single","heskes"),radii,nbRadii=30,
+                     assignment=c("single","heskes"),radii=somradii(somgrid),
                      maxiter=75,
                      kernel=c("gaussian","linear"),
                      normalised,
@@ -155,15 +147,6 @@ batchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
     ## distances?
     if(is.null(somgrid$dist)) {
         somgrid$dist <- as.matrix(dist(somgrid$pts,method="Euclidean"),diag=0)
-    }
-    ## compute radii
-    if(missing(radii)) {
-        if(kernel=="gaussian") {
-            minRadius <- 0.5
-        } else {
-            minRadius <- 1
-        }
-        radii <- radius.exp(minRadius,max(minRadius,somgrid$diam/3*2),nbRadii)
     }
     pre <- batchsom.lowlevel(somgrid,data,prototypes,theRule,radii,
                              maxiter,kernelType,normalised,cut,verbose)
@@ -211,7 +194,7 @@ batchsom.lowlevel <- function(somgrid,data,prototypes,
 
 colorCode <- function(data,nbcolor) {
     onedimgrid <- somgrid(xdim=nbcolor,ydim=1,topo="rectangular")
-    colorsom <- batchsom(data,onedimgrid,nbRadii=20)
+    colorsom <- batchsom(data,onedimgrid,radii=somradii(onedimgrid,nb=20))
     colorsom$classif
 }
 

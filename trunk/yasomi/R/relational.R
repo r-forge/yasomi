@@ -266,7 +266,8 @@ fastRelationalsom.lowlevel.R <- function(somgrid,diss,prototypes,
 }
 
 batchsom.dist <- function(data,somgrid,init=c("pca","random"),prototypes,
-                          assignment=c("single","heskes"),radii,nbRadii=30,
+                          assignment=c("single","heskes"),
+                          radii=somradii(somgrid),
                           maxiter=75,
                           kernel=c("gaussian","linear"),normalised,
                           cut=1e-7,verbose=FALSE,keepdata=TRUE,
@@ -321,21 +322,14 @@ batchsom.dist <- function(data,somgrid,init=c("pca","random"),prototypes,
     if(is.null(somgrid$dist)) {
         somgrid$dist <- as.matrix(dist(somgrid$pts,method="Euclidean"),diag=0)
     }
-    ## compute radii
-    if(missing(radii)) {
-        if(kernel=="gaussian") {
-            minRadius <- 0.5
-        } else {
-            minRadius <- 1
-        }
-        radii <- radius.exp(minRadius,max(minRadius,somgrid$diam/3*2),nbRadii)
-    }
     if(extended) {
-        pre <- lowlevel(somgrid,diss,prototypes,assignment,radii,maxiter,
-                        theKernel,normalised,cut,verbose,TRUE,data.norms)
+        pre <- fastRelationalsom.lowlevel.R(somgrid,diss,prototypes,assignment,
+                                            radii,maxiter,theKernel,normalised,
+                                            cut,verbose,TRUE,data.norms)
     } else {
-        pre <- lowlevel(somgrid,diss,prototypes,assignment,radii,maxiter,
-                        theKernel,normalised,cut,verbose,FALSE,NULL)
+        pre <- fastRelationalsom.lowlevel.R(somgrid,diss,prototypes,assignment,
+                                            radii,maxiter,theKernel,normalised,
+                                            cut,verbose,FALSE,NULL)
     }
     pre$assignment <- assignment
     pre$kernel <- kernel

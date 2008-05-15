@@ -7,7 +7,7 @@ dissimilarity data.
 }
 \usage{
 \method{batchsom}{dist}(data, somgrid, init=c("pca","random"), prototypes,
-         assignment = c("single", "heskes"),radii,nbRadii=30,
+         assignment = c("single", "heskes"),radii=somradii(somgrid),
          maxiter = 75,kernel=c("gaussian","linear"),normalised,
          cut = 1e-07, verbose = FALSE, keepdata = TRUE,
          lowlevel=fastRelationalsom.lowlevel.R,\dots)
@@ -25,11 +25,8 @@ dissimilarity data.
   \item{init}{the initialisation method (see details)}
   \item{assignment}{the assignment method used to compute the best
     matching unit of an observation during training}
-  \item{radii}{the radii of the neighbourhoods used during training. If
-    missing, \code{nbRadii} radii are computed starting from a radius of 2/3
-    of the diameter of the prior structure and ending with a radius small
-    enough to prevent any influence of a node on its neighbours}
-  \item{nbRadii}{the number of radii to generate if 'radii' is missing}
+  \item{radii}{the radii of the neighbourhoods used during training. See
+  \code{\link{somradii}} for the default values}
   \item{maxiter}{the maximum number of of iteration performed for each
     radius (the minimum is one)}
   \item{kernel}{the kernel to use to compute neighbouring iterations}
@@ -78,7 +75,8 @@ the method are transmitted to the initialisation method.
 %
 % ~Make other sections like Warning with \section{Warning }{....} ~
 %}
-\seealso{See \code{\link{sominit.pca.dist}} and
+\seealso{See \code{\link{somradii}} for some reasonable default values for the
+  radii, \code{\link{sominit.pca.dist}} and
   \code{\link{sominit.random.dist}} 
   for some control on the initial configuration of the prototypes, \code{\link{som.tune}} for the optimisation of some magic
   parameters (such as the radii), \code{\link{umatrix}} and
