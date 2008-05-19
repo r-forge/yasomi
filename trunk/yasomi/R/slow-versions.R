@@ -22,36 +22,50 @@ kernel.linear <- function(x) {
     }
 }
 
-bmu.R <- function(prototypes,data) {
-    result=rep(0,nrow(data))
-    for(i in 1:length(result)) {
-        result[i] <- which.min(rowSums(sweep(prototypes,2,data[i,],"-")^2))
+bmu.R <- function(prototypes,data,weights=NULL) {
+    distances <- dist(prototypes,data)
+    clusters <- apply(distances,2,which.min)
+    if(is.null(weights)) {
+        error <- mean(distances[cbind(clusters,1:length(clusters))])
+    } else {
+        error <- sum(weights*distances[cbind(clusters,1:length(clusters))])/sum(weights)
     }
-    result
+    list(clusters=clusters,error=error)
 }
 
-bmu.heskes.R <- function(prototypes,data,nv) {
-    result=rep(0,nrow(data))
-    for(i in 1:length(result)) {
-        result[i] <- which.min(nv%*%rowSums(sweep(prototypes,2,data[i,],"-")^2))
+bmu.heskes.R <- function(prototypes,data,nv,weights=NULL) {
+    distances <- dist(prototypes,data)
+    dnv <- nv%*%(distances^2)
+    clusters <- apply(dnv,2,which.min)
+    if(is.null(weights)) {
+        error <- mean(distances[cbind(clusters,1:length(clusters))])
+    } else {
+        error <- sum(weights*distances[cbind(clusters,1:length(clusters))])/sum(weights)
     }
-    result
+    list(clusters=clusters,error=error)
 }
 
 batchsom.R <- function(data,somgrid,init=c("pca","random"),prototypes,
                        assignment=c("single","heskes"),radii=somradii(somgrid),
-                       maxiter=75,
+                       weights,maxiter=75,
                        kernel=c("gaussian","linear"),normalised,
                        cut=1e-7,verbose=FALSE,keepdata=TRUE,...) {
     ## process parameters and perform a few sanity checks
+    if(class(somgrid)!="somgrid") {
+        stop("'somgrid' is not of somgrid class")
+    }
     assignment <- match.arg(assignment)
     if(missing(normalised)) {
         normalised <- assignment=="heskes"
     }
     kernel <- match.arg(kernel)
     theKernel <- switch(kernel,"gaussian"=kernel.gaussian,"linear"=kernel.linear)
-    if(class(somgrid)!="somgrid") {
-        stop("'somgrid' is not of somgrid class")
+    if(!missing(weights)) {
+        if(length(weights)!=nrow(data)) {
+            stop("'weights' and 'data' have different dimensions")
+        }
+    } else {
+        weights=NULL
     }
     if(missing(prototypes)) {
         ## initialisation based on the value of init
@@ -70,8 +84,8 @@ batchsom.R <- function(data,somgrid,init=c("pca","random"),prototypes,
     if(is.null(somgrid$dist)) {
         somgrid$dist <- as.matrix(dist(somgrid$pts,method="Euclidean"),diag=0)
     }
-    pre <- batchsom.lowlevel.R(somgrid,data,prototypes,assignment,radii,
-                               maxiter,theKernel,normalised,cut,verbose)
+    pre <- batchsom.lowlevel.R(somgrid,data,weights,prototypes,assignment,
+                               radii,maxiter,theKernel,normalised,cut,verbose)
     pre$assignment <- assignment
     pre$kernel <- kernel
     pre$normalised <- normalised
@@ -82,7 +96,7 @@ batchsom.R <- function(data,somgrid,init=c("pca","random"),prototypes,
     pre
 }
 
-batchsom.lowlevel.R <- function(somgrid,data,prototypes,
+batchsom.lowlevel.R <- function(somgrid,data,dataweights,prototypes,
                                 assignment,radii,maxiter,kernel,
                                 normalised,cut,verbose) {
     data <- as.matrix(data)
@@ -92,9 +106,9 @@ batchsom.lowlevel.R <- function(somgrid,data,prototypes,
         nv <- neighborhood(somgrid,radii[i],kernel,normalised=normalised)
         for(j in 1:maxiter) {
             if(assignment == "single") {
-                bmus <- bmu(prototypes,data)
+                bmus <- bmu.R(prototypes,data,dataweights)
             } else {
-                bmus <- bmu.heskes(prototypes,data,nv)
+                bmus <- bmu.heskes.R(prototypes,data,nv,dataweights)
             }
             nclassif <- bmus$clusters
             noChange = identical(classif,nclassif)
@@ -104,7 +118,11 @@ batchsom.lowlevel.R <- function(somgrid,data,prototypes,
                 print(paste(i,j,error))
             }
             errors[[i]] <- c(errors[[i]],error)
-            weights <- nv[,classif]
+            if(is.null(dataweights)) {
+                weights <- nv[,classif]
+            } else {
+                weights <- sweep(nv[,classif],2,dataweights,"*")
+            }
             normed <- rowSums(weights)
             mask <- (1:length(normed))[(normed/length(normed))>cut]
             prototypes[mask,] <- sweep(weights%*%data,1,normed,"/")[mask,]

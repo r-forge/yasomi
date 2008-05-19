@@ -130,7 +130,7 @@ void batch_som(double *proto,int *nproto,double *data,int *ndata,
     neighborhood(grid,nv,protoSize,radii[0],kernelType,isNormalized);
     for(iRad = 0; iRad < nbRadii; iRad++) {
 	for(iter = 0; iter < maxIter; iter++) {
-	    /* assignement */
+	    /*** assignment phase ***/
 	    if(assignmentRule == 1) {
 		/* Heskes' rule */
 		changed = bmu_heskes_ext_mem(proto,nv,nproto,data,ndata,dim,
@@ -142,46 +142,57 @@ void batch_som(double *proto,int *nproto,double *data,int *ndata,
 	    if(isVerbose) {
 		Rprintf("%i (%i) %g\n",iRad,iter,totalError);
 	    }
-	    /* representation */
-	    if(changed || iter >= 1 ||  iter == maxIter - 1) {
-		if(!changed) {
-		    if(isVerbose) {
-			Rprintf("Iteration %i for radius %g (%i) is stable, decreasing radius\n",iter,radii[iRad],iRad);
-		    }
-		    if(iRad == nbRadii - 1) {
-			break;
-		    }
-		    /* preparing the loop with the next radius */
-		    neighborhood(grid,nv,protoSize,radii[iRad+1],
-				 kernelType,isNormalized);
+	    /*** representation pahse ***/
+	    /* prepare the next loop when the partition has not changed or
+	     * when the end of the iter loop is reached */
+	    if(!changed ||  iter == maxIter - 1) {
+		if(isVerbose && !changed) {
+		    Rprintf("Iteration %i for radius %g (%i) is stable, decreasing radius\n",iter,radii[iRad],iRad);
 		}
-		/* update the prototypes */
-		for(j = 0; j < protoSize; j++) {
-		    base = j * protoSize;
-		    norm = 0;
-		    memset(tmpProto,0,dimension*sizeof(double));
-		    for(indiv = 0 ; indiv < dataSize ; indiv++) {
-			l = classif[indiv];
-			neigh = nv[ base + l ];
-			norm += neigh;
-			/* loop on dimensions */
-			for(k = 0; k < dimension; k++) {
-			    tmpProto[k] += neigh * data[indiv + k * dataSize];
-			}
-		    }
-		    /* normalization and storage */
-		    if(norm>cutValue) {
-			for(k = 0; k < dimension; k++) {
-			    proto[j + k * protoSize]=tmpProto[k]/norm;
-			}
-		    } 
+		if(iRad == nbRadii - 1) {
+		    /* this is really the final iteration so we don't need to
+		     * update the neighborhood */
+		    break;
 		}
+		/* preparing the loop with the next radius */
+		neighborhood(grid,nv,protoSize,radii[iRad+1],
+			     kernelType,isNormalized);
 	    }
+	    /* update the prototypes */
+	    for(j = 0; j < protoSize; j++) {
+		base = j * protoSize;
+		norm = 0;
+		memset(tmpProto,0,dimension*sizeof(double));
+		for(indiv = 0 ; indiv < dataSize ; indiv++) {
+		    l = classif[indiv];
+		    neigh = nv[ base + l ];
+		    norm += neigh;
+		    /* loop on dimensions */
+		    for(k = 0; k < dimension; k++) {
+			tmpProto[k] += neigh * data[indiv + k * dataSize];
+		    }
+		}
+		/* normalization and storage */
+		if(norm>cutValue) {
+		    for(k = 0; k < dimension; k++) {
+			proto[j + k * protoSize]=tmpProto[k]/norm;
+		    }
+		} 
+	    }
+	    
 	    /* break the internal loop if the partition is stable */
 	    if(!changed) {
 		break;
 	    }
 	}
+	if(isVerbose && changed) {
+	    Rprintf("Cannot reach a stable configuration with radius %g\n",radii[iRad]);
+	}
+    }
+    if(changed) {
+	/* final assignement if needed */
+	bmu(proto,nproto,data,ndata,dim,classif,&totalError);
+	errors[nbRadii*maxIter] = totalError;
     }
 }
 
@@ -266,7 +277,7 @@ void batch_som_optim(double *proto,int *nproto,double *data,int *ndata,
     neighborhood(grid,nv,protoSize,radii[0],kernelType,isNormalized);
     for(iRad = 0; iRad < nbRadii; iRad++) {
 	for(iter = 0; iter < maxIter; iter++) {
-	    /* assignement */
+	    /*** assignment phase ***/
 	    if(assignmentRule == 1) {
 		/* Heskes' rule */
 		changed = bmu_heskes_ext_mem(proto,nv,nproto,data,ndata,dim,
@@ -278,67 +289,64 @@ void batch_som_optim(double *proto,int *nproto,double *data,int *ndata,
 	    if(isVerbose) {
 		Rprintf("%i (%i) %g\n",iRad,iter,totalError);
 	    }
-	    /* representation */
-	    /* needed when:
-	       - the partition has changed
-	       - or with a new value of the radius if:
-	       -- the partition has not changed
-	       -- if the maximal number of iteration has been reached
-	    */
-	    if(changed || iter >= 1 || iter == maxIter - 1) {
-		if(!changed) {
-		    if(isVerbose) {
-			Rprintf("Iteration %i for radius %g (%i) is stable, decreasing radius\n",iter,radii[iRad],iRad);
-		    }
-		    if(iRad == nbRadii - 1) {
-			break;
-		    }
-		    /* preparing the loop with the next radius */
-		    neighborhood(grid,nv,protoSize,radii[iRad+1],
-				 kernelType,isNormalized);
+	    /*** representation phase ***/
+	    /* prepare the next loop when the partition has not changed or
+	     * when the end of the iter loop is reached */
+	    if(!changed || iter == maxIter - 1) {
+		if(isVerbose && !changed) {
+		    Rprintf("Iteration %i for radius %g (%i) is stable, decreasing radius\n",iter,radii[iRad],iRad);
 		}
-		/* first compute class center of mass */
-		/* zero */
-		memset(preProto,0,protoSize*dimension*sizeof(double));
-		memset(clusterSize,0,protoSize*sizeof(int));
-		for(indiv = 0 ; indiv < dataSize ; indiv++) {
-		    j = classif[indiv];
-		    clusterSize[j]++;
-		    /* loop on dimensions */
-		    protoBase = j * dimension;
-		    for(k = 0; k < dimension; k++) {
-			preProto[protoBase + k] += data[indiv + k * dataSize];
+		if(iRad == nbRadii - 1) {
+		    /* this is really the final iteration so we don't need to
+		     * update the neighborhood */
+		    break;
+		}
+		/* preparing the loop with the next radius */
+		neighborhood(grid,nv,protoSize,radii[iRad+1],
+			     kernelType,isNormalized);
+	    }
+	    /* prototype update */
+	    /* first compute class center of mass */
+	    /* zero */
+	    memset(preProto,0,protoSize*dimension*sizeof(double));
+	    memset(clusterSize,0,protoSize*sizeof(int));
+	    for(indiv = 0 ; indiv < dataSize ; indiv++) {
+		j = classif[indiv];
+		clusterSize[j]++;
+		/* loop on dimensions */
+		protoBase = j * dimension;
+		for(k = 0; k < dimension; k++) {
+		    preProto[protoBase + k] += data[indiv + k * dataSize];
+		}
+	    }
+	    /* then compute prototypes */
+	    for(j = 0; j < protoSize; j++) {
+		norm = 0;
+		/* first compute normalization factor */
+		base = j * protoSize;
+		for(l = 0; l < protoSize; l++) {
+		    if(clusterSize[l]>0) {
+			norm += nv[base + l] * clusterSize[l];
 		    }
 		}
-		/* then compute prototypes */
-		for(j = 0; j < protoSize; j++) {
-		    norm = 0;
-		    /* first compute normalization factor */
-		    base = j * protoSize;
+		/* update only if it is meaningful to do so */
+		if(norm>cutValue) {
+		    /* clear old value */
+		    memset(tmpProto,0,dimension*sizeof(double));
+		    /* compute new value */
 		    for(l = 0; l < protoSize; l++) {
 			if(clusterSize[l]>0) {
-			    norm += nv[base + l] * clusterSize[l];
-			}
-		    }
-		    /* update only if it is meaningful to do so */
-		    if(norm>cutValue) {
-			/* clear old value */
-			memset(tmpProto,0,dimension*sizeof(double));
-			/* compute new value */
-			for(l = 0; l < protoSize; l++) {
-			    if(clusterSize[l]>0) {
-				neigh = nv[base + l];
-				protoBase = l * dimension;
-				/* loop on dimensions */
-				for(k = 0; k < dimension; k++) {
-				    tmpProto[k] += neigh * preProto[protoBase + k];
-				}
+			    neigh = nv[base + l];
+			    protoBase = l * dimension;
+			    /* loop on dimensions */
+			    for(k = 0; k < dimension; k++) {
+				tmpProto[k] += neigh * preProto[protoBase + k];
 			    }
 			}
-			/* normalization and transfer */
-			for(k = 0; k < dimension; k++) {
-			    proto[j + k * protoSize] = tmpProto[k]/norm;
-			}
+		    }
+		    /* normalization and transfer */
+		    for(k = 0; k < dimension; k++) {
+			proto[j + k * protoSize] = tmpProto[k]/norm;
 		    }
 		}
 	    }
@@ -347,6 +355,14 @@ void batch_som_optim(double *proto,int *nproto,double *data,int *ndata,
 		break;
 	    }
 	}
+	if(isVerbose && changed) {
+	    Rprintf("Cannot reach a stable configuration with radius %g\n",radii[iRad]);
+	}
+    }
+    if(changed) {
+	/* final assignement if needed */
+	bmu(proto,nproto,data,ndata,dim,classif,&totalError);
+	errors[nbRadii*maxIter] = totalError;
     }
 }
 

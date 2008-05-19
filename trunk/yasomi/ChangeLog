@@ -1,3 +1,18 @@
+2008-05-19  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/slow-versions.R (bmu.R): updated to use proxy facilities and to support weighting
+	(bmu.heskes.R): idem bmu.R
+
+	* R/som.R (batchsom.lowlevel): one more slot in the errors vector to accomodate for the final assignment
+
+	* src/som.c (batch_som, batch_som_optim): final fix for the bug and modification to ensure that the final error is indeed the quantisation error
+
+2008-05-16  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* src/som.c (batch_som, batch_som_optim): fixed a bug in the loop that prevented the final loop to really happen
+
+	* R/slow-versions.R (batchsom.R): experimental weighting solution
+
 2008-05-15  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
 
 	* man/batchsom.default.Rd: updated to reflect the interface change

@@ -179,7 +179,7 @@ batchsom.lowlevel <- function(somgrid,data,prototypes,
                  as.double(cut)[1],
                  as.integer(verbose),
                  clusters=integer(nrow(data)),
-                 errors=as.double(rep(-1,length(radii)*maxiter)),
+                 errors=as.double(rep(-1,1+length(radii)*maxiter)),
                  PACKAGE="yasomi")
     prototypes <- matrix(result$proto,ncol=ncol(prototypes),
                          dimnames=list(NULL,dimnames(data)[[2]]))

@@ -12,13 +12,16 @@ Changes in yasomi 0.2
     o   Documentation has been improved, in particular with the addition of an
     	introductory vignette. 
 
-    o   Many small minor bugs have been fixed.  
-      	The only major bug fixed was in the u-matrix like visualisation
+    o   Many small minor bugs as well as two major ones have been fixed.  
+      	The first major bug fixed was in the u-matrix like visualisation
     	code. Discrete u-matrices (obtained via the umatrix and plot.sompdist
     	functions) must be redrawn as the one obtained by yasomi 0.1 were
     	bogus.
-	The quantisation error was also not clearly defined. In some
-      	functions, is was the mean squared Euclidean distance between data
+	The second major bug fixed prevented the algorithm to make a full use
+      	of the last epochs of the fitting process. It is therefore preferable
+      	to rerun all simulations based on yasomi 0.1.
+	In addition the quantisation error was not clearly defined. In some
+      	functions, it was the mean squared Euclidean distance between data
       	points and the associated bmu, in others it was the mean Euclidean
       	distance. It is now the mean Euclidean distance everywhere, with as
       	similar definition for the relational SOM. 
