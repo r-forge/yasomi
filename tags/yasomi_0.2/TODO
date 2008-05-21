@@ -1,0 +1,176 @@
+Tentative for 0.3:
+  - kernel SOM
+  - continuous annealing mode (in addition to the stepwise version implemented here)
+  - better plot.som
+  - smarter som.tune
+  - more documentation
+  - include some tests in the distributed package
+
+BUGS or problems:
+- support of weights must be included everywhere needed, not only batchsom:
+  - in error.*
+  - in sominit.*
+  - in colorCode?
+  - possibly in predict.* (for the error calculation)
+
++ Long term R goals:
+  - move to S4 classes
+  - grid graphics
+  - unit tests
+
+- coding conventions
+- C implementation of slow functions:
+  - prototype.distances?
+- batchsom
+  - handling of missing values
+  - handling of factors
+  - detect oscillatory behavior?
+  - save training information 
+- hitMap
+  - should perhaps return a value
+- tests of parameters
+- add new quality measures
+- torus like topology?
+- classif or cluster in results?
+
++ speed
+  - test the effects of the weighting code in the standard numerical case
+
++ weighting
+  - take weights into account during initialisation (see FIXME in the code)
+  - weighting for predict? 
+  - weighting for new data in error.*?
+
++ initialisation methods
+  - add randomness in PCA initialisation
+
++ relational SOM
+  - vignette
+
++ graphics
+  - fix plot.somgrid to use a interface close to filled.contour for specifying the color map
+  - use nice color map when adapted packages are available (e.g. color brewer)
+    - bidule=suppressWarnings(suppressPackageStartupMessages(require("something")))
+  - more options for distance.grid (mean, full but also neighbors and partial)
+  - 3D umatrix (rgl)
+  - add key to plot.somgrid without layout or a similar solution (?)
+  - better version of plot.som:
+    - use star glyh for low dimension
+    - allow parallel coordinates
+    - maybe bargraph for factors
+  - add options to colorCode
+  - color mapping in CIE Lab space (cf colorspace package)
+  - variation over the u-matrix principle
+  - smooth componentMap
+  - fix the legend in plot.somtune
+  - grid2lines might become a generic function, applicable to somgrid and to som
+
++ simple functions to improve
+  - summary for som (maybe print)
+
++ heuristics:
+  - annealing based on the map size
+  - number of initial radii based on the map size
+
++ documentation
+  - write vignettes:
+    - general introduction :
+      - add a standard u matrix
+    - dissimilarity som
+    - graphical methods
+  - add a package doc
+  - add original references in graphical methods (in addition to Vesanto's thesis) 
+  - add also references in most of the methods
+  - add links to online references
+  - status (ordered as in NAMESPACE):
+    - somgrid: ok
+    - batchsom: ok
+    + colorCode: add details
+    - mapToUnit: ok
+    + grid2lines: add an example with something else than the prototypes
+    - componentPlane: ok
+    + hitMap: check references
+    - umatrix: ok
+    + error.kaskilagus: add details on the calculation itself
+    - error.quantisation: ok
+    + som.tune: ok but lacks details
+    - som.tunecontrol: ok
+    - prototype.distances: ok
+    - distance.grid: ok
+    - sominit.pca: ok
+    + sominit.random: ok but might be more generic with specific details for the different datatypes
+    + radii: missing
+    - print.somgrid: ok
+    - summary.somgrid: ok
+    - plot.somgrid: ok
+    - print.som: ok
+    - summary.som: ok
+    + plot.som: to be rewritten (with the method)
+    + error.quantisation.som: missing, but should that be exported?
+    - print.somnum: ok
+    - summary.somnum: ok
+    - predict.somnum: ok
+    - as.dist.somnum: ok
+    - as.matrix.somnum: ok
+    - error.quantisation.somnum: ok
+    - error.kaskilagus.somnum: ok
+    - sominit.pca.default: ok
+    - sominit.random.default: ok
+    + batchsom.default: ok but details on the exact training algorithm might be needed
+    - print.relationalsom: ok
+    - summary.relationalsom: ok
+    - predict.relationalsom: ok
+    - as.dist.relationalsom: ok
+    - as.matrix.relationalsom: ok
+    - error.quantisation.relationalsom: ok
+    - error.kaskilagus.relationalsom: ok
+    + sominit.pca.dist: need some details
+    - sominit.random.dist: ok
+    + batchsom.dist: add references
+    - plot.sompdist: ok
+    - as.matrix,sompdist: ok
+    - as.dist.sompdist: ok
+    + plot.somtune: ok but will be improved when the method is
+    + print.somtune: alias in som.tune
+
+Done in version 0.2:
+- relational SOM (first version with optimal algorithm but no implementation tricks) :
+  - generic (S3) functions for batchsom, sominit and protoDist: most of the analysis and display functions can be used for both standard SOM and relational SOM
+  - PCA like initialisation method
+  - print and summary support
+  - basic plot support
+  - basic documentation for the relational method
+  - som.tune can be applied to relational som
+- grid2lines is now applicable to any matrix with the correct number of rows 
+- the original data are saved in the batchsom result
+- unified initialisation interface via two generic methods (sominit.pca and sominit.random)
+- som.tune improvements:
+  - returns now an object that can be plotted in some simple situations (only one parameter is modified during tuning)
+  - performs the pca initialisation only once
+- introduction to the package via a vignette
+
+Done in version 0.1:
+- plots:
+  - generic (plot.somgrid) with key (via layout)
+  - prototypes and additional variables (plot.som)
+  - U-matrix:
+    - custom rendering
+    - grid based rendering
+  - component planes
+  - hit map
+- quality measures:
+  - first version of Kaski and Lagus measure
+- C implementation of slow functions:
+  - batchsom and bmu* functions have been implemented in C
+- lower level access to batch som
+- first version of the documentation
+- predict.som (very basic)
+- first implementation of coding conventions
+- print.som 
+- summary.som (quite basic)
+- removed somgrid$basesize 
+- use somgrid$size where needed
+- compute somgrid$dist only if needed (or asked to)
+- save some training parameters in the som structure
+- batchsom 
+  - avoids assignment recomputation when the temperature is changed

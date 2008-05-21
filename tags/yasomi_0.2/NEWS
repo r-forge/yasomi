@@ -1,0 +1,53 @@
+Changes in yasomi 0.2
+
+    o  	The main novelty provided by this version is the support of
+    	dissimilarity data with the relational self organising map. Most of
+    	the functions have been made generic in order to support this new data
+    	type, both for fitting a SOM but also for visualising the results. 
+
+    o   The initialisation framework has been completely reworked, in
+    	particular to accommodate for the relational SOM. As a consequence the
+    	main function batchsom as a modified interface. 
+
+    o   Limited support for observation weighting has been added. In this
+    	version, the initialisation functions do not take the weights into
+    	account.
+
+    o   Documentation has been improved, in particular with the addition of an
+    	introductory vignette. 
+
+    o   Many small minor bugs as well as two major ones have been fixed.  
+      	The first major bug fixed was in the u-matrix like visualisation
+    	code. Discrete u-matrices (obtained via the umatrix and plot.sompdist
+    	functions) must be redrawn as the one obtained by yasomi 0.1 were
+    	bogus.
+	The second major bug fixed prevented the algorithm to make a full use
+      	of the last epochs of the fitting process. It is therefore preferable
+      	to rerun all simulations based on yasomi 0.1.
+	In addition the quantisation error was not clearly defined. In some
+      	functions, it was the mean squared Euclidean distance between data
+      	points and the associated bmu, in others it was the mean Euclidean
+      	distance. It is now the mean squared Euclidean distance everywhere,
+      	with as similar definition for the relational SOM. 
+	
+
+
+Changes in yasomi 0.1
+
+    o  	This initial revision provides self organising maps for standard
+       	numerical data (missing values are not supported) fitted via a batch
+       	algorithm. Efforts have been made to optimise the code both in R and
+       	via C implementation of slow parts.
+
+    o  	Fully automated parameter tuning can be performed via the som.tune
+    	function. In addition to the standard quantisation error, this
+    	function can select the best parameters by minimising Kaski and Lagus'
+    	distortion measure. 
+
+    o   Several graphical representations of the results are provided. A
+    	generic plotting function leverages the grid prior structure for glyph
+    	based rendering. Standard representations such as U-matrices,
+    	component places and hit maps are build on top of it. Another solution
+    	based on a smoothing strategy is also available (see the distance.grid
+    	function for details). 
+

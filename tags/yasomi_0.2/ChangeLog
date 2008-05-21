@@ -1,0 +1,534 @@
+2008-05-21  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/batchsom.default.Rd: adapted documentation for the weights parameter
+
+	* man/batchsom.dist.Rd: adapted documentation for the weights parameter
+
+	* man/som.tune.Rd: adapted documentation for the weights parameter
+
+	* R/relational.R (fastRelationalsom.lowlevel.R): made sur the final assigment is done
+
+	* R/slow-relational.R (relationalsom.lowlevel.R): fixed the loop bug
+
+	* R/tune.R (som.tune): support of weights
+
+	* R/relational.R (relationalsecondbmu.R): support of weights
+
+	* R/quality.R (KaskiLagus.somnum, error.kaskilagus.somnum)
+	(error.kaskilagus.relationalsom, KaskiLagus.relationalsom): added support of weights
+
+	* R/graphics.R (grid2lines): add a warning message when the method is used for something else than a numerical som
+
+	* R/relational.R (weightedFastRelationalBMU.R): weighted version
+
+	* R/slow-relational.R (weightedPartialSums.R): weighted version of the partial sums function
+
+	* R/relational.R (weightedPartialSums): R interface for the new function weighted_partial_sums
+
+	* src/relational.c (weighted_partial_sums): new function for weighted partial sums
+
+	* R/relational.R (batchsom.dist): saved the weights when the data are
+	(fastRelationalsom.lowlevel.R): weighting support
+
+	* R/slow-relational.R (relationalsom.lowlevel.R): fixed a problem with the extended case
+
+	* R/slow-versions.R (batchsom.R): saved the weights when the data are
+
+	* R/som.R (batchsom.default): saved the weights when the data are
+
+2008-05-19  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/relational.R (relational.keeppositive): replace negative values by 0 values when needed (with a warning)
+	(fastRelationalBMU.R): support of weights and mean squared error
+	(relationalbmu.R): support of weights and mean squared error
+	(predict.relationalsom): mean squared error
+	(extended.relationalbmu.R): support of weights and mean squared error
+	(relationalsecondbmu.R): mean squared error
+	(batchsom.dist): support of weights
+
+	* src/som.c (batch_som, batch_som_optim): support of weights
+
+	* R/som.R (batchsom.lowlevel, batchsom.default): support of weights
+
+	* src/bmu.h: support of weights
+
+	* src/bmu.c (bmu): support of weights and mean squared error
+	(bmu_heskes_ext_mem): idem
+	(bmu_heskes): idem
+
+	* R/som.R (bmu): support of weights
+
+	* src/bmu.c (bmu, bmu_heskes_ext_mem): moved back to standard mean squared error (rather than mean error)
+
+	* R/slow-versions.R (bmu.R): updated to use proxy facilities and to support weighting
+	(bmu.heskes.R): idem bmu.R
+
+	* R/som.R (batchsom.lowlevel): one more slot in the errors vector to accomodate for the final assignment
+
+	* src/som.c (batch_som, batch_som_optim): final fix for the bug and modification to ensure that the final error is indeed the quantisation error
+
+2008-05-16  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* src/som.c (batch_som, batch_som_optim): fixed a bug in the loop that prevented the final loop to really happen
+
+	* R/slow-versions.R (batchsom.R): experimental weighting solution
+
+2008-05-15  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/batchsom.default.Rd: updated to reflect the interface change
+
+	* man/batchsom.dist.Rd: updated to reflect the interface change
+
+	* man/radii.Rd: new documentation for a new function
+
+	* R/grid.R (radius.lin): moved here
+	(radius.exp): ditto
+
+	* R/relational.R (batchsom.dist): using the radii function
+
+	* R/slow-versions.R (batchsom.R): using the radii function
+
+	* R/tune.R (som.tune): using the radii function
+
+	* R/som.R (batchsom.default): radii is obtained by a call to the radii function
+
+2008-05-14  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/grid.R (radii): new function for generating radii
+
+	* man/batchsom.default.Rd: fixed typo
+
+2008-05-13  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/predict.relationalsom.Rd: new file for new function
+
+	* man/som.tunecontrol.Rd: added some details about the error criterion
+
+	* man/error.kaskilagus.relationalsom.Rd: relational case
+
+	* man/error.kaskilagus.somnum.Rd: numerical case
+
+	* man/error.kaskilagus.Rd: corresponds now to the generic case
+
+	* man/batchsom.dist.Rd: fixed a comment
+
+	* man/error.quantisation.relationalsom.Rd: relational case
+
+	* man/error.quantisation.somnum.Rd: numerical case
+
+	* man/error.quantisation.Rd: corresponds now to the generic case
+
+2008-05-12  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/tune.R (som.tune): modified to call the criterion only with the som parameter
+
+	* R/relational.R (predict.relationalsom): can return the second winner if needed
+	(relationalsecondbmu.R): new interface based on the data saved in the realtional som
+
+	* R/generic.R: removed KaskiLagus
+
+	* R/relational.R (relational.sqrt): new function that computes square roots and discards negative values
+	(relationalbmu.R): fixed to return distances rather then squared distances
+	(predict.relationalsom): as relationalbmu.R
+	(relationalsecondbmu.R): as relationalbmu.R
+	(fastRelationalBMU.R): as relationalbmu.R
+
+	* src/bmu.c (bmu): fixed to use the quantisation error, not the squared quantisation error
+	(bmu_heskes_ext_mem): as bmu
+
+2008-05-11  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/relational.R (predict.relationalsom): prediction for relational som (new function)
+
+	* R/quality.R (error.quantisation.som): generic version when no new data is used. 
+	(error.quantisation.somnum): numerical version
+	(error.quantisation.relationalsom): relational version
+
+	* R/generic.R (error.quantisation): moved to generic
+
+	* NEWS: new file with news.
+
+2008-05-10  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/plot.somgrid.Rd: fixed to document the new parameter
+
+	* R/grid.R (plot.somgrid): added a color.palette parameter for the simplest case of color palette specification
+
+	* man/som.tune.Rd: updated to reflect the extension to relational data
+
+	* R/tune.R (print.somtune): rudimentary printing function
+
+	* R/relational.R (relationalbmu.R): mean error rather than total error
+
+	* R/quality.R (error.quantisation): works only for numerical SOM in some circumstances
+
+	* R/tune.R (som.tune): only one pca based initialisation in a tuning call.
+
+2008-05-07  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* inst/doc/introduction.Rnw: used terrain.colors in filled.contour
+
+	* R/tune.R (som.tune): fixed to use the new return value of sominit.pca
+
+	* man/sominit.pca.dist.Rd: updated to reflect the new implementation.
+
+	* man/sominit.pca.default.Rd: updated to reflect the new result type.
+
+	* man/sominit.pca.Rd: updated to reflect the new result type.
+
+	* R/relational.R (double.centering): new internal function
+	(relationalbmu.R): moved from slow-relational.R to here
+	(extended.relationalbmu.R): new function when the prototypes' coefficients don't sum to one
+	(sominit.pca.dist): new version that does work as planned ;-)
+	(fastRelationalsom.lowlevel.R): support for extended prototypes
+	(batchsom.dist): support for extended prototypes
+
+2008-05-02  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/relational.R (batchsom.dist): added sanity check for prototypes
+
+	* R/som.R (batchsom.default): added a test for the number of rows of the prototype matrix
+
+	* man/sominit.pca.dist.Rd: fixed the example code
+
+	* TODO: complete documentation status added
+
+	* DESCRIPTION (Suggests): MASS is used in some examples
+
+	* man/as.dist.relationalsom.Rd: new documentation
+
+	* man/as.dist.somnum.Rd: new documentation
+
+	* R/umatrix.R (protoDist.relationalsom): added a warning when negative values are produced
+
+	* man/prototype.distances.Rd: added a note about the case of the relational SOM
+
+	* man/batchsom.default.Rd: added some links
+
+	* man/sominit.pca.default.Rd: added details
+
+	* man/print.som.Rd: added some links and made more generic
+
+	* man/plot.somgrid.Rd: fixed presentation
+
+	* man/somgrid.Rd: added details
+
+	* man/sominit.random.Rd: more generic version
+
+	* man/sominit.pca.Rd: fixed typos
+
+	* man/distance.grid.Rd: fixed phrasing and typos
+
+	* man/prototype.distances.Rd: fixed references and reorganized the content
+
+	* man/som.tune.Rd: fixed phrasing
+
+2008-05-01  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/hitMap.Rd: fixed phrasing
+
+	* man/grid2lines.Rd: added some details
+
+	* man/mapToUnit.Rd: added link to the predict method
+
+	* R/som.R (mapToUnit): fixed the error message
+
+2008-04-29  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/distance.grid.Rd: updated to document the new outer parameter
+
+	* R/umatrix.R (distance.grid): extended to allow (very limited) extrapolation
+
+	* demo/som-iris.R: used the adapted ploting function
+
+2008-04-28  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/umatrix.R (plot.sompdist): Fix a serious bug in the umatrix like code (row inversion in the matrix)
+
+2008-04-25  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* NAMESPACE: exported some new methods
+
+	* R/relational.R (as.matrix.relationalsom): new method that gives the distances between the prototypes directely as a matrix
+
+	* R/som.R (as.matrix.somnum): new method that gives the distances between the prototypes directely as a matrix
+
+	* man/plot.somtune.Rd: first rough documentation
+
+	* man/som.tune.Rd: use the plot.somtune method
+	more complete documentation of the function
+
+	* R/tune.R (som.tune): updated the call to som to the new initialisation approach
+
+	* man/batchsom.dist.Rd: fix to better describe initialisation
+
+	* man/batchsom.default.Rd: fix for specificity to numerical values
+
+	* man/batchsom.Rd: fix the documentation for genericity
+
+2008-04-02  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/batchsom.default.Rd: renamed from batchsom.Rd to batchsom.default.Rd, and started to fix the documentation according to the new initialisation scheme
+
+	* man/batchsom.dist.Rd: started to fix the documentation according to the new initialisation scheme
+
+	* R/relational.R (batchsom.dist): moved to the new initialisation scheme
+
+	* R/slow-versions.R (batchsom.R): fixed a few inconsistancies between the slow pure R version and the optimized one
+
+	* R/som.R (sominit.random.default): fixed a small bug when a cluster contains only one member
+	(batchsom.default): moved to the new initialisation scheme
+
+	* R/generic.R (batchsom): new parameter init to specify the initialisation method rather than the initial prototypes
+
+2008-03-27  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/som.R (as.dist.somnum): distance matrice between the prototypes
+
+	* R/relational.R (as.dist.relationalsom): distance matrice between the prototypes
+
+	* man/yasomi.Rd (Depends): fixed a small bug preventing latex compilation
+
+	* man/plot.som.Rd: renamed from plot.somnum.Rd to plot.som.Rd (content must be updated).
+
+	* R/graphics.R (componentPlane): applicable only to numerical SOMs
+	(plot.som): extended to relationalsom when a second parameter is given
+
+	* R/som.R (print.somnum, summary.somnum): new methods (which delegate to the standard ones)
+
+	* R/relational.R (summary.relationalsom, print.relationalsom): new methods (which delegate to the standard ones)
+
+	* R/slow-relational.R (relationalsom.lowlevel.R): correct order for classes
+
+	* R/relational.R (fastRelationalsom.lowlevel.R): correct order for classes
+
+	* R/som.R (batchsom.lowlevel): correct order for classes
+
+	* R/slow-versions.R (batchsom.lowlevel.R): correct order for classes
+
+	* inst/doc/introduction.Rnw: renamed yasomi.Rnw to introduction.Rnw
+
+	* R/relational.R (batchsom.dist): saved more information
+
+2008-03-16  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/sominit.pca.default.Rd: new documentation for the default implementation
+
+	* man/sominit.pca.Rd: describe only the method
+
+	* man/sominit.pca.dist.Rd: new documentation for the specific case of relational SOM pca based initialisation
+
+	* R/relational.R (sominit.pca.dist): Added a pca (mds) based initialisation for relational SOMs
+
+	* inst/doc/yasomi.Rnw: Added a comparison with PCA and additional visual based on PCA
+
+2008-03-15  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/batchsom.dist.Rd: new documentation for the relational som
+
+	* demo/som-two-dim.R: used the somtune plot method
+
+	* demo/som-iris.R: used the somtune plot method
+
+	* inst/doc/yasomi.Rnw: added an example of additional variable plotting
+
+	* R/slow-versions.R (batchsom.R): used the new initialisation method
+
+	* man/umatrix.Rd: \dots rather than ...
+
+	* man/sominit.random.Rd: updated documentation to follow the new code
+
+	* man/som.tunecontrol.Rd: fixed link to initialisation method
+
+	* man/somgrid.Rd: \dots rather than ...
+
+	* man/prototype.distances.Rd: \dots rather than ...
+
+	* man/print.som.Rd: \dots rather than ...
+
+	* man/predict.somnum.Rd: \dots rather than ...
+
+	* man/plot.sompdist.Rd: \dots rather than ...
+
+	* man/plot.somnum.Rd: \dots rather than ...
+
+	* man/plot.somgrid.Rd: \dots rather than ...
+
+	* man/hitMap.Rd: \dots rather than ...
+
+	* man/componentPlane.Rd: \dots rather than ...
+
+	* man/batchsom.Rd: updated to follow the new code
+
+	* R/som.R (sominit.random.default): extended to provide similar options as the relational one
+
+	* man/sominit.pca.Rd: updated documentation for the PCA based initialisation method
+
+	* R/tune.R (som.tune): new names for initialisation methods
+
+2008-03-14  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/relational.R (batchsom.dist): prototypes is now a parameter with no default value
+
+	* R/som.R (sominit.random.default): new name
+
+	* R/generic.R (sominit.random): sominit.random is now a generic function
+
+	* R/relational.R (sominit.random.dist): new name
+
+	* NAMESPACE: sominit.random is now a generic function
+
+	* R/som.R (sominit.random.default): renamed somRandomInit to sominit.random
+
+	* NAMESPACE: renamed sominit to sominit.pca
+
+	* R/generic.R (sominit.pca): renamed sominit to sominit.pca
+
+	* R/relational.R (sominit.pca.dist): renamed sominit to sominit.pca
+
+	* R/som.R (sominit.pca.default): renamed sominit to sominit.pca
+
+2008-03-12  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* NAMESPACE: added plot.somtune S3 method
+
+	* R/tune.R (som.tune): som.tune now returns an object of class "somtune" which contains a copy of its control parameter, as well as the quantisation error made by the algorithm and copies of the parameters used to fit the SOM
+	(plot.somtune): rudimentary plotting functions from som.tune result
+
+2008-03-11  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* inst/doc/yasomi.Rnw: started to write on an introduction to Yasomi
+
+	* man/batchsom.Rd: fixed a small documentation problem
+
+	* man/error.kaskilagus.Rd: documention updated according to the new semantic for newdata
+
+	* R/quality.R (error.kaskilagus): the second parameter is now newdata and is used to specify generalisation data. If missing data saved in the som object are used (if available).
+
+	* man/error.quantisation.Rd: documention updated according to the new semantic for newdata
+
+	* R/quality.R (error.quantisation): the second parameter is now newdata and is used to specify generalisation data
+
+2008-03-10  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/relational.R (batchsom.dist): save the data in the result list
+
+	* man/batchsom.Rd: the data is saved if keepdata=TRUE
+
+	* R/som.R (batchsom.default): save the data in the result list
+
+2007-12-24  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* TODO: demos are ok
+
+	* R/generic.R (batchsom): fixed interface which is now minimal (data and somgrid)
+
+	* R/tune.R (som.tune): fixed a bug in the parameter order 
+
+2007-12-16  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* demo/som-two-dim.R: fix parameter order
+
+	* demo/som-iris.R: fix parameter order
+
+	* man/predict.somnum.Rd: replaces predict.som.Rd (updated content)
+
+	* man/componentPlane.Rd: doc and example update for the new code
+
+	* man/distance.grid.Rd: example update for the new code
+
+	* man/error.quantisation.Rd: example update for the new code
+
+	* man/error.kaskilagus.Rd: example update for the new code
+
+	* man/grid2lines.Rd: example update for the new code
+
+	* man/hitMap.Rd: example update for the new code
+
+	* man/mapToUnit.Rd: example update for the new code
+
+	* man/plot.somgrid.Rd: example update for the new code
+
+	* man/plot.somnum.Rd: example update for the new code
+
+	* man/print.som.Rd: example update for the new code
+
+	* man/plot.sompdist.Rd: example update for the new code
+
+	* man/prototype.distances.Rd: example update for the new code
+
+	* man/sominit.default.Rd: replaces the somInitPCA documentation
+
+	* man/sominit.Rd: new documentation file for the generic initialisation method
+
+	* man/som.tunecontrol.Rd: doc update for the new code
+
+	* man/som.tune.Rd: example and doc update for the new code
+
+	* man/umatrix.Rd: example update for the new code
+
+	* R/som.R (batchsom.default): default batchsom (standard data)
+
+	* R/relational.R (batchsom.dist): batchsom for the dist class
+
+	* R/som.R (colorCode): fixed to use the new batchsom interface
+
+	* R/relational.R (sominit.dist): default initialisation for dissimilarity data
+
+	* R/som.R (sominit.default): pca initialisation for standard data
+	(predict.somnum): specific for numerical som (for now)
+
+	* R/generic.R (batchsom): generic method
+	(sominit): generic method
+	(protoDist): generic method
+	(KaskiLagus): generic method
+
+2007-12-15  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/umatrix.R (protoDist.somnum): this function applies only to numerical SOM
+
+	* R/som.R (batchsom.lowlevel): returns an object with both classes som and somnum
+
+	* R/slow-versions.R (batchsom.lowlevel.R): returns an object with both classes som and somnum
+
+	* R/slow-relational.R (relationalsom.lowlevel.R): returns an object with both classes som and relationalsom
+
+	* R/relational.R (fastRelationalsom.lowlevel.R): returns an object with both classes som and relationalsom
+
+	* R/quality.R (KaskiLagus.somnum): this function applies only to numerical SOM
+
+	* R/graphics.R (plot.somnum): this function applies only to numerical SOM
+
+	* man/plot.somnum.Rd: renamed according to the new class for numerical SOM
+
+2007-12-07  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/slow-relational.R: new file with slow versions of relational som related functions
+
+	* R/relational.R (fastRelationalsom.lowlevel.R): faster version of the relational SOM, using the partial sum trick
+
+	* src/relational.c (partial_sums): C implementation of partial sums (way faster)
+
+	* R/relational.R (relationalSomRandomInit): a new random initialisation method for relation SOM
+	(partialSum.R): partial sums implementation in pure R (very slow!)
+
+2007-12-06  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/relational.R (KaskiLagus.relationalsom): relational som version (should be redesigned)
+
+	* R/quality.R (KaskiLagus): generic version to be usable with relational SOM
+
+	* R/relational.R (relationalsom.lowlevel.R): added oscillation detection (rudimentary)
+
+	* R/graphics.R (grid2lines): added the possibility of building a grid on arbitrary data points
+
+2007-12-05  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/umatrix.R (protoDist): generic version of protoDist to be usable with relational SOM
+
+	* R/relational.R: started the implementation of the relational SOM
+
+	* demo/som-iris.R: updated this demo to use the distance.grid function
+
+	* R/som.R (somPCAInit): fixed a small bug in the eigenvector attribution 
+
