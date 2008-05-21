@@ -8,7 +8,7 @@ data, using a batch algorithm.
 \usage{
 \method{batchsom}{default}(data, somgrid, init=c("pca","random"), prototypes,
          assignment = c("single", "heskes"),radii=somradii(somgrid),
-         maxiter = 75,kernel=c("gaussian","linear"),normalised,
+         weights, maxiter = 75,kernel=c("gaussian","linear"),normalised,
          cut = 1e-07, verbose = FALSE, keepdata = TRUE, \dots)
 }
 \arguments{
@@ -23,7 +23,8 @@ data, using a batch algorithm.
   \item{assignment}{the assignment method used to compute the best
     matching unit of an observation during training}
   \item{radii}{the radii of the neighbourhoods used during training. See
-  \code{\link{somradii}} for the default values}
+    \code{\link{somradii}} for the default values}
+  \item{weights}{optional weights for the data points}
   \item{maxiter}{the maximum number of of iteration performed for each
     radius (the minimum is one)}
   \item{kernel}{the kernel to use to compute neighbouring iterations}
@@ -48,7 +49,7 @@ a function specified by the \code{init} parameter. If its value is
 \code{init} is not specified), while
 \code{\link{sominit.random.default}} is called when \code{init} is
 \code{"random"}. In both case, the additional parameters submitted to
-the method are transmitted to the initialisation method. 
+the method are transmitted to the initialisation method.
 }
 \value{
   An object of class \code{"som"}, a list with components including
@@ -61,6 +62,9 @@ the method are transmitted to the initialisation method.
     error during the fitting process}
   \item{data}{the original data if the function is called with
     \code{keepdata = TRUE}}
+  \item{weights}{the weights of the data points if the function is called with
+    \code{keepdata = TRUE} (if no weight where specified a uniform
+    weight of 1 is assigned to each observation)}
   The object is also of class
   \code{"somnum"}. 
 }

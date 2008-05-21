@@ -8,9 +8,8 @@ dissimilarity data.
 \usage{
 \method{batchsom}{dist}(data, somgrid, init=c("pca","random"), prototypes,
          assignment = c("single", "heskes"),radii=somradii(somgrid),
-         maxiter = 75,kernel=c("gaussian","linear"),normalised,
-         cut = 1e-07, verbose = FALSE, keepdata = TRUE,
-         lowlevel=fastRelationalsom.lowlevel.R,\dots)
+         weights, maxiter = 75,kernel=c("gaussian","linear"),normalised,
+         cut = 1e-07, verbose = FALSE, keepdata = TRUE,\dots)
 }
 \arguments{
   \item{data}{the data to which the SOM will be fitted represented by a
@@ -27,6 +26,7 @@ dissimilarity data.
     matching unit of an observation during training}
   \item{radii}{the radii of the neighbourhoods used during training. See
   \code{\link{somradii}} for the default values}
+ \item{weights}{optional weights for the observations}
   \item{maxiter}{the maximum number of of iteration performed for each
     radius (the minimum is one)}
   \item{kernel}{the kernel to use to compute neighbouring iterations}
@@ -37,8 +37,6 @@ dissimilarity data.
   \item{verbose}{switch for tracing the fitting process}
   \item{keepdata}{if \code{TRUE}, the original data are returned as
     part of the result object}
-  \item{lowlevel}{the underlying low level implementation of the method
-    (don't use this parameter, it's here only during the development process)}
   \item{\dots}{additional arguments to be passed to the initialisation method}
 }
 \details{
@@ -68,6 +66,8 @@ the method are transmitted to the initialisation method.
     error during the fitting process}
   \item{data}{the original data if the function is called with
     \code{keepdata = TRUE}}
+  \item{weights}{the weights of the data points if the function is called with
+    \code{keepdata = TRUE} and if the \code{weights} is given}
 }
 %\references{ ~put references to the literature/web site here ~ }
 \author{Fabrice Rossi}

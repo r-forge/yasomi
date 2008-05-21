@@ -1,4 +1,5 @@
 sominit.pca.default <- function(data,somgrid,...) {
+### FIXME: data weights support
     ## we don't scale the data
     data.pca <- prcomp(data)
     ## the more detailled axis is assigned to the first eigenvector
@@ -33,6 +34,7 @@ sominit.pca.default <- function(data,somgrid,...) {
 
 sominit.random.default <- function(data,somgrid,
                                    method=c("prototypes","random","cluster"),...) {
+### FIXME: data weights support
     method <- match.arg(method)
     data <- as.matrix(data)
     dim <- nrow(data)
@@ -57,9 +59,14 @@ sominit.random.default <- function(data,somgrid,
     }
 }
 
-bmu <- function(prototypes,data) {
+bmu <- function(prototypes,data,weights) {
     if(ncol(prototypes)!=ncol(data)) {
         stop("'prototypes' and 'data' have different dimensions")
+    }
+    if(missing(weights)) {
+        weights <- rep(1,nrow(data))
+    } else if(length(weights)!=nrow(data)) {
+        stop("'weights' and 'data' have different dimensions")
     }
     result <- .C("bmu",
                  as.double(prototypes),
@@ -67,6 +74,7 @@ bmu <- function(prototypes,data) {
                  as.double(data),
                  as.integer(nrow(data)),
                  as.integer(ncol(prototypes)),
+                 as.double(weights),
                  clusters=integer(nrow(data)),
                  error=as.double(0),
                  PACKAGE="yasomi")
@@ -87,7 +95,7 @@ secondBmu <- function(prototypes,data) {
               PACKAGE="yasomi")$clusters,ncol=2)
 }
 
-bmu.heskes <- function(prototypes,data,nv) {
+bmu.heskes <- function(prototypes,data,nv,weights) {
     if(ncol(prototypes)!=ncol(data)) {
         stop("'prototypes' and 'data' have different dimensions")
     }
@@ -97,6 +105,11 @@ bmu.heskes <- function(prototypes,data,nv) {
     if(ncol(nv)!=nrow(prototypes)) {
         stop("'nv' and 'prototypes' have different dimensions")
     }
+    if(missing(weights)) {
+        weights <- rep(1,nrow(data))
+    } else if(length(weights)!=nrow(data)) {
+        stop("'weights' and 'data' have different dimensions")
+    }
     ## nv must be in row major mode if normalised
     result <- .C("bmu_heskes",
                  as.double(prototypes),
@@ -105,6 +118,7 @@ bmu.heskes <- function(prototypes,data,nv) {
                  as.double(data),
                  as.integer(nrow(data)),
                  as.integer(ncol(prototypes)),
+                 as.double(weights),
                  clusters=integer(nrow(data)),
                  error=as.double(0),
                  PACKAGE="yasomi")
@@ -113,7 +127,7 @@ bmu.heskes <- function(prototypes,data,nv) {
 
 batchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
                      assignment=c("single","heskes"),radii=somradii(somgrid),
-                     maxiter=75,
+                     weights,maxiter=75,
                      kernel=c("gaussian","linear"),
                      normalised,
                      cut=1e-7,verbose=FALSE,keepdata=TRUE,...) {
@@ -127,6 +141,13 @@ batchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
     kernelType <- switch(kernel,"gaussian"=0,"linear"=1)
     if(class(somgrid)!="somgrid") {
         stop("'somgrid' is not of somgrid class")
+    }
+    if(!missing(weights)) {
+        if(length(weights)!=nrow(data)) {
+            stop("'weights' and 'data' have different dimensions")
+        }
+    } else {
+        weights <- rep(1,nrow(data))
     }
     if(missing(prototypes)) {
         ## initialisation based on the value of init
@@ -148,7 +169,7 @@ batchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
     if(is.null(somgrid$dist)) {
         somgrid$dist <- as.matrix(dist(somgrid$pts,method="Euclidean"),diag=0)
     }
-    pre <- batchsom.lowlevel(somgrid,data,prototypes,theRule,radii,
+    pre <- batchsom.lowlevel(somgrid,data,prototypes,theRule,radii,weights,
                              maxiter,kernelType,normalised,cut,verbose)
     pre$assignment <- assignment
     pre$kernel <- kernel
@@ -156,12 +177,13 @@ batchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
     pre$radii <- radii
     if(keepdata) {
         pre$data  <- data
+        pre$weights <- weights
     }
     pre
 }
 
 batchsom.lowlevel <- function(somgrid,data,prototypes,
-                              assignment,radii,maxiter,
+                              assignment,radii,weights,maxiter,
                               kernelType,normalised,cut,verbose) {
     result <- .C("batch_som_optim",
                  proto=as.double(prototypes),
@@ -169,6 +191,7 @@ batchsom.lowlevel <- function(somgrid,data,prototypes,
                  as.double(data),
                  as.integer(nrow(data)),
                  as.integer(ncol(data)),
+                 as.double(weights),
                  as.integer(assignment),
                  as.double(somgrid$dist),
                  as.double(radii),

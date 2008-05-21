@@ -34,17 +34,22 @@ error.kaskilagus.somnum <- function(som,newdata,...) {
         if(is.null(som$data)) {
             stop("cannot compute the quality measure without saved data or new data")
         }
-        newdata <- som$data
+        pre <- KaskiLagus.somnum(som,som$data,som$weights)
+    } else {
+        pre <- KaskiLagus.somnum(som,newdata)
     }
-    pre <- KaskiLagus.somnum(som,newdata)
     mean(pre$quant+pre$path)
 }
 
-KaskiLagus.somnum <- function(som,data) {
+KaskiLagus.somnum <- function(som,data,weights) {
     data <- as.matrix(data)
     winners <- secondBmu(som$prototypes,data)
     pdist <- as.matrix(prototype.distances(som))
-    list(quant=sqrt(rowSums((data-som$prototypes[winners[,1],])^2)),path=pdist[winners])
+    if(missing(weights)) {
+        list(quant=sqrt(rowSums((data-som$prototypes[winners[,1],])^2)),path=pdist[winners])
+    } else {
+        list(quant=sqrt(weights*rowSums((data-som$prototypes[winners[,1],])^2))/(mean(weights)),path=pdist[winners])
+    }
 }
 
 error.kaskilagus.relationalsom <- function(som,newdata,...) {
@@ -59,12 +64,12 @@ error.kaskilagus.relationalsom <- function(som,newdata,...) {
 KaskiLagus.relationalsom <- function(som,newdata) {
     if(missing(newdata)) {
         ## on the original data, we use Dalpha and nf
-        second <- relationalsecondbmu.R(som$Dalpha,som$nf)
+        second <- relationalsecondbmu.R(som$Dalpha,som$nf,som$weights)
     } else {
         ## on new data we use predict in extended mode
         second <- predict(som,newdata,with.secondwinner=TRUE)
     }
     pdist <- as.matrix(prototype.distances(som))
-    list(quant=second$error,path=pdist[second$winners])
+    list(quant=sqrt(second$error),path=pdist[second$winners])
 }
 

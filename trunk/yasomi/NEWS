@@ -9,6 +9,10 @@ Changes in yasomi 0.2
     	particular to accommodate for the relational SOM. As a consequence the
     	main function batchsom as a modified interface. 
 
+    o   Limited support for observation weighting has been added. In this
+    	version, the initialisation functions do not take the weights into
+    	account.
+
     o   Documentation has been improved, in particular with the addition of an
     	introductory vignette. 
 
@@ -23,8 +27,8 @@ Changes in yasomi 0.2
 	In addition the quantisation error was not clearly defined. In some
       	functions, it was the mean squared Euclidean distance between data
       	points and the associated bmu, in others it was the mean Euclidean
-      	distance. It is now the mean Euclidean distance everywhere, with as
-      	similar definition for the relational SOM. 
+      	distance. It is now the mean squared Euclidean distance everywhere,
+      	with as similar definition for the relational SOM. 
 	
 
 

@@ -1,4 +1,64 @@
+2008-05-21  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/batchsom.default.Rd: adapted documentation for the weights parameter
+
+	* man/batchsom.dist.Rd: adapted documentation for the weights parameter
+
+	* man/som.tune.Rd: adapted documentation for the weights parameter
+
+	* R/relational.R (fastRelationalsom.lowlevel.R): made sur the final assigment is done
+
+	* R/slow-relational.R (relationalsom.lowlevel.R): fixed the loop bug
+
+	* R/tune.R (som.tune): support of weights
+
+	* R/relational.R (relationalsecondbmu.R): support of weights
+
+	* R/quality.R (KaskiLagus.somnum, error.kaskilagus.somnum)
+	(error.kaskilagus.relationalsom, KaskiLagus.relationalsom): added support of weights
+
+	* R/graphics.R (grid2lines): add a warning message when the method is used for something else than a numerical som
+
+	* R/relational.R (weightedFastRelationalBMU.R): weighted version
+
+	* R/slow-relational.R (weightedPartialSums.R): weighted version of the partial sums function
+
+	* R/relational.R (weightedPartialSums): R interface for the new function weighted_partial_sums
+
+	* src/relational.c (weighted_partial_sums): new function for weighted partial sums
+
+	* R/relational.R (batchsom.dist): saved the weights when the data are
+	(fastRelationalsom.lowlevel.R): weighting support
+
+	* R/slow-relational.R (relationalsom.lowlevel.R): fixed a problem with the extended case
+
+	* R/slow-versions.R (batchsom.R): saved the weights when the data are
+
+	* R/som.R (batchsom.default): saved the weights when the data are
+
 2008-05-19  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/relational.R (relational.keeppositive): replace negative values by 0 values when needed (with a warning)
+	(fastRelationalBMU.R): support of weights and mean squared error
+	(relationalbmu.R): support of weights and mean squared error
+	(predict.relationalsom): mean squared error
+	(extended.relationalbmu.R): support of weights and mean squared error
+	(relationalsecondbmu.R): mean squared error
+	(batchsom.dist): support of weights
+
+	* src/som.c (batch_som, batch_som_optim): support of weights
+
+	* R/som.R (batchsom.lowlevel, batchsom.default): support of weights
+
+	* src/bmu.h: support of weights
+
+	* src/bmu.c (bmu): support of weights and mean squared error
+	(bmu_heskes_ext_mem): idem
+	(bmu_heskes): idem
+
+	* R/som.R (bmu): support of weights
+
+	* src/bmu.c (bmu, bmu_heskes_ext_mem): moved back to standard mean squared error (rather than mean error)
 
 	* R/slow-versions.R (bmu.R): updated to use proxy facilities and to support weighting
 	(bmu.heskes.R): idem bmu.R

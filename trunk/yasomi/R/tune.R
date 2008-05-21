@@ -19,7 +19,7 @@ som.tunecontrol <- function(somgrid,init="pca",ninit=1,
 }
 
 
-som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),
+som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),weights,
                      verbose=FALSE,internalVerbose=FALSE) {
     nbconf <- length(control$init)*control$ninit*length(control$assignment)*length(control$radii)*length(control$annealing)*length(control$kernel)
     dimensions <- character()
@@ -94,10 +94,24 @@ som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),
                             }
                             radii=somradii(somgrid,max=radius,nb=control$innernradii,annealing=annealing)
                             ## will always save the data
-                            som <- batchsom(data,somgrid,prototypes=prototypes,
-                                            assignement=assignment,radii=radii,
-                                            maxiter=control$maxiter,kernel=kernel,
-                                            verbose=internalVerbose)
+                            if(missing(weights)) {
+                                som <- batchsom(data,somgrid,
+                                                prototypes=prototypes,
+                                                assignement=assignment,
+                                                radii=radii,
+                                                maxiter=control$maxiter,
+                                                kernel=kernel,
+                                                verbose=internalVerbose)
+                            } else {
+                                som <- batchsom(data,somgrid,
+                                                prototypes=prototypes,
+                                                assignement=assignment,
+                                                radii=radii,
+                                                weights=weights,
+                                                maxiter=control$maxiter,
+                                                kernel=kernel,
+                                                verbose=internalVerbose)
+                            }
                             ## the criterion must use only the som structure
                             performances[confIndex] <- control$criterion(som)
                             comp.init[confIndex] <- init

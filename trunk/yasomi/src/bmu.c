@@ -1,14 +1,14 @@
 #include <R.h>
-#include <math.h>
 
 int bmu(double *proto,int *nproto,double *data,int *ndata,int *dim,
-	int *winner,double *error) 
+	double *weights,int *winner,double *error) 
 {
     double bestDist,dist,tmp;
     int i,j,k;
     int bestSoFar;
     int dataSize=*ndata,protoSize=*nproto,dimension=*dim;
     int changed = 0;
+    double norm = 0;
     
     *error = 0;
     /* loop on the individuals */
@@ -28,13 +28,14 @@ int bmu(double *proto,int *nproto,double *data,int *ndata,int *dim,
 		bestSoFar = j;
 	    }
 	}
-	*error += sqrt(bestDist);
+	*error += weights[i]*bestDist;
+	norm += weights[i];
 	if(bestSoFar != winner[i]) {
 	    winner[i] = bestSoFar;
 	    changed = 1;
 	}
     }
-    *error /= dataSize;
+    *error /= norm;
     return changed;
 }
 
@@ -79,8 +80,8 @@ void second_bmu(double *proto,int *nproto,double *data,int *ndata,int *dim,
 }
 
 int bmu_heskes_ext_mem(double *proto,double *neigh,int *nproto,double *data,
-		       int *ndata,int *dim,int *winner,double *error,
-		       double *distances) 
+		       int *ndata,int *dim,double *weights,int *winner,
+		       double *error,double *distances) 
 {
     double bestDist,dist,fullDist,tmp;
     int i,j,k,n;
@@ -88,6 +89,7 @@ int bmu_heskes_ext_mem(double *proto,double *neigh,int *nproto,double *data,
     int bestSoFar;
     int dataSize=*ndata,protoSize=*nproto,dimension=*dim;
     int changed = 0;
+    double norm = 0;
     
     *error = 0;
     /* loop on the individuals */
@@ -118,24 +120,25 @@ int bmu_heskes_ext_mem(double *proto,double *neigh,int *nproto,double *data,
 		bestSoFar = j;
 	    }
 	}
-	*error += sqrt(distances[bestSoFar]);
+	*error += weights[i]*distances[bestSoFar];
+	norm += weights[i];
 	if(bestSoFar != winner[i]) {
 	    winner[i] = bestSoFar;
 	    changed = 1;
 	}
     }
-    *error /= dataSize;
+    *error /= norm;
     return changed;
 }
 
 int bmu_heskes(double *proto,double *neigh,int *nproto,double *data,
-	       int *ndata,int *dim,int *winner,double *error) 
+	       int *ndata,int *dim,double *weights,int *winner,double *error) 
 {
     /* storage for intermediate results */
     double *distances = (double *) R_alloc(*nproto, sizeof(double));
     
-    return bmu_heskes_ext_mem(proto,neigh,nproto,data,ndata,dim,winner,error,
-			      distances);
+    return bmu_heskes_ext_mem(proto,neigh,nproto,data,ndata,dim,weights,winner,
+			      error,distances);
 }
 
 

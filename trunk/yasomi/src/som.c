@@ -48,6 +48,7 @@ void neighborhood(double *distances,double *nv,int nbUnit,double radius,
 
 /* proto (nproto,dim): initial values of the prototypes
    data (ndata,dim): dataset
+   weights (ndata): weights for the data points
    assign: assignment rule
    grid (nproto,nproto): distances between units (square matrix)
    radii (nradii): annealing scheme
@@ -61,7 +62,7 @@ void neighborhood(double *distances,double *nv,int nbUnit,double radius,
  */
 
 void batch_som(double *proto,int *nproto,double *data,int *ndata,
-	       int *dim,int *assign,double *grid,double *radii,
+	       int *dim,double *weights,int *assign,double *grid,double *radii,
 	       int *nradii,int *maxiter,int *kernel,int *normalized,
 	       double *cut,int *verbose,
 	       int *classif,double *errors) 
@@ -134,15 +135,17 @@ void batch_som(double *proto,int *nproto,double *data,int *ndata,
 	    if(assignmentRule == 1) {
 		/* Heskes' rule */
 		changed = bmu_heskes_ext_mem(proto,nv,nproto,data,ndata,dim,
-					     classif,&totalError,distances);
+					     weights,classif,&totalError,
+					     distances);
 	    } else {
-		changed = bmu(proto,nproto,data,ndata,dim,classif,&totalError);
+		changed = bmu(proto,nproto,data,ndata,dim,weights,classif,
+			      &totalError);
 	    }
 	    errors[iter + iRad*maxIter] = totalError;
 	    if(isVerbose) {
 		Rprintf("%i (%i) %g\n",iRad,iter,totalError);
 	    }
-	    /*** representation pahse ***/
+	    /*** representation phase ***/
 	    /* prepare the next loop when the partition has not changed or
 	     * when the end of the iter loop is reached */
 	    if(!changed ||  iter == maxIter - 1) {
@@ -165,7 +168,7 @@ void batch_som(double *proto,int *nproto,double *data,int *ndata,
 		memset(tmpProto,0,dimension*sizeof(double));
 		for(indiv = 0 ; indiv < dataSize ; indiv++) {
 		    l = classif[indiv];
-		    neigh = nv[ base + l ];
+		    neigh = nv[ base + l ] * weights[indiv];
 		    norm += neigh;
 		    /* loop on dimensions */
 		    for(k = 0; k < dimension; k++) {
@@ -191,7 +194,7 @@ void batch_som(double *proto,int *nproto,double *data,int *ndata,
     }
     if(changed) {
 	/* final assignement if needed */
-	bmu(proto,nproto,data,ndata,dim,classif,&totalError);
+	bmu(proto,nproto,data,ndata,dim,weights,classif,&totalError);
 	errors[nbRadii*maxIter] = totalError;
     }
 }
@@ -200,9 +203,9 @@ void batch_som(double *proto,int *nproto,double *data,int *ndata,
    the center of mass of each cluster and then the updated prototypes */
 
 void batch_som_optim(double *proto,int *nproto,double *data,int *ndata,
-		     int *dim,int *assign,double *grid,double *radii,
-		     int *nradii,int *maxiter,int *kernel,int *normalized,
-		     double *cut,int *verbose,
+		     int *dim,double *weights,int *assign,double *grid,
+		     double *radii,int *nradii,int *maxiter,int *kernel,
+		     int *normalized,double *cut,int *verbose,
 		     int *classif,double *errors) 
 {
     int dataSize=*ndata,protoSize=*nproto,dimension=*dim;
@@ -216,11 +219,11 @@ void batch_som_optim(double *proto,int *nproto,double *data,int *ndata,
     int base,protoBase;
     double *nv;
     double *preProto;
-    int *clusterSize;
+    double *clusterWeight;
     double *tmpProto;
     
     int changed;
-    double bestDist,dist,tmp,norm,neigh;
+    double bestDist,dist,tmp,norm,neigh,indivWeight;
     int bestSoFar;
     
     double totalError;
@@ -240,8 +243,8 @@ void batch_som_optim(double *proto,int *nproto,double *data,int *ndata,
     /* stored in row major mode */
     preProto = (double *) R_alloc(protoSize*dimension, sizeof(double));
     
-    /* clusterSize */
-    clusterSize = (int *) R_alloc(protoSize, sizeof(int));
+    /* clusterWeight */
+    clusterWeight = (double *) R_alloc(protoSize, sizeof(double));
     
     /* temporary prototype */
     tmpProto = (double *) R_alloc(dimension, sizeof(double));
@@ -281,9 +284,11 @@ void batch_som_optim(double *proto,int *nproto,double *data,int *ndata,
 	    if(assignmentRule == 1) {
 		/* Heskes' rule */
 		changed = bmu_heskes_ext_mem(proto,nv,nproto,data,ndata,dim,
-					     classif,&totalError,distances);
+					     weights,classif,&totalError,
+					     distances);
 	    } else {
-		changed = bmu(proto,nproto,data,ndata,dim,classif,&totalError);
+		changed = bmu(proto,nproto,data,ndata,dim,weights,classif,
+			      &totalError);
 	    }
 	    errors[iter + iRad*maxIter] = totalError;
 	    if(isVerbose) {
@@ -309,14 +314,15 @@ void batch_som_optim(double *proto,int *nproto,double *data,int *ndata,
 	    /* first compute class center of mass */
 	    /* zero */
 	    memset(preProto,0,protoSize*dimension*sizeof(double));
-	    memset(clusterSize,0,protoSize*sizeof(int));
+	    memset(clusterWeight,0,protoSize*sizeof(double));
 	    for(indiv = 0 ; indiv < dataSize ; indiv++) {
 		j = classif[indiv];
-		clusterSize[j]++;
+		indivWeight = weights[indiv];
+		clusterWeight[j]+=indivWeight;
 		/* loop on dimensions */
 		protoBase = j * dimension;
 		for(k = 0; k < dimension; k++) {
-		    preProto[protoBase + k] += data[indiv + k * dataSize];
+		    preProto[protoBase + k] += indivWeight*data[indiv + k * dataSize];
 		}
 	    }
 	    /* then compute prototypes */
@@ -325,8 +331,8 @@ void batch_som_optim(double *proto,int *nproto,double *data,int *ndata,
 		/* first compute normalization factor */
 		base = j * protoSize;
 		for(l = 0; l < protoSize; l++) {
-		    if(clusterSize[l]>0) {
-			norm += nv[base + l] * clusterSize[l];
+		    if(clusterWeight[l]>0) {
+			norm += nv[base + l] * clusterWeight[l];
 		    }
 		}
 		/* update only if it is meaningful to do so */
@@ -335,7 +341,7 @@ void batch_som_optim(double *proto,int *nproto,double *data,int *ndata,
 		    memset(tmpProto,0,dimension*sizeof(double));
 		    /* compute new value */
 		    for(l = 0; l < protoSize; l++) {
-			if(clusterSize[l]>0) {
+			if(clusterWeight[l]>0) {
 			    neigh = nv[base + l];
 			    protoBase = l * dimension;
 			    /* loop on dimensions */
@@ -361,7 +367,7 @@ void batch_som_optim(double *proto,int *nproto,double *data,int *ndata,
     }
     if(changed) {
 	/* final assignement if needed */
-	bmu(proto,nproto,data,ndata,dim,classif,&totalError);
+	bmu(proto,nproto,data,ndata,dim,weights,classif,&totalError);
 	errors[nbRadii*maxIter] = totalError;
     }
 }

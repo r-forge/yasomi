@@ -1,5 +1,8 @@
 grid2lines <- function(som,prototypes) {
     if(missing(prototypes)) {
+        if(!inherits(som,"somnum")) {
+            warning("'som' is not a standard numerical SOM, results might be meaningless")
+        }
         prototypes <- som$prototypes
     } else {
         if(nrow(prototypes)!=som$somgrid$size) {

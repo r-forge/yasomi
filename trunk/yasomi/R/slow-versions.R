@@ -22,25 +22,25 @@ kernel.linear <- function(x) {
     }
 }
 
-bmu.R <- function(prototypes,data,weights=NULL) {
+bmu.R <- function(prototypes,data,weights) {
     distances <- dist(prototypes,data)
     clusters <- apply(distances,2,which.min)
-    if(is.null(weights)) {
-        error <- mean(distances[cbind(clusters,1:length(clusters))])
+    if(missing(weights)|| is.null(weights)) {
+        error <- mean(distances[cbind(clusters,1:length(clusters))]^2)
     } else {
-        error <- sum(weights*distances[cbind(clusters,1:length(clusters))])/sum(weights)
+        error <- sum(weights*distances[cbind(clusters,1:length(clusters))]^2)/sum(weights)
     }
     list(clusters=clusters,error=error)
 }
 
-bmu.heskes.R <- function(prototypes,data,nv,weights=NULL) {
+bmu.heskes.R <- function(prototypes,data,nv,weights) {
     distances <- dist(prototypes,data)
     dnv <- nv%*%(distances^2)
     clusters <- apply(dnv,2,which.min)
-    if(is.null(weights)) {
-        error <- mean(distances[cbind(clusters,1:length(clusters))])
+    if(missing(weights) || is.null(weights)) {
+        error <- mean(distances[cbind(clusters,1:length(clusters))]^2)
     } else {
-        error <- sum(weights*distances[cbind(clusters,1:length(clusters))])/sum(weights)
+        error <- sum(weights*distances[cbind(clusters,1:length(clusters))]^2)/sum(weights)
     }
     list(clusters=clusters,error=error)
 }
@@ -84,31 +84,32 @@ batchsom.R <- function(data,somgrid,init=c("pca","random"),prototypes,
     if(is.null(somgrid$dist)) {
         somgrid$dist <- as.matrix(dist(somgrid$pts,method="Euclidean"),diag=0)
     }
-    pre <- batchsom.lowlevel.R(somgrid,data,weights,prototypes,assignment,
-                               radii,maxiter,theKernel,normalised,cut,verbose)
+    pre <- batchsom.lowlevel.R(somgrid,data,prototypes,assignment,radii,
+                               weights,maxiter,theKernel,normalised,cut,verbose)
     pre$assignment <- assignment
     pre$kernel <- kernel
     pre$normalised <- normalised
     pre$radii <- radii
     if(keepdata) {
         pre$data  <- data
-    }
+        pre$weights <- weights
+   }
     pre
 }
 
-batchsom.lowlevel.R <- function(somgrid,data,dataweights,prototypes,
-                                assignment,radii,maxiter,kernel,
+batchsom.lowlevel.R <- function(somgrid,data,prototypes,
+                                assignment,radii,weights,maxiter,kernel,
                                 normalised,cut,verbose) {
     data <- as.matrix(data)
     classif <- rep(NA,nrow(data))
     errors <- vector("list",length(radii))
+    nv <- neighborhood(somgrid,radii[1],kernel,normalised=normalised)
     for(i in 1:length(radii)) {
-        nv <- neighborhood(somgrid,radii[i],kernel,normalised=normalised)
         for(j in 1:maxiter) {
             if(assignment == "single") {
-                bmus <- bmu.R(prototypes,data,dataweights)
+                bmus <- bmu.R(prototypes,data,weights)
             } else {
-                bmus <- bmu.heskes.R(prototypes,data,nv,dataweights)
+                bmus <- bmu.heskes.R(prototypes,data,nv,weights)
             }
             nclassif <- bmus$clusters
             noChange = identical(classif,nclassif)
@@ -118,24 +119,39 @@ batchsom.lowlevel.R <- function(somgrid,data,dataweights,prototypes,
                 print(paste(i,j,error))
             }
             errors[[i]] <- c(errors[[i]],error)
-            if(is.null(dataweights)) {
-                weights <- nv[,classif]
-            } else {
-                weights <- sweep(nv[,classif],2,dataweights,"*")
-            }
-            normed <- rowSums(weights)
-            mask <- (1:length(normed))[(normed/length(normed))>cut]
-            prototypes[mask,] <- sweep(weights%*%data,1,normed,"/")[mask,]
-            if(noChange && j >=2) {
+            ## prepare next iteration
+            if(noChange) {
                 if(verbose) {
                     print(paste("radius:",radii[i],"iteration",j,"is stable, decreasing radius"))
                 }
+                ## update the weights
+                if(i<length(radii)) {
+                    nv <- neighborhood(somgrid,radii[i+1],kernel,normalised=normalised)
+                } else {
+                    break;
+                }
+            }
+            if(is.null(weights)) {
+                nvcl <- nv[,classif]
+            } else {
+                nvcl <- sweep(nv[,classif],2,weights,"*")
+            }
+            normed <- rowSums(nvcl)
+            mask <- (1:length(normed))[normed>cut]
+            prototypes[mask,] <- sweep(nvcl%*%data,1,normed,"/")[mask,]
+            if(noChange) {
                 break;
             }
         }
         if(!noChange && verbose) {
             print(paste("warning: can't reach a stable configuration with radius",i))
         }
+    }
+    if(!noChange) {
+        ## final assignment (always in standard mode)
+        bmus <- bmu.R(prototypes,data,weights)
+        classif <- bmus$clusters
+        errors[[length(radii)]] <- c(errors[[length(radii)]],bmus$error)
     }
     res <- list(somgrid=somgrid,prototypes=prototypes,classif=classif,
                 errors=unlist(errors))

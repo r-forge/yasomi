@@ -9,7 +9,7 @@ optimised by this function.
 }
 \usage{
 som.tune(data, somgrid, control = som.tunecontrol(somgrid),
-         verbose = FALSE, internalVerbose = FALSE)
+         weights, verbose = FALSE, internalVerbose = FALSE)
 \method{print}{somtune}(x,\dots)
 }
 \arguments{
@@ -17,7 +17,9 @@ som.tune(data, somgrid, control = som.tunecontrol(somgrid),
     e.g., a matrix or data frame of observations (which should be scaled), or a
     distance matrix}
   \item{somgrid}{an object of class 'somgrid'}
-  \item{control}{a control object which specifies the parameter to optimize}
+  \item{control}{a control object which specifies the parameter to
+    optimize}
+  \item{weights}{optional weights for the data points}
   \item{verbose}{switch for tracing the tuning process}
   \item{internalVerbose}{switch for tracing each call to
     \code{\link{batchsom}}}
@@ -58,14 +60,26 @@ data <- scale(iris[1:4])
 sg <- somgrid(xdim=15,ydim=15,topo="hex")
 
 # choose a good SOM via Kaski and Lagus' error measure
-tune.results <-
-  som.tune(data,sg,som.tunecontrol(sg,criterion=error.kaskilagus))
+tune.results <- som.tune(data,sg,
+                         som.tunecontrol(sg,criterion=error.kaskilagus))
 
 # print the results
 print(tune.results)
 
 # umatrix of the best SOM
 umatrix(tune.results$best.som)
+
+# give more weight to the first specie (i.e. setosa)
+tune.results <-  som.tune(data,sg,
+                          som.tunecontrol(sg,criterion=error.kaskilagus),
+                          weights=c(rep(3,50),rep(1,100)))
+
+# print the results
+print(tune.results)
+
+# umatrix of the best SOM
+umatrix(tune.results$best.som)
+
 }
 \keyword{cluster}
 

@@ -1,16 +1,21 @@
 # relational SOM
 
-relational.sqrt <- function(val,with.warning=TRUE) {
+relational.keeppositive <- function(val,with.warning=TRUE) {
     valmin <- min(val)
     if(with.warning && valmin < -sqrt(.Machine$double.eps)) {
         warning(paste("Non negligible negative minimal values (",valmin,") discared",sep=""))
     }
     val[val<0] <- 0
-    sqrt(val)
+    val
+}
+
+relational.sqrt <- function(val,with.warning=TRUE) {
+    sqrt(relational.keeppositive(val,with.warning))
 }
 
 sominit.random.dist <- function(data,somgrid,
                                 method=c("prototypes","random","cluster"),...) {
+### FIXME: data weights support
     method <- match.arg(method)
     dim <- nrow(data)
     nb <- somgrid$size
@@ -43,6 +48,7 @@ normsFromDist <- function(D) {
 }
 
 sominit.pca.dist <- function(data, somgrid, ...) {
+### FIXME: data weights support
     D <- as.matrix(data^2,diag=0)
     ## we do something very close to MDS and kernel PCA
     ## first double centering
@@ -99,7 +105,27 @@ fastRelationalBMU.R <- function(cluster,nclust,diss,nv) {
     ## nf <- 0.5*nfPS(ps$bips,nvnormed,nclust)
     distances <- sweep(Dalpha,1,nf,"-")
     bmu <- apply(distances,2,which.min)
-    error <- mean(relational.sqrt(distances[cbind(bmu,1:length(bmu))]))
+    error <- mean(relational.keeppositive(distances[cbind(bmu,1:length(bmu))]))
+    list(clusters=bmu,error=error,Dalpha=Dalpha,nf=nf)
+}
+
+weightedFastRelationalBMU.R <- function(cluster,nclust,diss,nv,weights) {
+    ps <- weightedPartialSums(cluster,nclust,diss,weights)
+    csize <- tapply(weights,factor(cluster,levels=1:nclust),sum)
+    csize[is.na(csize)] <- 0
+    normed <- nv%*%csize
+    nvnormed <- sweep(nv,1,normed,"/")
+    Dalpha <- nvnormed%*%ps$ps
+    interm <- tcrossprod(ps$bips,nvnormed)
+    nf <- double(nclust)
+    for(i in 1:nclust) {
+        nf[i] <- 0.5*c(nvnormed[i,]%*%interm[,i])
+    }
+    ## the alternate C version is barely faster
+    ## nf <- 0.5*nfPS(ps$bips,nvnormed,nclust)
+    distances <- sweep(Dalpha,1,nf,"-")
+    bmu <- apply(distances,2,which.min)
+    error <- sum(weights*relational.keeppositive(distances[cbind(bmu,1:length(bmu))]))/sum(weights)
     list(clusters=bmu,error=error,Dalpha=Dalpha,nf=nf)
 }
 
@@ -117,13 +143,28 @@ partialSums <- function(cluster,nclust,diss) {
          bips=matrix(result$bisums,nrow=nclust,ncol=nclust))
 }
 
+weightedPartialSums <- function(cluster,nclust,diss,weights) {
+    datasize <- as.integer(length(cluster))
+    ## partial_sums modifies only the bisums parameter: DUP=FALSE is safe here
+    result <- .C("weighted_partial_sums",
+                 as.integer(cluster-1),
+                 datasize,
+                 as.integer(nclust),
+                 as.double(diss),
+                 as.double(weights),
+                 sums=double(nclust*datasize),
+                 bisums=double(nclust^2),DUP=FALSE)
+    list(ps=matrix(result$sums,nrow=nclust,ncol=datasize),
+         bips=matrix(result$bisums,nrow=nclust,ncol=nclust))
+}
+
 nfPS <- function(bips,nvnormed,nclust) {
     ## th_bips_h modifies only the nf parameter: DUP=FALSE is safe here
     .C("th_bips_h",as.double(bips),as.double(nvnormed),as.integer(nclust),
        nf=double(nclust),DUP=FALSE)$nf
 }
 
-relationalbmu.R <- function(prototypes,diss) {
+relationalbmu.R <- function(prototypes,diss,weights) {
     ## first compute the base distances
     Dalpha <- tcrossprod(diss,prototypes)
     ## then the normalisation factor
@@ -134,7 +175,11 @@ relationalbmu.R <- function(prototypes,diss) {
     }
     distances <- sweep(Dalpha,2,nf,"-")
     clusters <- apply(distances,1,which.min)
-    error <- mean(relational.sqrt(distances[cbind(1:length(clusters),clusters)]))
+    if(missing(weights) || is.null(weights)) {
+        error <- mean(relational.keeppositive(distances[cbind(1:length(clusters),clusters)]))
+    } else {
+        error <- sum(weights*relational.keeppositive(distances[cbind(1:length(clusters),clusters)]))/sum(weights)
+    }
     list(clusters=clusters,error=error,Dalpha=Dalpha,nf=nf)
 }
 
@@ -154,7 +199,7 @@ predict.relationalsom <- function(object,newdata,with.secondwinner=FALSE,...) {
     } else {
         clusters <- apply(rdist,2,which.min)
     }
-    error <- mean(relational.sqrt(rdist[cbind(clusters,1:length(clusters))]))
+    error <- mean(relational.keeppositive(rdist[cbind(clusters,1:length(clusters))]))
     if(with.secondwinner) {
         list(classif=clusters,error=error,distances=rdist,winners=winners)
     } else {
@@ -163,7 +208,7 @@ predict.relationalsom <- function(object,newdata,with.secondwinner=FALSE,...) {
 }
 
 
-extended.relationalbmu.R <- function(prototypes,diss,norms) {
+extended.relationalbmu.R <- function(prototypes,diss,norms,weights) {
     ## we use here the extended formula when rowSums(prototypes)!=1
     Dalpha <- tcrossprod(diss,prototypes)
     ## then the normalisation factor
@@ -176,31 +221,39 @@ extended.relationalbmu.R <- function(prototypes,diss,norms) {
     protonorms <- prototypes%*%norms
     distances <- sweep(Dalpha,2,nf+sums*protonorms,"-")+norms%o%sums
     clusters <- apply(distances,1,which.min)
-    error <- mean(relational.sqrt(distances[cbind(1:length(clusters),clusters)]))
+    if(missing(weights) || is.null(weights)) {
+        error <- mean(relational.keeppositive(distances[cbind(1:length(clusters),clusters)]))
+    } else {
+        error <- sum(weights*relational.keeppositive(distances[cbind(1:length(clusters),clusters)]))/sum(weights)
+    }
     list(clusters=clusters,error=error,Dalpha=Dalpha,nf=nf)
 }
 
-relationalsecondbmu.R <- function(Dalpha,nf) {
+relationalsecondbmu.R <- function(Dalpha,nf,weights) {
     distances <- sweep(Dalpha,2,nf,"-")
     ## very suboptimal
     ordered <- apply(distances,1,order)
     winners <- t(ordered[1:2,])
-    error <- relational.sqrt(distances[cbind(1:nrow(winners),winners[,1])])
+    if(missing(weights) || is.null(weights)) {
+        error <- relational.keeppositive(distances[cbind(1:nrow(winners),winners[,1])])
+    } else {
+        error <- weights*relational.keeppositive(distances[cbind(1:nrow(winners),winners[,1])])/mean(weights)
+    }
     list(winners=winners,error=error)
 }
 
 fastRelationalsom.lowlevel.R <- function(somgrid,diss,prototypes,
-                                         assignment,radii,maxiter,kernel,
-                                         normalised,cut,verbose,extended,
+                                         assignment,radii,weights,maxiter,
+                                         kernel,normalised,cut,verbose,extended,
                                          data.norms) {
     oldClassif <- rep(NA,nrow(diss))
     errors <- vector("list",length(radii))
     nv <- neighborhood(somgrid,radii[1],kernel,normalised=normalised)
     ## a round of initialisation is needed
     if(extended) {
-        bmus <- extended.relationalbmu.R(prototypes,diss,data.norms)
+        bmus <- extended.relationalbmu.R(prototypes,diss,data.norms,weights)
     } else {
-        bmus <- relationalbmu.R(prototypes,diss)
+        bmus <- relationalbmu.R(prototypes,diss,weights)
     }
     classif <- bmus$clusters
     errors[[1]] <- bmus$error
@@ -216,7 +269,11 @@ fastRelationalsom.lowlevel.R <- function(somgrid,diss,prototypes,
         for(j in iterations) {
             ## assignment
             if(assignment == "single") {
-                bmus <- fastRelationalBMU.R(classif,somgrid$size,diss,nv)
+                if(is.null(weights)) {
+                    bmus <- fastRelationalBMU.R(classif,somgrid$size,diss,nv)
+                } else {
+                    bmus <- weightedFastRelationalBMU.R(classif,somgrid$size,diss,nv,weights)
+                }
             } else {
                 stop(paste(assignment,"is not implemented for relational SOM"))
             }
@@ -253,10 +310,24 @@ fastRelationalsom.lowlevel.R <- function(somgrid,diss,prototypes,
             print(paste("warning: can't reach a stable configuration with radius",i))
         }
     }
+    if(!noChange) {
+        ## final assignment
+        if(is.null(weights)) {
+            bmus <- fastRelationalBMU.R(classif,somgrid$size,diss,nv)
+        } else {
+            bmus <- weightedFastRelationalBMU.R(classif,somgrid$size,diss,nv,weights)
+        }
+        classif <- bmus$clusters
+        errors[[length(radii)]] <- c(errors[[length(radii)]],bmus$error)
+    }
     ## for latter use
-    weights <- nv[,classif]
-    normed <- rowSums(weights)
-    prototypes <- sweep(weights,1,normed,"/")
+    if(is.null(weights)) {
+        nvcl <- nv[,classif]
+    } else {
+        nvcl <- sweep(nv[,classif],2,weights,"*")
+    }
+    normed <- rowSums(nvcl)
+    prototypes <- sweep(nvcl,1,normed,"/")
     Dalpha <- bmus$Dalpha
     nf <- bmus$nf
     res <- list(somgrid=somgrid,prototypes=prototypes,classif=classif,
@@ -268,10 +339,9 @@ fastRelationalsom.lowlevel.R <- function(somgrid,diss,prototypes,
 batchsom.dist <- function(data,somgrid,init=c("pca","random"),prototypes,
                           assignment=c("single","heskes"),
                           radii=somradii(somgrid),
-                          maxiter=75,
+                          weights,maxiter=75,
                           kernel=c("gaussian","linear"),normalised,
-                          cut=1e-7,verbose=FALSE,keepdata=TRUE,
-                          lowlevel=fastRelationalsom.lowlevel.R,...) {
+                          cut=1e-7,verbose=FALSE,keepdata=TRUE,...) {
     ## process parameters and perform a few sanity checks
     if(verbose) {
         print(match.call())
@@ -285,7 +355,15 @@ batchsom.dist <- function(data,somgrid,init=c("pca","random"),prototypes,
     if(class(somgrid)!="somgrid") {
         stop("'somgrid' is not of somgrid class")
     }
+    if(!missing(weights)) {
+        if(length(weights)!=nrow(data)) {
+            stop("'weights' and 'data' have different dimensions")
+        }
+    } else {
+        weights <- NULL
+    }
     ## diss is initialized in this code
+    data.norms <- NULL
     if(missing(prototypes)) {
         ## initialisation based on the value of init
         init <- match.arg(init)
@@ -322,21 +400,17 @@ batchsom.dist <- function(data,somgrid,init=c("pca","random"),prototypes,
     if(is.null(somgrid$dist)) {
         somgrid$dist <- as.matrix(dist(somgrid$pts,method="Euclidean"),diag=0)
     }
-    if(extended) {
-        pre <- fastRelationalsom.lowlevel.R(somgrid,diss,prototypes,assignment,
-                                            radii,maxiter,theKernel,normalised,
-                                            cut,verbose,TRUE,data.norms)
-    } else {
-        pre <- fastRelationalsom.lowlevel.R(somgrid,diss,prototypes,assignment,
-                                            radii,maxiter,theKernel,normalised,
-                                            cut,verbose,FALSE,NULL)
-    }
+    pre <- fastRelationalsom.lowlevel.R(somgrid,diss,prototypes,assignment,
+                                        radii,weights,maxiter,theKernel,
+                                        normalised,cut,verbose,extended,
+                                        data.norms)
     pre$assignment <- assignment
     pre$kernel <- kernel
     pre$normalised <- normalised
     pre$radii <- radii
     if(keepdata) {
         pre$data  <- data
+        pre$weights <- weights
     }
     pre
 }
