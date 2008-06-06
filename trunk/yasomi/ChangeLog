@@ -1,4 +1,12 @@
+2008-05-27  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/som.R (mapToUnit): slightly more generic implementation
+
+	* man/somgrid.Rd: fixed some inconsistency
+
 2008-05-21  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* NAMESPACE: importing as.dist from proxy
 
 	* man/batchsom.default.Rd: adapted documentation for the weights parameter
 

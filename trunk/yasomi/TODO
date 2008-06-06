@@ -2,7 +2,7 @@ Tentative for 0.3:
   - kernel SOM
   - continuous annealing mode (in addition to the stepwise version implemented here)
   - better plot.som
-  - smarter som.tune
+  - smarter and cleaner som.tune (one loop ;-)
   - more documentation
   - include some tests in the distributed package
 
@@ -12,6 +12,7 @@ BUGS or problems:
   - in sominit.*
   - in colorCode?
   - possibly in predict.* (for the error calculation)
+- fix the border "problem" in plot.somgrid
 
 + Long term R goals:
   - move to S4 classes

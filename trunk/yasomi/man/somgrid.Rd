@@ -30,7 +30,8 @@ somgrid(xdim, ydim, topo = c("rectangular", "hexagonal"),with.dist = TRUE)
     the distances between all pairs of points in the grid}
   \item{diam}{the diameter of the grid, i.e., the largest distance
     between to points in the grid}
-  \item{xdim,ydim,topo,basesize}{as in the arguments to \code{somgrid}}
+  \item{size}{the number of points of the prior structure, i.e. \code{xdim}\code{ydim}}
+  \item{xdim,ydim,topo}{as in the arguments to \code{somgrid}}
 
 }
 \author{Fabrice Rossi}

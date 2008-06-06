@@ -222,8 +222,14 @@ colorCode <- function(data,nbcolor) {
 }
 
 mapToUnit <- function(som,values) {
-    if(length(values)!=length(som$classif)) {
-        stop("'values' is not of the same size as the data used to fit the 'som'")
+    if(is.null(nrow(values))) {
+        if(length(values)!=length(som$classif)) {
+            stop("'values' is not of the same size as the data used to fit the 'som'")
+        }
+    } else {
+        if(nrow(values)!=length(som$classif)) {
+            stop("'values' is not of the same size as the data used to fit the 'som'")
+        }
     }
     result <- vector("list",nrow(som$prototypes))
     if(is.null(dim(values))) {
@@ -239,11 +245,11 @@ mapToUnit <- function(som,values) {
 }
 
 mapFactorToUnit <- function(som,values) {
-    if(length(values)!=length(som$classif)) {
-        stop("'values' is not of the same size as data use to fit the 'som'")
-    }
     if(!is.factor(values)) {
         stop("'values' is not a factor")
+    }
+    if(length(values)!=length(som$classif)) {
+        stop("'values' is not of the same size as data use to fit the 'som'")
     }
     lv <- levels(values)
     result <- matrix(0,nrow=nrow(som$prototypes),ncol=length(lv),
