@@ -25,3 +25,9 @@ sominit.random <- function(data,somgrid,method=c("prototypes","random","cluster"
 batchsom <- function(data,somgrid,init,prototypes,...) {
     UseMethod("batchsom")
 }
+
+## in kernel.R
+
+as.kernelmatrix <- function(data,...) {
+    UseMethod("as.kernelmatrix")
+}

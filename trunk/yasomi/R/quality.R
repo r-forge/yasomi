@@ -27,6 +27,23 @@ error.quantisation.relationalsom <- function(som,newdata,...) {
     }
 }
 
+error.quantisation.kernelsom <- function(som,newdata,norms,...) {
+    if(missing(newdata)) {
+        NextMethod()
+    } else {
+        baseerror <- predict(som,newdata)$error
+        if(missing(norms)) {
+            warning("cannot compute a full quantisation error with newdata norms")
+        } else {
+            if(length(norms)!=ncol(newdata)) {
+                stop("'newdata' and 'norms' have different dimensions")
+            }
+            baseerror <- baseerror + mean(norms)
+        }
+        baseerror
+    }
+}
+
 ## Kasksi and Lagus' error measure
 
 error.kaskilagus.somnum <- function(som,newdata,...) {
@@ -68,6 +85,31 @@ KaskiLagus.relationalsom <- function(som,newdata) {
     } else {
         ## on new data we use predict in extended mode
         second <- predict(som,newdata,with.secondwinner=TRUE)
+    }
+    pdist <- as.matrix(prototype.distances(som))
+    list(quant=sqrt(second$error),path=pdist[second$winners])
+}
+
+error.kaskilagus.kernelsom <- function(som,newdata,norms,...) {
+    if(missing(newdata)) {
+        pre <- KaskiLagus.kernelsom(som)
+    } else {
+        pre <- KaskiLagus.kernelsom(som,newdata,norms)
+    }
+    mean(pre$quant+pre$path)
+}
+
+KaskiLagus.kernelsom <- function(som,newdata,norms) {
+    if(missing(newdata)) {
+        ## on the original data, we use saved information
+        second <- kernelsomsecondbmu(som$prototypes,som$data,som$weights)
+    } else {
+        if(length(norms)!=ncol(newdata)) {
+            stop("'newdata' and 'norms' have different dimensions")
+        }
+        ## on new data we use predict in extended mode
+        second <- predict(som,newdata,with.secondwinner=TRUE)
+        second$error <- second$error + mean(norms)
     }
     pdist <- as.matrix(prototype.distances(som))
     list(quant=sqrt(second$error),path=pdist[second$winners])

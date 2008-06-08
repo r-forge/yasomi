@@ -1,4 +1,5 @@
 Tentative for 0.3:
+  - Heskes' criterion for the relational SOM
   - kernel SOM
   - continuous annealing mode (in addition to the stepwise version implemented here)
   - better plot.som

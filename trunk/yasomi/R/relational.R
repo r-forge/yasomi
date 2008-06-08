@@ -192,7 +192,7 @@ predict.relationalsom <- function(object,newdata,with.secondwinner=FALSE,...) {
     }
     rdist <- sweep(object$prototypes%*%(newdata^2),1,object$nf,"-")
     if(with.secondwinner) {
-        ## very suboptimal
+### FIXME: very suboptimal
         ordered <- apply(rdist,2,order)
         winners <- t(ordered[1:2,])
         clusters <- winners[,1]
@@ -321,6 +321,7 @@ fastRelationalsom.lowlevel.R <- function(somgrid,diss,prototypes,
         errors[[length(radii)]] <- c(errors[[length(radii)]],bmus$error)
     }
     ## for latter use
+### FIXME: shouldn't that be moved before the last assignment?
     if(is.null(weights)) {
         nvcl <- nv[,classif]
     } else {

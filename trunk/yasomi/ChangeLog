@@ -1,3 +1,30 @@
+2008-06-08  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/kernel.R (summary.kernelsom, print.kernelsom)
+	(as.matrix.kernelsom, as.dist.kernelsom): new functions for kernel SOM
+
+	* R/umatrix.R (protoDist.kernelsom): new function for kernel SOM
+
+	* R/kernel.R (kernelsomsecondbmu): new function for kernel SOM
+
+	* R/quality.R (error.quantisation.kernelsom): new function for kernel SOM
+	(error.kaskilagus.kernelsom): new function for kernel SOM
+	(KaskiLagus.kernelsom): new function for kernel SOM
+
+	* R/kernel.R (predict.kernelsom): new function for kernel SOM
+
+2008-06-07  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* NAMESPACE: new methods and functions for kernel SOM
+
+2008-06-06  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/kernel.R (batchsom.kernelmatrix): started to implemented the relation SOM: highlevel function
+	(kernelsom.lowlevel.R): low level (slow) version
+	(kernelsombmu): best matching unit for kernel som
+	(sominit.random.kernelmatrix): random init for kernel som
+	(as.kernelmatrix.matrix): turn a matrix into a kernel matrix
+
 2008-05-27  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
 
 	* R/som.R (mapToUnit): slightly more generic implementation

@@ -10,6 +10,12 @@ protoDist.relationalsom <- function(som,i,j,k,l) {
     relational.sqrt(c(som$prototypes[from,]%*%som$Dalpha[,to]-som$nf[from]-som$nf[to]))
 }
 
+protoDist.kernelsom <- function(som,i,j,k,l) {
+    from <- i+(j-1)*som$somgrid$xdim
+    to <- k+(l-1)*som$somgrid$xdim
+    sqrt(c(som$pnorms[from]+som$pnorms[to]-2*som$prototypes[from,]%*%som$Kp[,to]))
+}
+
 prototype.distances <- function(som) {
     sg <- som$somgrid
     if(sg$topo=="rectangular") {
