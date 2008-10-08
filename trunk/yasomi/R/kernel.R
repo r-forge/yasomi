@@ -4,26 +4,28 @@ as.kernelmatrix.matrix <- function(data,...) {
     data
 }
 
-predict.kernelsom <- function(object,newdata,with.secondwinner=FALSE,...) {
+predict.kernelsom <- function(object,newdata,newdatanorms,with.secondwinner=FALSE,...) {
     if(nrow(newdata)!=ncol(object$prototypes)) {
         stop("'newdata' and 'object$prototypes' have different dimensions")
     }
+    if(length(newdatanorms)!=ncol(newdata)) {
+        stop("'newdata' and 'newdatanorms' have incompatible sizes")
+    }
     nKp <- object$prototypes%*%newdata
-    predistances <- sweep(-2*nKp,1,object$pnorms,"+")
+    distances <- t(sweep(sweep(-2*nKp,1,object$pnorms,"+"),2,newdatanorms,"+"))
     if(with.secondwinner) {
 ### FIXME: very suboptimal
-        ordered <- apply(predistances,1,order)
+        ordered <- apply(distances,1,order)
         winners <- t(ordered[1:2,])
         bmu <- winners[,1]
     } else {
-        bmu <- apply(predistances,1,which.min)
+        bmu <- apply(distances,1,which.min)
     }
-### FIXME: this is not the real error
-    error <- mean(predistances[cbind(1:length(bmu),bmu)])
+    error <- mean(distances[cbind(1:length(bmu),bmu)])
     if(with.secondwinner) {
-        list(classif=clusters,error=error,distances=predistances,winners=winners)
+        list(classif=bmu,error=error,distances=distances,winners=winners)
     } else {
-        list(classif=clusters,error=error,distances=predistances)
+        list(classif=bmu,error=error,distances=distances)
     }
 }
 
@@ -91,7 +93,7 @@ kernelsom.lowlevel.R <- function(somgrid,K,prototypes,
             }
             errors[[i]] <- c(errors[[i]],error)
             ## there is no representation phase!
-            if(noChange || hasLoop) {
+            if(noChange | hasLoop | j==maxiter) {
                 if(verbose) {
                     if(noChange) {
                         print(paste("radius:",radii[i],"iteration",j,
@@ -287,6 +289,7 @@ print.kernelsom <- function(x,...)
 
 
 as.matrix.kernelsom <- function(x,...) {
+### FIXME: check for negative values?
     predist <- -2*x$prototypes%*%x$Kp
     thedist <- sweep(predist,1,x$pnorms,"+")
     thedist <- sweep(thedist,2,x$pnorms,"+")

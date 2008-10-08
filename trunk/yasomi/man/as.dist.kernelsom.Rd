@@ -1,30 +1,30 @@
-\name{as.dist.relationalsom}
-\alias{as.dist.relationalsom}
-\alias{as.matrix.relationalsom}
+\name{as.dist.kernelsom}
+\alias{as.dist.kernelsom}
+\alias{as.matrix.kernelsom}
 \title{Compute all the distances between prototypes in a fitted Self-Organising Map}
 \description{
 Computes all the pairwaise distances between the prototypes of a fitted
-Relational Self-Organising Map (SOM). 
+Kernel Self-Organising Map (SOM). 
 }
 \usage{
-\method{as.dist}{relationalsom}(x, FUN = NULL)
-\method{as.matrix}{relationalsom}(x, \dots)
+\method{as.dist}{kernelsom}(x, FUN = NULL)
+\method{as.matrix}{kernelsom}(x, \dots)
 }
 \arguments{
-  \item{x}{an object of class \code{"relationalsom"}}
+  \item{x}{an object of class \code{"kernelsom"}}
   \item{\dots}{not used}
   \item{FUN}{not used}
 }
 \details{
 Contrarily to the \code{\link{prototype.distances}} function, those
 methods compute all the pairwise distances between the prototypes of the
-SOM in the original space. This is useful in order to display those
+SOM in the kernel space. This is useful in order to display those
 prototypes via a nonlinear projection method such the Sammon mapping
 (\code{\link{sammon}}).
 
-The distances are obtained via the relational formula which can lead to
-  negative values. When such values are obtained, they are replaced by
-  zeros and a warning is generated. 
+The distances are computed in the kernel space. If the kernel used to
+fit the SOM is not positive, negative values may be obtained. When such
+values are generated, they are replaced by \code{NA}.
 }
 \value{
 \code{as.matrix} returns a square matrix and \code{as.dist} an object
@@ -39,13 +39,13 @@ The distances are obtained via the relational formula which can lead to
 \examples{
 data(iris)
 # scaling
-data <- dist(scale(iris[1:4]))
+K <- as.kernelmatrix(tcrossprod(scale(iris[1:4])))
 
 # a small hexagonal grid
 sg <- somgrid(xdim=8,ydim=8,topo="hex")
 
 # fit the SOM (random initialisation)
-som <- batchsom(data,sg,init="random",method="cluster")
+som <- batchsom(K,sg,init="random",method="cluster")
 
 # display the prototypes via sammon mapping
 library(MASS)

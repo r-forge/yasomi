@@ -1,22 +1,38 @@
-protoDist.somnum <- function(som,i,j,k,l) {
+protoDist.somnum <- function(som,i,j,k,l,check=FALSE) {
     from <- som$prototypes[i+(j-1)*som$somgrid$xdim,]
     to <- som$prototypes[k+(l-1)*som$somgrid$xdim,]
     sqrt(sum((from-to)^2))
 }
 
-protoDist.relationalsom <- function(som,i,j,k,l) {
+protoDist.relationalsom <- function(som,i,j,k,l,check=FALSE) {
     from <- i+(j-1)*som$somgrid$xdim
     to <- k+(l-1)*som$somgrid$xdim
-    relational.sqrt(c(som$prototypes[from,]%*%som$Dalpha[,to]-som$nf[from]-som$nf[to]))
+    pre <- c(som$prototypes[from,]%*%som$Dalpha[,to]-som$nf[from]-som$nf[to])
+    if(check & pre < -sqrt(.Machine$double.eps)) {
+        stop(paste("Negative value",pre,"between prototypes",from,"and",to))
+    } else {
+        if(pre<0) {
+            pre <- 0
+        }
+    }
+    sqrt(pre)
 }
 
-protoDist.kernelsom <- function(som,i,j,k,l) {
+protoDist.kernelsom <- function(som,i,j,k,l,check=FALSE) {
     from <- i+(j-1)*som$somgrid$xdim
     to <- k+(l-1)*som$somgrid$xdim
-    sqrt(c(som$pnorms[from]+som$pnorms[to]-2*som$prototypes[from,]%*%som$Kp[,to]))
+    pre <- c(som$pnorms[from]+som$pnorms[to]-2*som$prototypes[from,]%*%som$Kp[,to])
+    if(check & pre < -sqrt(.Machine$double.eps)) {
+        stop(paste("Negative value",pre,"between prototypes",from,"and",to))
+    } else {
+        if(pre<0) {
+            pre <- 0
+        }
+    }
+    sqrt(pre)
 }
 
-prototype.distances <- function(som) {
+prototype.distances <- function(som,check=FALSE) {
     sg <- som$somgrid
     if(sg$topo=="rectangular") {
         ## column major
@@ -26,19 +42,19 @@ prototype.distances <- function(som) {
             for(i in 1:sg$xdim) {
                 ## right
                 if(i<sg$xdim) {
-                    distances[pos,1] <- protoDist(som,i,j,i+1,j)
+                    distances[pos,1] <- protoDist(som,i,j,i+1,j,check)
                 }
                 ## lower right
                 if(j<sg$ydim & i<sg$xdim) {
-                    distances[pos,2] <- protoDist(som,i,j,i+1,j+1)
+                    distances[pos,2] <- protoDist(som,i,j,i+1,j+1,check)
                 }
                 ## below neighbor
                 if(j<sg$ydim) {
-                    distances[pos,3] <- protoDist(som,i,j,i,j+1)
+                    distances[pos,3] <- protoDist(som,i,j,i,j+1,check)
                 }
                 ## lower left
                 if(j<sg$ydim & i>1) {
-                    distances[pos,4] <- protoDist(som,i,j,i-1,j+1)
+                    distances[pos,4] <- protoDist(som,i,j,i-1,j+1,check)
                 }
                 ## left
                 if(i>1) {
@@ -67,15 +83,15 @@ prototype.distances <- function(som) {
             for(i in 1:sg$xdim) {
                 ## right
                 if(i<sg$xdim) {
-                    distances[pos,1] <- protoDist(som,i,j,i+1,j)
+                    distances[pos,1] <- protoDist(som,i,j,i+1,j,check)
                 }
                 if(j%%2==1) {
                     if(j<sg$ydim) {
                         ## below right
-                        distances[pos,2] <- protoDist(som,i,j,i,j+1)
+                        distances[pos,2] <- protoDist(som,i,j,i,j+1,check)
                         ## below left
                         if(i>1) {
-                            distances[pos,3] <- protoDist(som,i,j,i-1,j+1)
+                            distances[pos,3] <- protoDist(som,i,j,i-1,j+1,check)
                         }
                     }
                     if(j>1) {
@@ -89,10 +105,10 @@ prototype.distances <- function(som) {
                 } else {
                     if(j<sg$ydim) {
                         ## below left
-                        distances[pos,3] <- protoDist(som,i,j,i,j+1)
+                        distances[pos,3] <- protoDist(som,i,j,i,j+1,check)
                         ## below right
                         if(i<sg$xdim) {
-                            distances[pos,2] <- protoDist(som,i,j,i+1,j+1)
+                            distances[pos,2] <- protoDist(som,i,j,i+1,j+1,check)
                         }
                     }
                     if(j>1) {

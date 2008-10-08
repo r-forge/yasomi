@@ -2,9 +2,11 @@
 \alias{print.som}
 \alias{print.somnum}
 \alias{print.relationalsom}
+\alias{print.kernelsom}
 \alias{summary.som}
 \alias{summary.somnum}
 \alias{summary.relationalsom}
+\alias{summary.kernelsom}
 \title{Describe a fitted Self-Organising Map}
 \description{
   Print and summary methods for Self-Organising Maps. Gives some
@@ -15,9 +17,11 @@
 \method{print}{som}(x, \dots)
 \method{print}{somnum}(x, \dots)
 \method{print}{relationalsom}(x, \dots)
+\method{print}{kernelsom}(x, \dots)
 \method{summary}{som}(object, \dots)
 \method{summary}{somnum}(object, \dots)
 \method{summary}{relationalsom}(object, \dots)
+\method{summary}{kernelsom}(object, \dots)
 }
 \arguments{
   \item{x,object}{an object of class \code{"som"}}

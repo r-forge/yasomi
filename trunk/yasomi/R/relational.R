@@ -288,12 +288,12 @@ fastRelationalsom.lowlevel.R <- function(somgrid,diss,prototypes,
             }
             errors[[i]] <- c(errors[[i]],error)
             ## there is no representation phase!
-            if(noChange || hasLoop) {
+            if(noChange | hasLoop | j == maxiter) {
                 if(verbose) {
                     if(noChange) {
                         print(paste("radius:",radii[i],"iteration",j,
                                     "is stable, decreasing radius"))
-                    } else {
+                    } else if(hasLoop) {
                         print(paste("radius:",radii[i],"iteration",j,
                                     "oscillation detected, decreasing radius"))
                     }
@@ -328,11 +328,15 @@ fastRelationalsom.lowlevel.R <- function(somgrid,diss,prototypes,
         nvcl <- sweep(nv[,classif],2,weights,"*")
     }
     normed <- rowSums(nvcl)
+    if(verbose) {
+        print("computing final prototypes, Dalpha and nf")
+    }
     prototypes <- sweep(nvcl,1,normed,"/")
-    Dalpha <- bmus$Dalpha
-    nf <- bmus$nf
+    Dalpha <- tcrossprod(diss,prototypes)
+    ## this is slow
+    nf <- 0.5*diag(prototypes%*%Dalpha)
     res <- list(somgrid=somgrid,prototypes=prototypes,classif=classif,
-                errors=unlist(errors),Dalpha=t(Dalpha),nf=nf)
+                errors=unlist(errors),Dalpha=Dalpha,nf=nf)
     class(res) <- c("relationalsom","som")
     res
 }
@@ -366,6 +370,9 @@ batchsom.dist <- function(data,somgrid,init=c("pca","random"),prototypes,
     ## diss is initialized in this code
     data.norms <- NULL
     if(missing(prototypes)) {
+        if(verbose) {
+            print("Initializing prototypes")
+        }
         ## initialisation based on the value of init
         init <- match.arg(init)
         args <- list(...)
@@ -395,6 +402,8 @@ batchsom.dist <- function(data,somgrid,init=c("pca","random"),prototypes,
             }
             extended <- TRUE
             data.norms <- normsFromDist(diss)
+        } else {
+            extended <- FALSE
         }
     }
     ## distances?

@@ -77,18 +77,16 @@ void batch_som(double *proto,int *nproto,double *data,int *ndata,
     int iRad,iter,indiv,j,k,l;
     int base;
     double *nv;
-    double *preProto;
     double *tmpProto;
     
-    int changed;
-    double bestDist,dist,tmp,norm,neigh;
-    int bestSoFar;
+    int changed=1;
+    double norm,neigh;
     
     double totalError;
     
     /* for heskes' rule */
     int assignmentRule=*assign;
-    double *distances;
+    double *distances=NULL;
     
     if(assignmentRule == 1) {
 	distances = (double *) R_alloc(protoSize, sizeof(double));
@@ -222,15 +220,14 @@ void batch_som_optim(double *proto,int *nproto,double *data,int *ndata,
     double *clusterWeight;
     double *tmpProto;
     
-    int changed;
-    double bestDist,dist,tmp,norm,neigh,indivWeight;
-    int bestSoFar;
+    int changed=1;
+    double norm,neigh,indivWeight;
     
     double totalError;
     
     /* for heskes' rule */
     int assignmentRule=*assign;
-    double *distances;
+    double *distances=NULL;
     
     if(assignmentRule == 1) {
 	distances = (double *) R_alloc(protoSize, sizeof(double));

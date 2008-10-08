@@ -1,3 +1,47 @@
+2008-10-08  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/as.dist.kernelsom.Rd: new focumentation
+
+	* man/as.dist.relationalsom.Rd: fixed a typo
+
+	* R/kernel.R (predict.kernelsom): bug fix: used clusters instead of bmu
+	bug fix: wrong column ordering
+	added a parameter for computing the real quantisation error
+
+	* man/predict.kernelsom.Rd: new documentation
+
+	* man/print.som.Rd: covers now kernel som
+
+	* man/prototype.distances.Rd: added documentation for the check parameter. 
+
+	* NAMESPACE: corrected broken declaration for kernelsom methods
+
+	* src/som.c (batch_som_optim): removed unused variables and fixed initialization warning
+	(batch_som): removed unused variables and fixed initialization warning
+
+	* tests/kernel.R: new file: high level test for identical behavior of kernel som and classical som
+
+	* tests/relational.R: new file: high level test for identical behavior of relational som and classical som
+
+	* R/kernel.R (kernelsom.lowlevel.R): fixed the same bug as in the relational som: when the internal loop is not converging, the neighborhood values mus be updated
+
+	* NEWS: added the bug fixes
+
+2008-10-06  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/relational.R (fastRelationalsom.lowlevel.R): bug fix: when the internal loop was not converging, the neighborhood values were not updated
+
+2008-10-03  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/relational.R (batchsom.dist): added some debugging code, fixed small bug in the initialization code
+
+2008-06-10  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/umatrix.R (protoDist.kernelsom, protoDist.relationalsom)
+	(protoDist.somnum, prototype.distances): support for the new parameter
+
+	* R/generic.R (protoDist): new parameter for checking the validity of the distance
+
 2008-06-08  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
 
 	* R/kernel.R (summary.kernelsom, print.kernelsom)

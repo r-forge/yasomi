@@ -9,12 +9,15 @@ Compute the distances between the prototypes of a fitted
 Self-Organising Map (SOM) for neighbouring units in the prior structure.
 }
 \usage{
-prototype.distances(som)
+prototype.distances(som, check = FALSE)
 \method{as.matrix}{sompdist}(x, extended = TRUE, \dots)
 \method{as.dist}{sompdist}(x, FUN = NULL)
 }
 \arguments{
   \item{som}{an object of class \code{"som"}}
+  \item{check}{logical, with default to \code{FALSE}. If \code{TRUE},
+    the underlying prototype distance calculation function will stop if
+    it encounters non negligible negative values (see details).}
   \item{x}{an object of class \code{"sompdist"}}
   \item{extended}{logical. If \code{TRUE} the distance matrix or object
     build from neighbouring prototypes is extended to cover all pairs of
@@ -31,9 +34,11 @@ prototype.distances(som)
   matrix obtained this way \strong{is not} the matrix of the Euclidean
   distances between the prototypes of the SOM: only
   the distances between direct neighbours in the grid are
-  considered (see \code{\link{as.dist.somnum}} and
-  \code{\link{as.dist.relationalsom}} for all pairwise
-  distances between prototypes). There are used as edge lengths (or weights) for an
+  considered (see \code{\link{as.dist.somnum}},
+  \code{\link{as.dist.relationalsom}} and
+  \code{\link{as.dist.kernelsom}} for all pairwise
+  distances between prototypes). There are used as edge lengths (or
+  weights) for an 
   undirected graph whose nodes are the units and which has edges only
   between direct neighbours. If the \code{as.matrix} method is called
   with \code{extended=TRUE} (the default value), then this graph is used
@@ -42,7 +47,17 @@ prototype.distances(som)
   unit distance used in \code{\link{error.kaskilagus}}). If the
   method is used with \code{extended=FALSE}, then the missing distances
   (i.e. between non direct neighbours) are unknown (value \code{NA}).
-
+  
+  If the \code{som} is a relational SOM, the "distances" between
+  prototypes are computed via the relational extension which can lead
+  under some circumstances to negative values. If the \code{check}
+  parameter is set to \code{TRUE}, the code will stop in this
+  circumstance. This should never happen in the case of the kernel
+  SOM. However, no effort is made to verify that the kernel matrix is
+  non negative and therefore, negative values can also be found in this
+  case. As in the relational case, a \code{TRUE} value for \code{check}
+  asks to the code to stop in case of negative values. 
+  
   The \code{as.dist} method can be used to convert a distance matrix
   (an object of class \code{"sompdist"}) into an object of class
   \code{"dist"}. The extension procedure described above is always

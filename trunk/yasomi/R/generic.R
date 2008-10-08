@@ -8,7 +8,7 @@ error.kaskilagus <- function(som,newdata,...) {
 }
 
 ## in umatrix.R
-protoDist <- function(som,i,j,k,l) {
+protoDist <- function(som,i,j,k,l,check) {
     UseMethod("protoDist")
 }
 

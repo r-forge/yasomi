@@ -129,6 +129,17 @@ BUGS or problems:
     + sominit.pca.dist: need some details
     - sominit.random.dist: ok
     + batchsom.dist: add references
+    + print.kernelsom: ok
+    + summary.kernelsom: ok
+    + predict.kernelsom: ok
+    + as.dist.kernelsom: ok
+    + as.matrix.kernelsom: ok
+    + error.quantisation.kernelsom: to be written
+    + error.kaskilagus.kernelsom: to be written
+    + as.kernelmatrix.matrix: to be written
+    + sominit.pca.kernelmatrix: to be written
+    + sominit.random.kernelmatrix: to be written
+    + batchsom.kernelmatrix: to be written
     - plot.sompdist: ok
     - as.matrix,sompdist: ok
     - as.dist.sompdist: ok
