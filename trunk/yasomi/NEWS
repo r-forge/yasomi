@@ -1,4 +1,8 @@
 Changes in yasomi 0.3
+
+    o  	The main novelty provided by this version is the support of kernel
+        self organising map.
+
     o   High level consistency tests are now included in the tests directory.
 
     o   Minor Bug fixes: missing parameter in some circumstances in the
@@ -40,7 +44,7 @@ Changes in yasomi 0.2
       	functions, it was the mean squared Euclidean distance between data
       	points and the associated bmu, in others it was the mean Euclidean
       	distance. It is now the mean squared Euclidean distance everywhere,
-      	with as similar definition for the relational SOM. 
+      	with a similar definition for the relational SOM. 
 	
 
 Changes in yasomi 0.1

@@ -1,5 +1,11 @@
 as.kernelmatrix.matrix <- function(data,...) {
 ### FIXME: check for "kernelity"
+    if(!is.matrix(data)) {
+        stop("'data' is not a matrix")
+    }
+    if(!isSymmetric(data)) {
+        stop("'data' is not symmetric")
+    }
     class(data) <- c("kernelmatrix",class(data))
     data
 }
@@ -21,7 +27,7 @@ predict.kernelsom <- function(object,newdata,newdatanorms,with.secondwinner=FALS
     } else {
         bmu <- apply(distances,1,which.min)
     }
-    error <- mean(distances[cbind(1:length(bmu),bmu)])
+    error <- mean(relational.keeppositive(distances[cbind(1:length(bmu),bmu)]))
     if(with.secondwinner) {
         list(classif=bmu,error=error,distances=distances,winners=winners)
     } else {

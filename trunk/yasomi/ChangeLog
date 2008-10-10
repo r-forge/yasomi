@@ -1,3 +1,27 @@
+2008-10-10  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/batchsom.kernelmatrix.Rd: new documentation
+
+	* man/sominit.random.Rd: applies also to kernelmatrix
+
+	* man/sominit.pca.kernelmatrix.Rd: new documentation
+
+	* R/kernel.R (as.kernelmatrix.matrix): added symmetry test and matrix class check
+
+	* man/as.kernelmatrix.Rd: new documentation
+
+	* R/kernel.R (predict.kernelsom): added positivity check
+
+	* R/quality.R (error.kaskilagus.kernelsom): changed parameter name for consistency with predict
+	(KaskiLagus.kernelsom): changed parameter name for consistency with predict
+	(error.kaskilagus.kernelsom): check for missing parameter
+
+	* man/error.kaskilagus.kernelsom.Rd: new documentation
+
+	* R/quality.R (error.quantisation.kernelsom): changed parameter name for consistency with predict
+
+	* man/error.quantisation.kernelsom.Rd: new documentation
+
 2008-10-08  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
 
 	* man/as.dist.kernelsom.Rd: new focumentation

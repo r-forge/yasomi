@@ -2,6 +2,7 @@
 \alias{sominit.random}
 \alias{sominit.random.default}
 \alias{sominit.random.dist}
+\alias{sominit.random.kernelmatrix}
 \title{Initialise the prototypes of a SOM via some random sample}
 \description{
 Initialise the prototypes of a Self-Organising Map by choosing randomly
@@ -13,11 +14,12 @@ the hypercube spanned by the data.
 sominit.random(data, somgrid, method=c("prototypes","random","cluster"),\dots)
 \method{sominit.random}{default}(data, somgrid, method=c("prototypes","random","cluster"),\dots)
 \method{sominit.random}{dist}(data, somgrid, method=c("prototypes","random","cluster"),\dots)
+\method{sominit.random}{kernelmatrix}(data, somgrid, method=c("prototypes","random","cluster"),\dots)
 }
 \arguments{
   \item{data}{the data to which the SOM will be fitted. This can be,
-    e.g., a matrix or data frame of observations (which should be scaled), or a
-    distance matrix}
+    e.g., a matrix or data frame of observations (which should be scaled), a
+    distance matrix or a kernel matrix}
   \item{somgrid}{a \code{somgrid} object}
   \item{method}{the initialisation method (see details)}
   \item{\dots}{additional parameters}

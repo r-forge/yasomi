@@ -27,20 +27,14 @@ error.quantisation.relationalsom <- function(som,newdata,...) {
     }
 }
 
-error.quantisation.kernelsom <- function(som,newdata,norms,...) {
+error.quantisation.kernelsom <- function(som,newdata,newdatanorms,...) {
     if(missing(newdata)) {
         NextMethod()
     } else {
-        baseerror <- predict(som,newdata)$error
-        if(missing(norms)) {
-            warning("cannot compute a full quantisation error with newdata norms")
-        } else {
-            if(length(norms)!=ncol(newdata)) {
-                stop("'newdata' and 'norms' have different dimensions")
-            }
-            baseerror <- baseerror + mean(norms)
+        if(missing(newdatanorms)) {
+            stop("cannot compute a full quantisation error without newdata norms")
         }
-        baseerror
+        predict(som,newdata,newdatanorms)$error
     }
 }
 
@@ -90,26 +84,25 @@ KaskiLagus.relationalsom <- function(som,newdata) {
     list(quant=sqrt(second$error),path=pdist[second$winners])
 }
 
-error.kaskilagus.kernelsom <- function(som,newdata,norms,...) {
+error.kaskilagus.kernelsom <- function(som,newdata,newdatanorms,...) {
     if(missing(newdata)) {
         pre <- KaskiLagus.kernelsom(som)
     } else {
-        pre <- KaskiLagus.kernelsom(som,newdata,norms)
+        if(missing(newdatanorms)) {
+            stop("cannot compute a full quantisation error without newdata norms")
+        }
+        pre <- KaskiLagus.kernelsom(som,newdata,newdatanorms)
     }
     mean(pre$quant+pre$path)
 }
 
-KaskiLagus.kernelsom <- function(som,newdata,norms) {
+KaskiLagus.kernelsom <- function(som,newdata,newdatanorms) {
     if(missing(newdata)) {
         ## on the original data, we use saved information
         second <- kernelsomsecondbmu(som$prototypes,som$data,som$weights)
     } else {
-        if(length(norms)!=ncol(newdata)) {
-            stop("'newdata' and 'norms' have different dimensions")
-        }
         ## on new data we use predict in extended mode
-        second <- predict(som,newdata,with.secondwinner=TRUE)
-        second$error <- second$error + mean(norms)
+        second <- predict(som,newdata,newdatanorms,with.secondwinner=TRUE)
     }
     pdist <- as.matrix(prototype.distances(som))
     list(quant=sqrt(second$error),path=pdist[second$winners])
