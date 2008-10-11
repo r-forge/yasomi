@@ -150,6 +150,10 @@ BUGS or problems:
     + plot.somtune: ok but will be improved when the method is
     + print.somtune: alias in som.tune
 
+Done in version 0.3:
+- kernel SOM
+- weighted observations
+
 Done in version 0.2:
 - relational SOM (first version with optimal algorithm but no implementation tricks) :
   - generic (S3) functions for batchsom, sominit and protoDist: most of the analysis and display functions can be used for both standard SOM and relational SOM

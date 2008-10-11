@@ -1,3 +1,10 @@
+2008-10-11  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/kernel.R (fastKernelsombmu): fast version of the bmu determination for the kernel SOM, based on partial sums
+	(weightedFastKernelsombmu): fast version of the bmu determination for the kernel SOM when objects are weighted
+	(fastKernelsom.lowlevel.R): fast version of the kernel SOM
+	(batchsom.kernelmatrix): use now the fast version of the kernel SOM
+
 2008-10-10  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
 
 	* man/batchsom.kernelmatrix.Rd: new documentation
@@ -87,7 +94,7 @@
 
 2008-06-06  Rossi Fabrice  <Fabrice dot Rossi at apiacoa dot org>
 
-	* R/kernel.R (batchsom.kernelmatrix): started to implemented the relation SOM: highlevel function
+	* R/kernel.R (batchsom.kernelmatrix): started to implemented the kernel SOM: highlevel function
 	(kernelsom.lowlevel.R): low level (slow) version
 	(kernelsombmu): best matching unit for kernel som
 	(sominit.random.kernelmatrix): random init for kernel som

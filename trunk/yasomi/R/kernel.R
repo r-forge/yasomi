@@ -54,6 +54,141 @@ kernelsomsecondbmu <- function(prototypes,K,weights) {
     list(clusters=bmu,error=error,pnorms=pnorms,winners=winners)
 }
 
+fastKernelsombmu <- function(cluster,nclust,K,nv) {
+    ps <- partialSums(cluster,nclust,K)
+    csize <- table(factor(cluster,levels=1:nclust))
+    normed <- nv%*%csize
+    nvnormed <- sweep(nv,1,normed,"/")
+    innerProducts <- nvnormed%*%ps$ps
+    interm <- tcrossprod(ps$bips,nvnormed)
+    pnorms <- double(nclust)
+    for(i in 1:nclust) {
+        pnorms[i] <- c(nvnormed[i,]%*%interm[,i])
+    }
+    predistances <- sweep(-2*innerProducts,1,pnorms,"+")
+    bmu <- apply(predistances,2,which.min)
+    error <- mean(predistances[cbind(bmu,1:length(bmu))]+diag(K))
+    list(clusters=bmu,error=error,Kp=t(innerProducts),pnorms=pnorms)
+}
+
+weightedFastKernelsombmu <- function(cluster,nclust,K,nv,weights) {
+    ps <- partialSums(cluster,nclust,K,weights)
+    csize <- tapply(weights,factor(cluster,levels=1:nclust),sum)
+    csize[is.na(csize)] <- 0
+    normed <- nv%*%csize
+    nvnormed <- sweep(nv,1,normed,"/")
+    innerProducts <- nvnormed%*%ps$ps
+    interm <- tcrossprod(ps$bips,nvnormed)
+    pnorms <- double(nclust)
+    for(i in 1:nclust) {
+        pnorms[i] <- c(nvnormed[i,]%*%interm[,i])
+    }
+    predistances <- sweep(-2*innerProducts,1,pnorms,"+")
+    bmu <- apply(predistances,2,which.min)
+    error <- sum(weights*(predistances[cbind(bmu,1:length(bmu))]+diag(K)))/sum(weights)
+    list(clusters=bmu,error=error,Kp=t(innerProducts),pnorms=pnorms)
+}
+
+
+fastKernelsom.lowlevel.R <- function(somgrid,K,prototypes,
+                                     assignment,radii,weights,maxiter,
+                                     kernel,normalised,cut,verbose) {
+    oldClassif <- rep(NA,nrow(K))
+    errors <- vector("list",length(radii))
+    ## a round of initialisation is needed
+    nv <- neighborhood(somgrid,radii[1],kernel,normalised=normalised)
+    bmus <- kernelsombmu(prototypes,K,weights)
+    classif <- bmus$clusters
+    errors[[1]] <- bmus$error
+    if(verbose) {
+        print(paste(1,1,bmus$error))
+    }
+    for(i in 1:length(radii)) {
+        if(i==1) {
+            iterations <- 2:maxiter
+        } else {
+            iterations <- 1:maxiter
+        }
+        for(j in iterations) {
+            ## assignment
+            if(assignment == "single") {
+                if(is.null(weights)) {
+                    bmus <-  fastKernelsombmu(classif,sg$size,K,nv)
+                } else {
+                    bmus <-  weightedFastKernelsombmu(classif,sg$size,K,nv,weighted)
+                }
+            } else {
+                stop(paste(assignment,"is not implemented for kernel SOM"))
+            }
+            nclassif <- bmus$clusters
+            noChange <- identical(classif,nclassif)
+            hasLoop <- identical(oldClassif,nclassif)
+            oldClassif <- classif
+            classif <- nclassif
+            error <- bmus$error
+            if(verbose) {
+                print(paste(i,j,error))
+            }
+            errors[[i]] <- c(errors[[i]],error)
+            ## there is no representation phase!
+            if(noChange | hasLoop | j==maxiter) {
+                if(verbose) {
+                    if(noChange) {
+                        print(paste("radius:",radii[i],"iteration",j,
+                                    "is stable, decreasing radius"))
+                    } else {
+                        print(paste("radius:",radii[i],"iteration",j,
+                                    "oscillation detected, decreasing radius"))
+                    }
+                }
+                if(i==length(radii)) {
+                    ## the fitting is done
+                    break;
+                }
+                ## preparing the loop with the next radius
+                nv <- neighborhood(somgrid,radii[i+1],kernel,
+                                   normalised=normalised)
+            }
+            ## break the loop if the partition is stable or when we have
+            ## an oscillating behaviour
+            if(noChange || hasLoop) {
+                break;
+            }
+        }
+        if(!noChange && verbose) {
+            print(paste("warning: can't reach a stable configuration with radius",i))
+        }
+    }
+    if(!noChange) {
+        ## final assignment
+        if(is.null(weights)) {
+            bmus <-  fastKernelsombmu(classif,sg$size,K,nv)
+        } else {
+            bmus <-  weightedFastKernelsombmu(classif,sg$size,K,nv,weighted)
+        }
+        classif <- bmus$clusters
+        errors[[length(radii)]] <- c(errors[[length(radii)]],bmus$error)
+    }
+    ## for latter use
+### FIXME: shouldn't that be moved before the last assignment?
+    if(is.null(weights)) {
+        nvcl <- nv[,classif]
+    } else {
+        nvcl <- sweep(nv[,classif],2,weights,"*")
+    }
+    normed <- rowSums(nvcl)
+    prototypes <- sweep(nvcl,1,normed,"/")
+    Kp <- tcrossprod(K,prototypes)
+    pnorms <- double(nrow(prototypes))
+    for(i in 1:length(pnorms)) {
+        pnorms[i] <- c(prototypes[i,]%*%Kp[,i])
+    }
+    res <- list(somgrid=somgrid,prototypes=prototypes,classif=classif,
+                errors=unlist(errors),Kp=Kp,pnorms=pnorms)
+    class(res) <- c("kernelsom","som")
+    res
+}
+
 kernelsombmu <- function(prototypes,K,weights) {
     Kp <- tcrossprod(K,prototypes)
     pnorms <- double(nrow(prototypes))
@@ -199,9 +334,9 @@ batchsom.kernelmatrix <- function(data,somgrid,init=c("pca","random"),
     if(is.null(somgrid$dist)) {
         somgrid$dist <- as.matrix(dist(somgrid$pts,method="Euclidean"),diag=0)
     }
-    pre <- kernelsom.lowlevel.R(somgrid,data,prototypes,assignment,
-                                radii,weights,maxiter,theKernel,
-                                normalised,cut,verbose)
+    pre <- fastKernelsom.lowlevel.R(somgrid,data,prototypes,assignment,
+                                    radii,weights,maxiter,theKernel,
+                                    normalised,cut,verbose)
     pre$assignment <- assignment
     pre$kernel <- kernel
     pre$normalised <- normalised
