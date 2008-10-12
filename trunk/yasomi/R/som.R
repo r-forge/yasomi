@@ -33,14 +33,18 @@ sominit.pca.default <- function(data,somgrid,...) {
 }
 
 sominit.random.default <- function(data,somgrid,
-                                   method=c("prototypes","random","cluster"),...) {
-### FIXME: data weights support
+                                   method=c("prototypes","random","cluster"),
+                                   weights,...) {
     method <- match.arg(method)
     data <- as.matrix(data)
-    dim <- nrow(data)
+    nb.data <- nrow(data)
     nb <- somgrid$size
-    if(method=="prototypes" || (method=="cluster" && nb>=dim)) {
-        data[sample(1:nrow(data),size=somgrid$size,replace=nb>dim),]
+    if(method=="prototypes" || (method=="cluster" && nb>=nb.data)) {
+        if(missing(weights) || is.null(weights)) {
+            data[sample(nb.data,size=somgrid$size,replace=nb>nb.data),]
+        } else {
+            data[sample(nb.data,size=somgrid$size,replace=nb>nb.data,prob=weights),]
+        }
     } else if(method=="random") {
         result <- matrix(0,ncol=ncol(data),nrow=nb)
         for(i in 1:ncol(data)) {
@@ -49,8 +53,8 @@ sominit.random.default <- function(data,somgrid,
         }
         result
     } else {
-        ## nb <dim
-        clusters <- cut(sample(1:dim),nb,labels=FALSE,include.lowest=TRUE)
+        ## nb <nb.data
+        clusters <- cut(sample(nb.data),nb,labels=FALSE,include.lowest=TRUE)
         result <- matrix(0,ncol=ncol(data),nrow=nb)
         for(i in 1:nb) {
             result[i,] <- colMeans(as.matrix(data[clusters==i,],ncol=ncol(data)))
@@ -153,7 +157,7 @@ batchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
         ## initialisation based on the value of init
         init <- match.arg(init)
         args <- list(...)
-        params <- c(list(data=data,somgrid=somgrid),list(...))
+        params <- c(list(data=data,somgrid=somgrid,weights=weights),args)
         prototypes <- switch(init,
                              "pca"=do.call("sominit.pca",params)$prototypes,
                              "random"=do.call("sominit.random",params))

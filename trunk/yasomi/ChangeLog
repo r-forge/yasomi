@@ -1,5 +1,32 @@
 2008-10-12  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
 
+	* R/relational.R (batchsom.dist): added weights to the call to initialisation methods
+
+	* R/kernel.R (batchsom.kernelmatrix): added weights to the call to initialisation methods
+
+	* R/som.R (batchsom.default): added weights to the call to initialisation methods
+
+	* R/relational.R (sominit.random.dist): added weights support
+
+	* man/sominit.random.Rd: describe weights support
+
+	* R/som.R (sominit.random.default): added weights support
+
+	* R/quality.R (KaskiLagus.kernelsom): fixed broken weight support
+	(error.kaskilagus.kernelsom): fixed broken weight support
+
+	* R/kernel.R (kernelsomsecondbmu): removed weight support: it does not belong to this function
+
+	* R/quality.R (error.kaskilagus.relationalsom): fixed broken weight support
+	(KaskiLagus.relationalsom): fixed broken weight support
+
+	* R/relational.R (relationalsecondbmu.R): removed weight support: it does not belong to this function
+
+	* R/quality.R (KaskiLagus.somnum): fixed broken weight support
+	(error.kaskilagus.somnum): fixed broken weight support
+
+	* tests/weights.R: new integration test: compares the results obtained via weighting examples and via replicating them
+
 	* R/kernel.R (weightedFastKernelsombmu): fixed call to the wrong version of the partial som calculation
 	(fastKernelsom.lowlevel.R): removed a few broken references to global variables
 

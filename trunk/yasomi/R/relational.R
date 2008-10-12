@@ -14,22 +14,25 @@ relational.sqrt <- function(val,with.warning=TRUE) {
 }
 
 sominit.random.dist <- function(data,somgrid,
-                                method=c("prototypes","random","cluster"),...) {
-### FIXME: data weights support
+                                method=c("prototypes","random","cluster"),weights,...) {
     method <- match.arg(method)
-    dim <- nrow(data)
+    nb.data <- nrow(data)
     nb <- somgrid$size
-    if(method=="prototypes" || (method=="cluster" && nb>=dim)) {
-        protos <- matrix(0,ncol=dim,nrow=nb)
-        protos[cbind(1:nb,sample(1:dim,size=nb,replace=nb>dim))] <- 1
+    if(method=="prototypes" || (method=="cluster" && nb>=nb.data)) {
+        protos <- matrix(0,ncol=nb.data,nrow=nb)
+        if(missing(weights) || is.null(weights)) {
+            protos[cbind(1:nb,sample(nb.data,size=nb,replace=nb>nb.data))] <- 1
+        } else {
+            protos[cbind(1:nb,sample(nb.data,size=nb,replace=nb>nb.data,prob=weights))] <- 1
+        }
     } else if(method=="random") {
-        protos <- matrix(runif(dim*nb),ncol=dim,nrow=nb)
+        protos <- matrix(runif(nb.data*nb),ncol=nb.data,nrow=nb)
         protos <- sweep(protos,1,rowSums(protos),"/")
     } else {
-        ## nb <dim
-        clusters <- cut(sample(1:dim),nb,labels=FALSE,include.lowest=TRUE)
-        protos <- matrix(0,ncol=dim,nrow=nb)
-        protos[cbind(clusters,1:dim)] <- 1
+        ## nb <nb.data
+        clusters <- cut(sample(nb.data),nb,labels=FALSE,include.lowest=TRUE)
+        protos <- matrix(0,ncol=nb.data,nrow=nb)
+        protos[cbind(clusters,1:nb.data)] <- 1
         protos <- sweep(protos,1,rowSums(protos),"/")
     }
     protos
@@ -229,16 +232,12 @@ extended.relationalbmu.R <- function(prototypes,diss,norms,weights) {
     list(clusters=clusters,error=error,Dalpha=Dalpha,nf=nf)
 }
 
-relationalsecondbmu.R <- function(Dalpha,nf,weights) {
+relationalsecondbmu.R <- function(Dalpha,nf) {
     distances <- sweep(Dalpha,2,nf,"-")
     ## very suboptimal
     ordered <- apply(distances,1,order)
     winners <- t(ordered[1:2,])
-    if(missing(weights) || is.null(weights)) {
-        error <- relational.keeppositive(distances[cbind(1:nrow(winners),winners[,1])])
-    } else {
-        error <- weights*relational.keeppositive(distances[cbind(1:nrow(winners),winners[,1])])/mean(weights)
-    }
+    error <- relational.keeppositive(distances[cbind(1:nrow(winners),winners[,1])])
     list(winners=winners,error=error)
 }
 
@@ -376,7 +375,7 @@ batchsom.dist <- function(data,somgrid,init=c("pca","random"),prototypes,
         ## initialisation based on the value of init
         init <- match.arg(init)
         args <- list(...)
-        params <- c(list(data=data,somgrid=somgrid),list(...))
+        params <- c(list(data=data,somgrid=somgrid,weights=weights),args)
         if(init=="random") {
             prototypes <- do.call("sominit.random",params)
             extended <- FALSE

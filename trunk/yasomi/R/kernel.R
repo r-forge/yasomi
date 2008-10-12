@@ -35,7 +35,7 @@ predict.kernelsom <- function(object,newdata,newdatanorms,with.secondwinner=FALS
     }
 }
 
-kernelsomsecondbmu <- function(prototypes,K,weights) {
+kernelsomsecondbmu <- function(prototypes,K) {
     Kp <- tcrossprod(K,prototypes)
     pnorms <- double(nrow(prototypes))
     for(i in 1:length(pnorms)) {
@@ -46,11 +46,7 @@ kernelsomsecondbmu <- function(prototypes,K,weights) {
     ordered <- apply(predistances,1,order)
     winners <- t(ordered[1:2,])
     bmu <- winners[,1]
-    if(missing(weights) || is.null(weights)) {
-        error <- predistances[cbind(1:length(bmu),bmu)]+diag(K)
-    } else {
-        error <- weights*(predistances[cbind(1:length(bmu),bmu)]+diag(K))/mean(weights)
-    }
+    error <- predistances[cbind(1:length(bmu),bmu)]+diag(K)
     list(clusters=bmu,error=error,pnorms=pnorms,winners=winners)
 }
 
@@ -315,7 +311,7 @@ batchsom.kernelmatrix <- function(data,somgrid,init=c("pca","random"),
         ## initialisation based on the value of init
         init <- match.arg(init)
         args <- list(...)
-        params <- c(list(data=data,somgrid=somgrid),list(...))
+        params <- c(list(data=data,somgrid=somgrid,weights=weights),args)
         if(init=="random") {
             prototypes <- do.call("sominit.random",params)
         } else {
@@ -349,23 +345,26 @@ batchsom.kernelmatrix <- function(data,somgrid,init=c("pca","random"),
 }
 
 sominit.random.kernelmatrix <- function(data,somgrid,
-                                        method=c("prototypes","random","cluster"),...) {
-### FIXME: data weights support
+                                        method=c("prototypes","random","cluster"),weights,...) {
 ### FIXME: share this with relationalsom
     method <- match.arg(method)
-    dim <- nrow(data)
+    nb.data <- nrow(data)
     nb <- somgrid$size
-    if(method=="prototypes" || (method=="cluster" && nb>=dim)) {
-        protos <- matrix(0,ncol=dim,nrow=nb)
-        protos[cbind(1:nb,sample(1:dim,size=nb,replace=nb>dim))] <- 1
+    if(method=="prototypes" || (method=="cluster" && nb>=nb.data)) {
+        protos <- matrix(0,ncol=nb.data,nrow=nb)
+        if(missing(weights) || is.null(weights)) {
+            protos[cbind(1:nb,sample(nb.data,size=nb,replace=nb>nb.data))] <- 1
+        } else {
+            protos[cbind(1:nb,sample(nb.data,size=nb,replace=nb>nb.data,prob=weights))] <- 1
+        }
     } else if(method=="random") {
-        protos <- matrix(runif(dim*nb),ncol=dim,nrow=nb)
+        protos <- matrix(runif(nb.data*nb),ncol=nb.data,nrow=nb)
         protos <- sweep(protos,1,rowSums(protos),"/")
     } else {
-        ## nb <dim
-        clusters <- cut(sample(1:dim),nb,labels=FALSE,include.lowest=TRUE)
-        protos <- matrix(0,ncol=dim,nrow=nb)
-        protos[cbind(clusters,1:dim)] <- 1
+        ## nb <nb.data
+        clusters <- cut(sample(nb.data),nb,labels=FALSE,include.lowest=TRUE)
+        protos <- matrix(0,ncol=nb.data,nrow=nb)
+        protos[cbind(clusters,1:nb.data)] <- 1
         protos <- sweep(protos,1,rowSums(protos),"/")
     }
     protos

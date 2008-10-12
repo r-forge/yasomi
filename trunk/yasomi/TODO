@@ -10,7 +10,7 @@ Tentative for 0.3:
 BUGS or problems:
 - support of weights must be included everywhere needed, not only batchsom:
   - in error.*
-  - in sominit.*
+  - in sominit.pca.*
   - in colorCode?
   - possibly in predict.* (for the error calculation)
 - fix the border "problem" in plot.somgrid
@@ -42,6 +42,7 @@ BUGS or problems:
   - take weights into account during initialisation (see FIXME in the code)
   - weighting for predict? 
   - weighting for new data in error.*?
+  - should we take into account weighting more extensively in sominit.random to mimic what would happen when using replicated data points?
 
 + initialisation methods
   - add randomness in PCA initialisation
@@ -50,7 +51,6 @@ BUGS or problems:
   - vignette
 
 + kernel SOM
-  - fast implementation
   - positivity checking
 
 + graphics

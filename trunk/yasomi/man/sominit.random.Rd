@@ -12,9 +12,9 @@ the hypercube spanned by the data.
 }
 \usage{
 sominit.random(data, somgrid, method=c("prototypes","random","cluster"),\dots)
-\method{sominit.random}{default}(data, somgrid, method=c("prototypes","random","cluster"),\dots)
-\method{sominit.random}{dist}(data, somgrid, method=c("prototypes","random","cluster"),\dots)
-\method{sominit.random}{kernelmatrix}(data, somgrid, method=c("prototypes","random","cluster"),\dots)
+\method{sominit.random}{default}(data, somgrid, method=c("prototypes","random","cluster"),weights,\dots)
+\method{sominit.random}{dist}(data, somgrid, method=c("prototypes","random","cluster"),weights,\dots)
+\method{sominit.random}{kernelmatrix}(data, somgrid, method=c("prototypes","random","cluster"),weights,\dots)
 }
 \arguments{
   \item{data}{the data to which the SOM will be fitted. This can be,
@@ -22,6 +22,7 @@ sominit.random(data, somgrid, method=c("prototypes","random","cluster"),\dots)
     distance matrix or a kernel matrix}
   \item{somgrid}{a \code{somgrid} object}
   \item{method}{the initialisation method (see details)}
+  \item{weights}{optional weights for the data points}
   \item{\dots}{additional parameters}
 }
 \details{
@@ -29,12 +30,19 @@ sominit.random(data, somgrid, method=c("prototypes","random","cluster"),\dots)
   \describe{
     \item{\code{"prototypes"}}{the standard method proceeds by choosing
     randomly a subset of the data of the requested size (with repetition
-    if the grid size is larger than the data size).}
+    if the grid size is larger than the data size). If the
+    \code{weights} parameter is given, the probability of choosing a data
+  point is proportionnal to its weight.}
   \item{\code{"random"}}{the \code{"random"} method generate prototypes
-    randomly and uniformly in the hypercube spanned by the data.}
+    randomly and uniformly in the hypercube spanned by the data for
+    standard Euclidean data. For dissimilarity data or for the Kernel
+    SOM, the method generates prototypes via random convex combinations
+    of the data points. In all cases, the optional
+  \code{weights} are not taken into account by this method.}
   \item{\code{"cluster"}}{the clustering initialisation method build a
     random partition the data into balanced clusters and uses as initial
-  prototypes the centre of mass of those clusters.}
+  prototypes the centre of mass of those clusters. The optional
+  \code{weights} are not taken into account for balancing the clusters.}
     }
   }
 \value{
