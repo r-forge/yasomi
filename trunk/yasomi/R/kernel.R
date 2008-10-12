@@ -72,7 +72,7 @@ fastKernelsombmu <- function(cluster,nclust,K,nv) {
 }
 
 weightedFastKernelsombmu <- function(cluster,nclust,K,nv,weights) {
-    ps <- partialSums(cluster,nclust,K,weights)
+    ps <- weightedPartialSums(cluster,nclust,K,weights)
     csize <- tapply(weights,factor(cluster,levels=1:nclust),sum)
     csize[is.na(csize)] <- 0
     normed <- nv%*%csize
@@ -113,9 +113,9 @@ fastKernelsom.lowlevel.R <- function(somgrid,K,prototypes,
             ## assignment
             if(assignment == "single") {
                 if(is.null(weights)) {
-                    bmus <-  fastKernelsombmu(classif,sg$size,K,nv)
+                    bmus <-  fastKernelsombmu(classif,somgrid$size,K,nv)
                 } else {
-                    bmus <-  weightedFastKernelsombmu(classif,sg$size,K,nv,weighted)
+                    bmus <-  weightedFastKernelsombmu(classif,somgrid$size,K,nv,weights)
                 }
             } else {
                 stop(paste(assignment,"is not implemented for kernel SOM"))
@@ -162,9 +162,9 @@ fastKernelsom.lowlevel.R <- function(somgrid,K,prototypes,
     if(!noChange) {
         ## final assignment
         if(is.null(weights)) {
-            bmus <-  fastKernelsombmu(classif,sg$size,K,nv)
+            bmus <-  fastKernelsombmu(classif,somgrid$size,K,nv)
         } else {
-            bmus <-  weightedFastKernelsombmu(classif,sg$size,K,nv,weighted)
+            bmus <-  weightedFastKernelsombmu(classif,somgrid$size,K,nv,weights)
         }
         classif <- bmus$clusters
         errors[[length(radii)]] <- c(errors[[length(radii)]],bmus$error)

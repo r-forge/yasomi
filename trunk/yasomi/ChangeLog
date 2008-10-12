@@ -1,3 +1,8 @@
+2008-10-12  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/kernel.R (weightedFastKernelsombmu): fixed call to the wrong version of the partial som calculation
+	(fastKernelsom.lowlevel.R): removed a few broken references to global variables
+
 2008-10-11  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
 
 	* R/kernel.R (fastKernelsombmu): fast version of the bmu determination for the kernel SOM, based on partial sums
