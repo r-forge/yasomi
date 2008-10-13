@@ -1,3 +1,18 @@
+2008-10-13  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/som.R (batchsom.lowlevelcontinuous): R wrapper for continuous annealing
+
+	* src/som.c (batch_som_optim_continuous): new implementation with continuous annealing
+
+	* R/som.R (newbatchsom.default): temporary function that will replace batchsom.default when finished
+
+	* R/grid.R (plot.somgrid): moved some functions to annealing.R
+
+	* R/annealing.R: new file for control parameters of the batchsom
+	(radius.exp): moved here
+	(radius.lin): moved here
+	(somradii): moved here
+
 2008-10-12  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
 
 	* R/relational.R (batchsom.dist): added weights to the call to initialisation methods

@@ -369,4 +369,149 @@ void batch_som_optim(double *proto,int *nproto,double *data,int *ndata,
     }
 }
 
+void batch_som_optim_continuous(double *proto,int *nproto,double *data,
+				int *ndata,int *dim,double *weights,
+				int *assign,double *grid,double *radii,
+				int *nradii,int *kernel,
+				int *normalized,double *cut,int *verbose,
+				int *classif,double *errors) 
+{
+    int dataSize=*ndata,protoSize=*nproto,dimension=*dim;
+    int nbRadii=*nradii;
+    double cutValue=*cut;
+    int kernelType=*kernel;
+    int isNormalized=*normalized;
+    int isVerbose=*verbose;
+    
+    int iRad,indiv,j,k,l;
+    int base,protoBase;
+    double *nv;
+    double *preProto;
+    double *clusterWeight;
+    double *tmpProto;
+    
+    int changed=1;
+    double norm,neigh,indivWeight;
+    
+    double totalError;
+    
+    /* for heskes' rule */
+    int assignmentRule=*assign;
+    double *distances=NULL;
+    
+    if(assignmentRule == 1) {
+	distances = (double *) R_alloc(protoSize, sizeof(double));
+    }
+    
+    /* neighboorhood function */
+    nv = (double *) R_alloc(protoSize*protoSize, sizeof(double));
+    
+    /* class based prototypes */
+    /* stored in row major mode */
+    preProto = (double *) R_alloc(protoSize*dimension, sizeof(double));
+    
+    /* clusterWeight */
+    clusterWeight = (double *) R_alloc(protoSize, sizeof(double));
+    
+    /* temporary prototype */
+    tmpProto = (double *) R_alloc(dimension, sizeof(double));
+    
+    if(isVerbose) {
+	Rprintf("Continuous annealing using");
+	if(isNormalized) {
+	    Rprintf(" normalized");
+	} else {
+	    Rprintf(" unnormalized");
+	}
+	switch(kernelType) {
+	case 0:
+	    Rprintf(" Gaussian kernel");
+	    break;
+	case 1:
+	    Rprintf(" linear kernel");
+	    break;
+	}
+	switch(assignmentRule) {
+	case 0:
+	    Rprintf(" with simple BMU determination");
+	    break;
+	case 1:
+	    Rprintf(" with Heskes' assignment rule");
+	    break;
+	}
+	Rprintf("\n");
+    }
+    
+    /* annealing loop */
+    for(iRad = 0; iRad < nbRadii; iRad++) {
+	/* compute neighboorhood */
+	neighborhood(grid,nv,protoSize,radii[iRad],kernelType,isNormalized);
+	/*** assignment phase ***/
+	if(assignmentRule == 1) {
+	    /* Heskes' rule */
+	    changed = bmu_heskes_ext_mem(proto,nv,nproto,data,ndata,dim,
+					 weights,classif,&totalError,
+					 distances);
+	} else {
+	    changed = bmu(proto,nproto,data,ndata,dim,weights,classif,
+			  &totalError);
+	}
+	errors[iRad] = totalError;
+	if(isVerbose) {
+	    Rprintf("%i %g\n",iRad,totalError);
+	}
+	/*** representation phase ***/
+	/* prototype update */
+	/* first compute class center of mass */
+	/* zero */
+	memset(preProto,0,protoSize*dimension*sizeof(double));
+	memset(clusterWeight,0,protoSize*sizeof(double));
+	for(indiv = 0 ; indiv < dataSize ; indiv++) {
+	    j = classif[indiv];
+	    indivWeight = weights[indiv];
+	    clusterWeight[j]+=indivWeight;
+	    /* loop on dimensions */
+	    protoBase = j * dimension;
+	    for(k = 0; k < dimension; k++) {
+		preProto[protoBase + k] += indivWeight*data[indiv + k * dataSize];
+	    }
+	}
+	/* then compute prototypes */
+	for(j = 0; j < protoSize; j++) {
+	    norm = 0;
+	    /* first compute normalization factor */
+	    base = j * protoSize;
+	    for(l = 0; l < protoSize; l++) {
+		if(clusterWeight[l]>0) {
+		    norm += nv[base + l] * clusterWeight[l];
+		}
+	    }
+	    /* update only if it is meaningful to do so */
+	    if(norm>cutValue) {
+		/* clear old value */
+		memset(tmpProto,0,dimension*sizeof(double));
+		/* compute new value */
+		for(l = 0; l < protoSize; l++) {
+		    if(clusterWeight[l]>0) {
+			neigh = nv[base + l];
+			protoBase = l * dimension;
+			/* loop on dimensions */
+			for(k = 0; k < dimension; k++) {
+			    tmpProto[k] += neigh * preProto[protoBase + k];
+			}
+		    }
+		}
+		/* normalization and transfer */
+		for(k = 0; k < dimension; k++) {
+		    proto[j + k * protoSize] = tmpProto[k]/norm;
+		}
+	    }
+	}
+    }
+    if(changed) {
+	/* final assignement if needed */
+	bmu(proto,nproto,data,ndata,dim,weights,classif,&totalError);
+	errors[nbRadii] = totalError;
+    }
+}
 

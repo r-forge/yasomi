@@ -153,6 +153,7 @@ BUGS or problems:
 Done in version 0.3:
 - kernel SOM
 - weighted observations
+- some integration tests
 
 Done in version 0.2:
 - relational SOM (first version with optimal algorithm but no implementation tricks) :

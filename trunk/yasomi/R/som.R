@@ -186,6 +186,58 @@ batchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
     pre
 }
 
+newbatchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
+                                control,weights,verbose=FALSE,keepdata=TRUE,...) {
+    if(class(somgrid)!="somgrid") {
+        stop("'somgrid' is not of somgrid class")
+    }
+    if(missing(control)) {
+        control <- batchsom.control(somgrid)
+    }
+    theRule <- switch(control$assignment,"single"=0,"heskes"=1)
+    kernelType <- switch(control$kernel,"gaussian"=0,"linear"=1)
+    if(!missing(weights)) {
+        if(length(weights)!=nrow(data)) {
+            stop("'weights' and 'data' have different dimensions")
+        }
+    } else {
+        weights <- rep(1,nrow(data))
+    }
+    if(missing(prototypes)) {
+        ## initialisation based on the value of init
+        init <- match.arg(init)
+        args <- list(...)
+        params <- c(list(data=data,somgrid=somgrid,weights=weights),args)
+        prototypes <- switch(init,
+                             "pca"=do.call("sominit.pca",params)$prototypes,
+                             "random"=do.call("sominit.random",params))
+    } else {
+        if(ncol(prototypes)!=ncol(data)) {
+            stop("'prototypes' and 'data' have different dimensions")
+        }
+        if(nrow(prototypes)!=somgrid$size) {
+            stop("'prototypes' and 'somgrid' are not compatible")
+        }
+    }
+    ## distances?
+    if(is.null(somgrid$dist)) {
+        somgrid$dist <- as.matrix(dist(somgrid$pts,method="Euclidean"),diag=0)
+    }
+    pre <- switch(control$mode,
+                  "stepwise"=batchsom.lowlevel(somgrid,data,prototypes,theRule,
+                  control$radii,weights,control$max.iter,kernelType,
+                  control$normalised,control$cut,verbose),
+                  "continuous"=batchsom.lowlevelcontinuous(somgrid,data,
+                  prototypes,theRule,control$radii,weights,kernelType,
+                  control$normalised,control$cut,verbose))
+    pre$control <- control
+    if(keepdata) {
+        pre$data  <- data
+        pre$weights <- weights
+    }
+    pre
+}
+
 batchsom.lowlevel <- function(somgrid,data,prototypes,
                               assignment,radii,weights,maxiter,
                               kernelType,normalised,cut,verbose) {
@@ -207,6 +259,37 @@ batchsom.lowlevel <- function(somgrid,data,prototypes,
                  as.integer(verbose),
                  clusters=integer(nrow(data)),
                  errors=as.double(rep(-1,1+length(radii)*maxiter)),
+                 PACKAGE="yasomi")
+    prototypes <- matrix(result$proto,ncol=ncol(prototypes),
+                         dimnames=list(NULL,dimnames(data)[[2]]))
+    res <- list(somgrid=somgrid,
+                prototypes=prototypes,
+                classif=result$cluster+1,
+                errors=result$errors[result$errors>=0])
+    class(res) <- c("somnum","som")
+    res
+}
+
+batchsom.lowlevelcontinuous <- function(somgrid,data,prototypes,
+                                        assignment,radii,weights,
+                                        kernelType,normalised,cut,verbose) {
+    result <- .C("batch_som_optim_continuous",
+                 proto=as.double(prototypes),
+                 as.integer(somgrid$size),
+                 as.double(data),
+                 as.integer(nrow(data)),
+                 as.integer(ncol(data)),
+                 as.double(weights),
+                 as.integer(assignment),
+                 as.double(somgrid$dist),
+                 as.double(radii),
+                 as.integer(length(radii)),
+                 as.integer(kernelType)[1],
+                 as.integer(normalised)[1],
+                 as.double(cut)[1],
+                 as.integer(verbose),
+                 clusters=integer(nrow(data)),
+                 errors=as.double(rep(-1,1+length(radii))),
                  PACKAGE="yasomi")
     prototypes <- matrix(result$proto,ncol=ncol(prototypes),
                          dimnames=list(NULL,dimnames(data)[[2]]))
