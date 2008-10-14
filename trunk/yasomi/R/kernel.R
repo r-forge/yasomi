@@ -1,5 +1,5 @@
 as.kernelmatrix.matrix <- function(data,...) {
-### FIXME: check for "kernelity"
+### FIXME: check for positivity
     if(!is.matrix(data)) {
         stop("'data' is not a matrix")
     }
@@ -8,6 +8,20 @@ as.kernelmatrix.matrix <- function(data,...) {
     }
     class(data) <- c("kernelmatrix",class(data))
     data
+}
+
+as.kernelmatrix.dist <- function(data,...) {
+### FIXME: check for positivity
+    result <- -0.5*double.centering(as.matrix(data^2,diag=0))
+    class(result) <- c("kernelmatrix",class(result))
+    result
+}
+
+as.dist.kernelmatrix <- function(x,FUN=NULL) {
+    predist <- sweep(-2*x,1,diag(x),"+")
+    predist <- sweep(predist,2,diag(x),"+")
+    class(predist) <- c("matrix")
+    as.dist(sqrt(predist))
 }
 
 predict.kernelsom <- function(object,newdata,newdatanorms,with.secondwinner=FALSE,...) {
@@ -379,6 +393,7 @@ sominit.pca.kernelmatrix <- function(data, somgrid, ...) {
     D.eigen <- eigen(D.c,symmetric=T)
     ## normalize (positive eigen values only)
     positive <- D.eigen$values>0
+### FIXME: check that we indeed have positive eigne values!
     D.eigen$vectors[,positive] <- sweep(D.eigen$vectors[,positive],2,sqrt(D.eigen$values[positive]),"/")
     ## and center
     D.eigen$vectors <- scale(D.eigen$vectors,scale=FALSE)

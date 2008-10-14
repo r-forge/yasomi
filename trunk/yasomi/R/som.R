@@ -187,13 +187,20 @@ batchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
 }
 
 newbatchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
-                                control,weights,verbose=FALSE,keepdata=TRUE,...) {
+                                weights,
+                                mode = c("stepwise","continuous"),
+                                min.radius, max.radius, steps,
+                                decrease = c("power", "linear"), max.iter,
+                                kernel = c("gaussian", "linear"), normalised,
+                                assignment = c("single", "heskes"),
+                                cut = 1e-07,
+                                verbose=FALSE,keepdata=TRUE,...) {
     if(class(somgrid)!="somgrid") {
         stop("'somgrid' is not of somgrid class")
     }
-    if(missing(control)) {
-        control <- batchsom.control(somgrid)
-    }
+    the.call <- match.call()
+    the.call[[1]] <- as.name("batchsom.control")
+    control <- eval(the.call)
     theRule <- switch(control$assignment,"single"=0,"heskes"=1)
     kernelType <- switch(control$kernel,"gaussian"=0,"linear"=1)
     if(!missing(weights)) {

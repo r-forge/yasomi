@@ -141,6 +141,8 @@ BUGS or problems:
     - error.quantisation.kernelsom: ok
     - error.kaskilagus.kernelsom: ok
     - as.kernelmatrix.matrix: ok
+    + as.kernelmatrix.dist: TODO
+    + as.dist.kernelmatrix: TODO
     + sominit.pca.kernelmatrix: ok but references are needed
     - sominit.random.kernelmatrix: ok
     - batchsom.kernelmatrix: ok

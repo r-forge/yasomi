@@ -1,3 +1,16 @@
+2008-10-14  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* NAMESPACE: added new methods
+
+	* R/kernel.R (as.kernelmatrix.dist): conversion for a dissimilarity matrix to a kernel matrix via the standard double centering trick
+	(as.dist.kernelmatrix): conversion from a kernel matrix to the corresponding distance matrix in the kernel induced feature space
+
+	* R/som.R (newbatchsom.default): modified interface: control is used only internally
+
+	* R/generic.R (batchsom.control): new generic function for batch SOM control parameters construction
+
+	* R/annealing.R (batchsom.control.default): default implementation of the control structure construction method
+
 2008-10-13  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
 
 	* R/som.R (batchsom.lowlevelcontinuous): R wrapper for continuous annealing

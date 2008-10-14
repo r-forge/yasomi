@@ -30,12 +30,14 @@ somradii <- function(somgrid,min,max,nb,annealing=c("power","linear"),
            "power"=radius.exp(min,max,nb))
 }
 
-batchsom.control <- function(somgrid, mode = c("stepwise","continuous"),
-                             min.radius, max.radius, steps,
-                             decrease = c("power", "linear"), max.iter,
-                             kernel = c("gaussian", "linear"), normalised,
-                             assignment = c("single", "heskes"),
-                             cut = 1e-07)
+batchsom.control.default <- function(data,somgrid,
+                                     mode = c("continuous","stepwise"),
+                                     min.radius, max.radius, steps,
+                                     decrease = c("power", "linear"), max.iter,
+                                     kernel = c("gaussian", "linear"),
+                                     normalised,
+                                     assignment = c("single", "heskes"),
+                                     cut = 1e-07,...)
 {
     mode <- match.arg(mode,c("stepwise","continuous"))
     decrease <- match.arg(decrease,c("power","linear"))
@@ -70,5 +72,6 @@ batchsom.control <- function(somgrid, mode = c("stepwise","continuous"),
                     "linear"=radius.lin(min.radius,max.radius,steps),
                     "power"=radius.exp(min.radius,max.radius,steps))
     list(mode=mode,radii=radii,max.iter=max.iter,kernel=kernel,
-         normalised=normalised,assignment=assignment,cut=cut)
+         normalised=normalised,assignment=assignment,
+         cut=cut)
 }

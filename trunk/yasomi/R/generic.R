@@ -31,3 +31,17 @@ batchsom <- function(data,somgrid,init,prototypes,...) {
 as.kernelmatrix <- function(data,...) {
     UseMethod("as.kernelmatrix")
 }
+
+
+## in annealing.R
+
+batchsom.control <- function(data,somgrid,
+                             mode = c("stepwise","continuous"),
+                             min.radius, max.radius, steps,
+                             decrease = c("power", "linear"), max.iter,
+                             kernel = c("gaussian", "linear"),
+                             normalised,
+                             assignment = c("single", "heskes"),
+                             cut = 1e-07,...) {
+    UseMethod("batchsom.control")
+}
