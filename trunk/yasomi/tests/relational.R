@@ -16,17 +16,18 @@ prototypes.init <- X[init.points,]
 
 radius.max <- runif(1,min=1/3,max=4/3)*sg$diam
 nb.radii <- ceiling(runif(1,min=radius.max,max=3*radius.max))
+mode <- sample(c("continuous","stepwise"),1)
 
 ## let's fit the SOM
 rsom <- batchsom(dX,sg,prototypes=rprototypes.init,verbose=TRUE,
-                 radii=somradii(sg,max=radius.max,nb=nb.radii))
+                 max.radius=radius.max,steps=nb.radii,mode=mode)
 
 rprototypes.final <- rsom$prototypes%*%X
 
 ## and now the same thing for the standard vector SOM
 
 som <- batchsom(X,sg,prototypes=prototypes.init,verbose=TRUE,
-                radii=somradii(sg,max=radius.max,nb=nb.radii))
+                max.radius=radius.max,steps=nb.radii,mode=mode)
 
 stopifnot(all.equal(error.kaskilagus(som),error.kaskilagus(rsom)))
 stopifnot(all.equal(error.quantisation(som),error.quantisation(rsom)))

@@ -442,13 +442,14 @@ void batch_som_optim_continuous(double *proto,int *nproto,double *data,
 	Rprintf("\n");
     }
     
-    /* annealing loop */
+    /* annealing loop */    
     for(iRad = 0; iRad < nbRadii; iRad++) {
 	/* compute neighboorhood */
 	neighborhood(grid,nv,protoSize,radii[iRad],kernelType,isNormalized);
 	/*** assignment phase ***/
 	if(assignmentRule == 1) {
 	    /* Heskes' rule */
+	    /* FIXME: should we use nv from this round or for the previous one?*/
 	    changed = bmu_heskes_ext_mem(proto,nv,nproto,data,ndata,dim,
 					 weights,classif,&totalError,
 					 distances);

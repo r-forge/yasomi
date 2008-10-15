@@ -12,18 +12,19 @@ prototypes.init <- X[pinit.choice,]
 
 radius.max <- runif(1,min=1/3,max=4/3)*sg$diam
 nb.radii <- ceiling(runif(1,min=radius.max,max=3*radius.max))
+mode <- sample(c("continuous","stepwise"),1)
 
 ## random integer weights
 weights <- sample(5,size=nrow(X),replace=T,prob=exp(-seq(0,2,length=5)))
 
 ## with weight support
 som <- batchsom(X,sg,prototypes=prototypes.init,weights=weights,verbose=TRUE,
-                radii=somradii(sg,max=radius.max,nb=nb.radii))
+                max.radius=radius.max,steps=nb.radii,mode=mode)
 
 ## weighting via replication
 X.rep <- X[rep(1:nrow(X),times=weights),]
 som.rep <- batchsom(X.rep,sg,prototypes=prototypes.init,verbose=TRUE,
-                    radii=somradii(sg,max=radius.max,nb=nb.radii))
+                    max.radius=radius.max,steps=nb.radii,mode=mode)
 
 stopifnot(all.equal(error.quantisation(som),error.quantisation(som.rep)))
 stopifnot(all.equal(som.rep$errors,som$errors))
@@ -37,7 +38,7 @@ rprototypes.init <- matrix(0,nrow=sg$size,ncol=nrow(X))
 rprototypes.init[cbind(1:sg$size,pinit.choice)] <- 1
 
 rsom <- batchsom(dX,sg,prototypes=rprototypes.init,weights=weights,verbose=TRUE,
-                 radii=somradii(sg,max=radius.max,nb=nb.radii))
+                 max.radius=radius.max,steps=nb.radii,mode=mode)
 
 rprototypes.final <- rsom$prototypes%*%X
 
@@ -52,7 +53,7 @@ stopifnot(all.equal(som$prototypes,rprototypes.final,
 KX <- as.kernelmatrix(tcrossprod(X))
 
 ksom <- batchsom(KX,sg,prototypes=rprototypes.init,weights=weights,verbose=TRUE,
-                 radii=somradii(sg,max=radius.max,nb=nb.radii))
+                 max.radius=radius.max,steps=nb.radii,mode=mode)
 stopifnot(all.equal(error.kaskilagus(som),error.kaskilagus(ksom)))
 stopifnot(all.equal(error.quantisation(som),error.quantisation(ksom)))
 stopifnot(all.equal(som$errors,ksom$errors))

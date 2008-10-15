@@ -1,4 +1,59 @@
+2008-10-15  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/slow-versions.R (batchsom.lowlevel.R): updated to reflect the new calling interface in the fast implementations
+
+	* R/som.R: removed the previous interface
+
+	* R/annealing.R (batchsom.control.default): removed somradii
+
+	* NAMESPACE: removed somradii
+
+	* man/batchsom.kernelmatrix.Rd: fixed to reflect the new interface
+
+	* man/batchsom.dist.Rd: fixed to reflect the new interface
+
+	* man/batchsom.default.Rd: fixed to reflect the new interface
+
+	* man/batchsom.Rd: fixed to reflect the new interface
+
+	* tests/weights.R: random annealing mode and new interface
+
+	* tests/relational.R: random annealing mode and new interface
+
+	* tests/kernel.R: random annealing mode and new interface
+
+	* R/kernel.R (fastKernelsom.lowlevelcontinuous.R): fixed the time of the neighborhood update for consistency with the classical SOM
+
+	* R/relational.R (fastRelationalsom.lowlevelcontinuous.R): fixed the time of the neighborhood update for consistency with the classical SOM
+
+	* R/som.R (print.som): fixed to use the control parameter
+	(summary.som): fixed to use the control parameter
+
 2008-10-14  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/som.R (colorCode): used the new calling convention
+
+	* R/tune.R (som.tune): used the new calling convention
+
+	* R/kernel.R (batchsom.kernelmatrix): new calling convention with the control parameter list
+	(fastKernelsom.lowlevel.R): new calling convention with the control parameter list
+	(fastKernelsom.lowlevelcontinuous.R): continuous annealing for kernel SOM
+
+	* R/relational.R (batchsom.dist): new calling convention with the control parameter list
+	(fastRelationalsom.lowlevel.R): new calling convention with the control parameter list
+	(fastRelationalsom.lowlevelcontinuous.R): continuous annealing for relational SOM
+
+	* R/generic.R (batchsom): more default parameters
+
+	* R/som.R (batchsom.default): new parameters + continuous annealing
+	(batchsom.lowlevelcontinuous): new calling convention based on the control parameter list
+	(batchsom.lowlevel): new calling convention based on the control parameter list
+
+	* R/annealing.R (batchsom.control.default): continuous annealing as default
+
+	* R/generic.R (batchsom.control): continuous annealing as default
+
+	* R/kernel.R (sominit.pca.kernelmatrix): added positivity checking
 
 	* NAMESPACE: added new methods
 

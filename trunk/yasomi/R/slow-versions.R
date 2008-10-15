@@ -46,20 +46,29 @@ bmu.heskes.R <- function(prototypes,data,nv,weights) {
 }
 
 batchsom.R <- function(data,somgrid,init=c("pca","random"),prototypes,
-                       assignment=c("single","heskes"),radii=somradii(somgrid),
-                       weights,maxiter=75,
-                       kernel=c("gaussian","linear"),normalised,
-                       cut=1e-7,verbose=FALSE,keepdata=TRUE,...) {
+                             weights,
+                             mode = c("continuous","stepwise"),
+                             min.radius, max.radius, steps,
+                             decrease = c("power", "linear"), max.iter,
+                             kernel = c("gaussian", "linear"), normalised,
+                             assignment = c("single", "heskes"),
+                             cut = 1e-07,
+                             verbose=FALSE,keepdata=TRUE,...) {
     ## process parameters and perform a few sanity checks
     if(class(somgrid)!="somgrid") {
         stop("'somgrid' is not of somgrid class")
     }
-    assignment <- match.arg(assignment)
-    if(missing(normalised)) {
-        normalised <- assignment=="heskes"
+    the.call <- match.call()
+    if(verbose) {
+        print(the.call)
     }
-    kernel <- match.arg(kernel)
-    theKernel <- switch(kernel,"gaussian"=kernel.gaussian,"linear"=kernel.linear)
+    the.call[[1]] <- batchsom.control
+    control <- eval(the.call,envir = parent.frame())
+    if(control$mode=="continuous") {
+        stop("continuous annealing mode is unsupported in batchsom.R")
+    }
+    control$kernel.fun <- switch(control$kernel,"gaussian"=kernel.gaussian,"linear"=kernel.linear)
+
     if(!missing(weights)) {
         if(length(weights)!=nrow(data)) {
             stop("'weights' and 'data' have different dimensions")
@@ -71,7 +80,7 @@ batchsom.R <- function(data,somgrid,init=c("pca","random"),prototypes,
         ## initialisation based on the value of init
         init <- match.arg(init)
         args <- list(...)
-        params <- c(list(data=data,somgrid=somgrid),list(...))
+        params <- c(list(data=data,somgrid=somgrid),args)
         prototypes <- switch(init,
                              "pca"=do.call("sominit.pca",params)$prototypes,
                              "random"=do.call("sominit.random",params))
@@ -84,12 +93,9 @@ batchsom.R <- function(data,somgrid,init=c("pca","random"),prototypes,
     if(is.null(somgrid$dist)) {
         somgrid$dist <- as.matrix(dist(somgrid$pts,method="Euclidean"),diag=0)
     }
-    pre <- batchsom.lowlevel.R(somgrid,data,prototypes,assignment,radii,
-                               weights,maxiter,theKernel,normalised,cut,verbose)
-    pre$assignment <- assignment
-    pre$kernel <- kernel
-    pre$normalised <- normalised
-    pre$radii <- radii
+    pre <- batchsom.lowlevel.R(somgrid,data,prototypes,
+                               weights,control,verbose)
+    pre$control <- control
     if(keepdata) {
         pre$data  <- data
         pre$weights <- weights
@@ -97,16 +103,15 @@ batchsom.R <- function(data,somgrid,init=c("pca","random"),prototypes,
     pre
 }
 
-batchsom.lowlevel.R <- function(somgrid,data,prototypes,
-                                assignment,radii,weights,maxiter,kernel,
-                                normalised,cut,verbose) {
+batchsom.lowlevel.R <- function(somgrid,data,prototypes,weights,control,
+                                verbose) {
     data <- as.matrix(data)
     classif <- rep(NA,nrow(data))
-    errors <- vector("list",length(radii))
-    nv <- neighborhood(somgrid,radii[1],kernel,normalised=normalised)
-    for(i in 1:length(radii)) {
-        for(j in 1:maxiter) {
-            if(assignment == "single") {
+    errors <- vector("list",length(control$radii))
+    nv <- neighborhood(somgrid,control$radii[1],control$kernel.fun,normalised=control$normalised)
+    for(i in 1:length(control$radii)) {
+        for(j in 1:control$max.iter) {
+            if(control$assignment == "single") {
                 bmus <- bmu.R(prototypes,data,weights)
             } else {
                 bmus <- bmu.heskes.R(prototypes,data,nv,weights)
@@ -122,11 +127,11 @@ batchsom.lowlevel.R <- function(somgrid,data,prototypes,
             ## prepare next iteration
             if(noChange) {
                 if(verbose) {
-                    print(paste("radius:",radii[i],"iteration",j,"is stable, decreasing radius"))
+                    print(paste("radius:",control$radii[i],"iteration",j,"is stable, decreasing radius"))
                 }
                 ## update the weights
-                if(i<length(radii)) {
-                    nv <- neighborhood(somgrid,radii[i+1],kernel,normalised=normalised)
+                if(i<length(control$radii)) {
+                    nv <- neighborhood(somgrid,control$radii[i+1],control$kernel.fun,normalised=control$normalised)
                 } else {
                     break;
                 }
@@ -151,7 +156,7 @@ batchsom.lowlevel.R <- function(somgrid,data,prototypes,
         ## final assignment (always in standard mode)
         bmus <- bmu.R(prototypes,data,weights)
         classif <- bmus$clusters
-        errors[[length(radii)]] <- c(errors[[length(radii)]],bmus$error)
+        errors[[length(control$radii)]] <- c(errors[[length(control$radii)]],bmus$error)
     }
     res <- list(somgrid=somgrid,prototypes=prototypes,classif=classif,
                 errors=unlist(errors))

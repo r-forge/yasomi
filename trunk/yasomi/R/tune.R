@@ -92,23 +92,26 @@ som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),weights,
                             if(verbose) {
                                 print(paste("Configuration ",confIndex,"/",nbconf,sep=""))
                             }
-                            radii=somradii(somgrid,max=radius,nb=control$innernradii,annealing=annealing)
                             ## will always save the data
                             if(missing(weights)) {
                                 som <- batchsom(data,somgrid,
                                                 prototypes=prototypes,
                                                 assignement=assignment,
-                                                radii=radii,
-                                                maxiter=control$maxiter,
+                                                max.radius=radius,
+                                                steps=control$innernradii,
+                                                max.iter=control$maxiter,
                                                 kernel=kernel,
+                                                decrease=annealing,
                                                 verbose=internalVerbose)
                             } else {
                                 som <- batchsom(data,somgrid,
                                                 prototypes=prototypes,
                                                 assignement=assignment,
-                                                radii=radii,
+                                                max.radius=radius,
+                                                steps=control$innernradii,
+                                                max.iter=control$maxiter,
+                                                decrease=annealing,
                                                 weights=weights,
-                                                maxiter=control$maxiter,
                                                 kernel=kernel,
                                                 verbose=internalVerbose)
                             }

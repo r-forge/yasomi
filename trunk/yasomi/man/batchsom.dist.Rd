@@ -6,10 +6,13 @@
 dissimilarity data.
 }
 \usage{
-\method{batchsom}{dist}(data, somgrid, init=c("pca","random"), prototypes,
-         assignment = c("single", "heskes"),radii=somradii(somgrid),
-         weights, maxiter = 75,kernel=c("gaussian","linear"),normalised,
-         cut = 1e-07, verbose = FALSE, keepdata = TRUE,\dots)
+\method{batchsom}{dist}(data, somgrid, init=c("pca","random"),
+                prototypes,weights,
+                mode = c("continuous","stepwise"), min.radius, max.radius,
+                steps, decrease = c("power", "linear"), max.iter,
+                kernel = c("gaussian", "linear"), normalised,
+                assignment = c("single", "heskes"), cut = 1e-07,
+                verbose = FALSE, keepdata = TRUE, \dots)
 }
 \arguments{
   \item{data}{the data to which the SOM will be fitted represented by a
@@ -19,19 +22,58 @@ dissimilarity data.
   \item{somgrid}{an object of class \code{"somgrid"} that specifies the prior
     structure of the Self-Organising Map: see \code{\link{somgrid}} }
   \item{prototypes}{a matrix of initial values for the
-    prototypes. If missing chosen via
+    prototypes. It contains linear coefficients that describe the
+    prototypes as virtual linear combination of the initial data
+    points. It has therefore one row for each prototype (as specified by
+    the prior structure \code{somgrid}) and has many columns as data
+    points. If missing chosen via 
     the method specified by the \code{init} parameter (see details)}
   \item{init}{the initialisation method (see details)}
-  \item{assignment}{the assignment method used to compute the best
-    matching unit of an observation during training}
-  \item{radii}{the radii of the neighbourhoods used during training. See
-  \code{\link{somradii}} for the default values}
- \item{weights}{optional weights for the observations}
-  \item{maxiter}{the maximum number of of iteration performed for each
-    radius (the minimum is one)}
-  \item{kernel}{the kernel to use to compute neighbouring iterations}
+  \item{weights}{optional weights for the data points}
+  \item{mode}{annealing mode:
+    \describe{
+      \item{\code{"continuous"} (default)}{this is the standard
+	annealing strategy for SOM: the influence of neighbours changes
+	at each epoch of the algorithm, from \code{max.radius} to
+	\code{min.radius} in exactly \code{step} steps.}
+      \item{\code{"stepwise"}}{in this strategy, the algorithm performs
+	several epochs (a maximum of \code{max.iter}) for each of the
+	\code{step} radii (from \code{max.radius} to
+	\code{min.radius}). The algorithm changes the neighbours
+	influence only when the classification remains stable from one
+	epoch to another. The \code{max.iter} parameter provides a
+	safeguard against cycling behaviours.}
+    }
+  }
+  \item{min.radius}{the minimum neighbourhood influence radius. If
+    missing, the value depends on the one of \code{kernel} but ensures
+    in practice a local learning only (see details)}
+  \item{max.radius}{the maximal neighbourhood influence radius. If missing
+    two third of the prior structure diameter plus one}
+  \item{steps}{the number of radii to use during annealing}
+  \item{decrease}{the radii generating formula (\code{"power"} or
+    \code{"linear"}), i.e., the way the \code{steps} radii are generated
+    from the extremal values given by \code{min.radius} and
+    \code{max.radius}}
+  \item{max.iter}{maximal number of epochs for one radius in the
+    \code{"stepwise"} annealing mode (defaults to 75)}
+  \item{kernel}{the kernel used to transform distances in the prior
+    structure into influence coefficients}
   \item{normalised}{switch for normalising the neighbouring
     interactions. Has no influence with the \code{"single"} assignment method}
+  \item{assignment}{the assignment method used to compute the best
+    matching unit (BMU) of an observation during training:
+    \describe{
+      \item{\code{"single"} (default)}{this is the standard BMU
+	calculation approach in which the best unit for an observation
+	is the one of the closest prototype of this observation }
+      \item{\code{"heskes"}}{Tom Heskes' variant for the BMU in which a
+	weighted fit of all the prototypes to an observation is used to
+	compute the best unit. The rationale is that the BMU's prototype
+	and its neighbouring units' prototypes must be close to the
+	observation.}
+    }
+  }
   \item{cut}{minimal value below wich neighbouring interactions are not
     take into account}
   \item{verbose}{switch for tracing the fitting process}
@@ -64,6 +106,7 @@ the method are transmitted to the initialisation method.
     observation has been assigned}
   \item{errors}{a vector containing the evolution of the quantisation
     error during the fitting process}
+  \item{control}{a list containing all the parameters used to fit the SOM}
   \item{data}{the original data if the function is called with
     \code{keepdata = TRUE}}
   \item{weights}{the weights of the data points if the function is called with
@@ -75,8 +118,7 @@ the method are transmitted to the initialisation method.
 %
 % ~Make other sections like Warning with \section{Warning }{....} ~
 %}
-\seealso{See \code{\link{somradii}} for some reasonable default values for the
-  radii, \code{\link{sominit.pca.dist}} and
+\seealso{See \code{\link{sominit.pca.dist}} and
   \code{\link{sominit.random.dist}} 
   for some control on the initial configuration of the prototypes, \code{\link{som.tune}} for the optimisation of some magic
   parameters (such as the radii), \code{\link{umatrix}} and

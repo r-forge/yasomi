@@ -100,35 +100,34 @@ weightedFastKernelsombmu <- function(cluster,nclust,K,nv,weights) {
 }
 
 
-fastKernelsom.lowlevel.R <- function(somgrid,K,prototypes,
-                                     assignment,radii,weights,maxiter,
-                                     kernel,normalised,cut,verbose) {
+fastKernelsom.lowlevel.R <- function(somgrid,K,prototypes,weights,control,
+                                     verbose) {
     oldClassif <- rep(NA,nrow(K))
-    errors <- vector("list",length(radii))
+    errors <- vector("list",length(control$radii))
     ## a round of initialisation is needed
-    nv <- neighborhood(somgrid,radii[1],kernel,normalised=normalised)
+    nv <- neighborhood(somgrid,control$radii[1],control$kernel.fun,normalised=control$normalised)
     bmus <- kernelsombmu(prototypes,K,weights)
     classif <- bmus$clusters
     errors[[1]] <- bmus$error
     if(verbose) {
         print(paste(1,1,bmus$error))
     }
-    for(i in 1:length(radii)) {
+    for(i in 1:length(control$radii)) {
         if(i==1) {
-            iterations <- 2:maxiter
+            iterations <- 2:control$max.iter
         } else {
-            iterations <- 1:maxiter
+            iterations <- 1:control$max.iter
         }
         for(j in iterations) {
             ## assignment
-            if(assignment == "single") {
+            if(control$assignment == "single") {
                 if(is.null(weights)) {
                     bmus <-  fastKernelsombmu(classif,somgrid$size,K,nv)
                 } else {
                     bmus <-  weightedFastKernelsombmu(classif,somgrid$size,K,nv,weights)
                 }
             } else {
-                stop(paste(assignment,"is not implemented for kernel SOM"))
+                stop(paste(control$assignment,"is not implemented for kernel SOM"))
             }
             nclassif <- bmus$clusters
             noChange <- identical(classif,nclassif)
@@ -141,23 +140,24 @@ fastKernelsom.lowlevel.R <- function(somgrid,K,prototypes,
             }
             errors[[i]] <- c(errors[[i]],error)
             ## there is no representation phase!
-            if(noChange | hasLoop | j==maxiter) {
+            if(noChange | hasLoop | j==control$max.iter) {
                 if(verbose) {
                     if(noChange) {
-                        print(paste("radius:",radii[i],"iteration",j,
+                        print(paste("radius:",control$radii[i],"iteration",j,
                                     "is stable, decreasing radius"))
                     } else {
-                        print(paste("radius:",radii[i],"iteration",j,
+                        print(paste("radius:",control$radii[i],"iteration",j,
                                     "oscillation detected, decreasing radius"))
                     }
                 }
-                if(i==length(radii)) {
+                if(i==length(control$radii)) {
                     ## the fitting is done
                     break;
                 }
                 ## preparing the loop with the next radius
-                nv <- neighborhood(somgrid,radii[i+1],kernel,
-                                   normalised=normalised)
+                nv <- neighborhood(somgrid,control$radii[i+1],
+                                   control$kernel.fun,
+                                   normalised=control$normalised)
             }
             ## break the loop if the partition is stable or when we have
             ## an oscillating behaviour
@@ -177,7 +177,7 @@ fastKernelsom.lowlevel.R <- function(somgrid,K,prototypes,
             bmus <-  weightedFastKernelsombmu(classif,somgrid$size,K,nv,weights)
         }
         classif <- bmus$clusters
-        errors[[length(radii)]] <- c(errors[[length(radii)]],bmus$error)
+        errors[[length(control$radii)]] <- c(errors[[length(control$radii)]],bmus$error)
     }
     ## for latter use
 ### FIXME: shouldn't that be moved before the last assignment?
@@ -195,6 +195,70 @@ fastKernelsom.lowlevel.R <- function(somgrid,K,prototypes,
     }
     res <- list(somgrid=somgrid,prototypes=prototypes,classif=classif,
                 errors=unlist(errors),Kp=Kp,pnorms=pnorms)
+    class(res) <- c("kernelsom","som")
+    res
+}
+
+fastKernelsom.lowlevelcontinuous.R <-
+    function(somgrid,K,prototypes,weights,control,verbose) {
+    oldClassif <- rep(NA,nrow(K))
+    errors <- rep(NA,length(control$radii))
+    ## a round of initialisation is needed
+    bmus <- kernelsombmu(prototypes,K,weights)
+    classif <- bmus$clusters
+    errors[1] <- bmus$error
+    if(verbose) {
+        print(paste(1,bmus$error))
+    }
+    ## no representation phase is needed
+    nv <- neighborhood(somgrid,control$radii[1],control$kernel.fun,normalised=control$normalised)
+    for(i in 2:length(control$radii)) {
+        ## assignment
+        if(control$assignment == "single") {
+            if(is.null(weights)) {
+                bmus <-  fastKernelsombmu(classif,somgrid$size,K,nv)
+            } else {
+                bmus <-  weightedFastKernelsombmu(classif,somgrid$size,K,nv,weights)
+            }
+        } else {
+            stop(paste(control$assignment,"is not implemented for kernel SOM"))
+        }
+        nclassif <- bmus$clusters
+        noChange <- identical(classif,nclassif)
+        classif <- nclassif
+        errors[i] <- bmus$error
+        if(verbose) {
+            print(paste(i,errors[i]))
+        }
+        nv <- neighborhood(somgrid,control$radii[i],
+                           control$kernel.fun,
+                           normalised=control$normalised)
+    }
+    ## for latter use
+    if(is.null(weights)) {
+        nvcl <- nv[,classif]
+    } else {
+        nvcl <- sweep(nv[,classif],2,weights,"*")
+    }
+    normed <- rowSums(nvcl)
+    prototypes <- sweep(nvcl,1,normed,"/")
+    Kp <- tcrossprod(K,prototypes)
+    pnorms <- double(nrow(prototypes))
+    for(i in 1:length(pnorms)) {
+        pnorms[i] <- c(prototypes[i,]%*%Kp[,i])
+    }
+    if(!noChange) {
+        ## final assignment
+        if(is.null(weights)) {
+            bmus <-  fastKernelsombmu(classif,somgrid$size,K,nv)
+        } else {
+            bmus <-  weightedFastKernelsombmu(classif,somgrid$size,K,nv,weights)
+        }
+        classif <- bmus$clusters
+        errors <- c(errors,bmus$error)
+    }
+    res <- list(somgrid=somgrid,prototypes=prototypes,classif=classif,
+                errors=errors,Kp=Kp,pnorms=pnorms)
     class(res) <- c("kernelsom","som")
     res
 }
@@ -296,24 +360,25 @@ kernelsom.lowlevel.R <- function(somgrid,K,prototypes,
 
 batchsom.kernelmatrix <- function(data,somgrid,init=c("pca","random"),
                                   prototypes,
-                                  assignment=c("single","heskes"),
-                                  radii=somradii(somgrid),
-                                  weights,maxiter=75,
-                                  kernel=c("gaussian","linear"),normalised,
-                                  cut=1e-7,verbose=FALSE,keepdata=TRUE,...) {
+                                  weights,
+                                  mode = c("continuous","stepwise"),
+                                  min.radius, max.radius, steps,
+                                  decrease = c("power", "linear"), max.iter,
+                                  kernel = c("gaussian", "linear"), normalised,
+                                  assignment = c("single", "heskes"),
+                                  cut = 1e-07,
+                                  verbose=FALSE,keepdata=TRUE,...) {
     ## process parameters and perform a few sanity checks
-    if(verbose) {
-        print(match.call())
-    }
-    assignment <- match.arg(assignment)
-    if(missing(normalised)) {
-        normalised <- assignment=="heskes"
-    }
-    kernel <- match.arg(kernel)
-    theKernel <- switch(kernel,"gaussian"=kernel.gaussian,"linear"=kernel.linear)
     if(class(somgrid)!="somgrid") {
         stop("'somgrid' is not of somgrid class")
     }
+    the.call <- match.call()
+    if(verbose) {
+        print(the.call)
+    }
+    the.call[[1]] <- batchsom.control
+    control <- eval(the.call,envir = parent.frame())
+    control$kernel.fun <- switch(control$kernel,"gaussian"=kernel.gaussian,"linear"=kernel.linear)
     if(!missing(weights)) {
         if(length(weights)!=nrow(data)) {
             stop("'weights' and 'data' have different dimensions")
@@ -344,13 +409,12 @@ batchsom.kernelmatrix <- function(data,somgrid,init=c("pca","random"),
     if(is.null(somgrid$dist)) {
         somgrid$dist <- as.matrix(dist(somgrid$pts,method="Euclidean"),diag=0)
     }
-    pre <- fastKernelsom.lowlevel.R(somgrid,data,prototypes,assignment,
-                                    radii,weights,maxiter,theKernel,
-                                    normalised,cut,verbose)
-    pre$assignment <- assignment
-    pre$kernel <- kernel
-    pre$normalised <- normalised
-    pre$radii <- radii
+    pre <- switch(control$mode,
+                  "stepwise"=fastKernelsom.lowlevel.R(somgrid,data,
+                  prototypes,weights,control,verbose),
+                  "continuous"=fastKernelsom.lowlevelcontinuous.R(somgrid,data,
+                  prototypes,weights,control,verbose))
+    pre$control <- control
     if(keepdata) {
         pre$data  <- data
         pre$weights <- weights
@@ -391,9 +455,15 @@ sominit.pca.kernelmatrix <- function(data, somgrid, ...) {
     D.c <- double.centering(data)
     ## then eigenanalysis
     D.eigen <- eigen(D.c,symmetric=T)
+    min.eigenvalue <- min(D.eigen$values)
+    if(min.eigenvalue < -sqrt(.Machine$double.eps)) {
+        warning(paste("Non negligible negative eigenvalue ",min.eigenvalue))
+    }
     ## normalize (positive eigen values only)
     positive <- D.eigen$values>0
-### FIXME: check that we indeed have positive eigne values!
+    if(sum(positive)<2) {
+        stop("The centered kernel matrix must have at least two positive eigenvalues")
+    }
     D.eigen$vectors[,positive] <- sweep(D.eigen$vectors[,positive],2,sqrt(D.eigen$values[positive]),"/")
     ## and center
     D.eigen$vectors <- scale(D.eigen$vectors,scale=FALSE)

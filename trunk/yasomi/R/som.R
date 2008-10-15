@@ -130,79 +130,25 @@ bmu.heskes <- function(prototypes,data,nv,weights) {
 }
 
 batchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
-                     assignment=c("single","heskes"),radii=somradii(somgrid),
-                     weights,maxiter=75,
-                     kernel=c("gaussian","linear"),
-                     normalised,
-                     cut=1e-7,verbose=FALSE,keepdata=TRUE,...) {
-    ## process parameters and perform a few sanity checks
-    assignment <- match.arg(assignment)
-    if(missing(normalised)) {
-        normalised <- assignment=="heskes"
-    }
-    theRule <- switch(assignment,"single"=0,"heskes"=1)
-    kernel <- match.arg(kernel)
-    kernelType <- switch(kernel,"gaussian"=0,"linear"=1)
-    if(class(somgrid)!="somgrid") {
-        stop("'somgrid' is not of somgrid class")
-    }
-    if(!missing(weights)) {
-        if(length(weights)!=nrow(data)) {
-            stop("'weights' and 'data' have different dimensions")
-        }
-    } else {
-        weights <- rep(1,nrow(data))
-    }
-    if(missing(prototypes)) {
-        ## initialisation based on the value of init
-        init <- match.arg(init)
-        args <- list(...)
-        params <- c(list(data=data,somgrid=somgrid,weights=weights),args)
-        prototypes <- switch(init,
-                             "pca"=do.call("sominit.pca",params)$prototypes,
-                             "random"=do.call("sominit.random",params))
-    } else {
-        if(ncol(prototypes)!=ncol(data)) {
-            stop("'prototypes' and 'data' have different dimensions")
-        }
-        if(nrow(prototypes)!=somgrid$size) {
-            stop("'prototypes' and 'somgrid' are not compatible")
-        }
-    }
-    ## distances?
-    if(is.null(somgrid$dist)) {
-        somgrid$dist <- as.matrix(dist(somgrid$pts,method="Euclidean"),diag=0)
-    }
-    pre <- batchsom.lowlevel(somgrid,data,prototypes,theRule,radii,weights,
-                             maxiter,kernelType,normalised,cut,verbose)
-    pre$assignment <- assignment
-    pre$kernel <- kernel
-    pre$normalised <- normalised
-    pre$radii <- radii
-    if(keepdata) {
-        pre$data  <- data
-        pre$weights <- weights
-    }
-    pre
-}
-
-newbatchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
-                                weights,
-                                mode = c("stepwise","continuous"),
-                                min.radius, max.radius, steps,
-                                decrease = c("power", "linear"), max.iter,
-                                kernel = c("gaussian", "linear"), normalised,
-                                assignment = c("single", "heskes"),
-                                cut = 1e-07,
-                                verbose=FALSE,keepdata=TRUE,...) {
+                             weights,
+                             mode = c("continuous","stepwise"),
+                             min.radius, max.radius, steps,
+                             decrease = c("power", "linear"), max.iter,
+                             kernel = c("gaussian", "linear"), normalised,
+                             assignment = c("single", "heskes"),
+                             cut = 1e-07,
+                             verbose=FALSE,keepdata=TRUE,...) {
     if(class(somgrid)!="somgrid") {
         stop("'somgrid' is not of somgrid class")
     }
     the.call <- match.call()
-    the.call[[1]] <- as.name("batchsom.control")
-    control <- eval(the.call)
-    theRule <- switch(control$assignment,"single"=0,"heskes"=1)
-    kernelType <- switch(control$kernel,"gaussian"=0,"linear"=1)
+    if(verbose) {
+        print(the.call)
+    }
+    the.call[[1]] <- batchsom.control
+    control <- eval(the.call,envir = parent.frame())
+    control$assignment.int <- switch(control$assignment,"single"=0,"heskes"=1)
+    control$kernel.int <- switch(control$kernel,"gaussian"=0,"linear"=1)
     if(!missing(weights)) {
         if(length(weights)!=nrow(data)) {
             stop("'weights' and 'data' have different dimensions")
@@ -231,12 +177,10 @@ newbatchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
         somgrid$dist <- as.matrix(dist(somgrid$pts,method="Euclidean"),diag=0)
     }
     pre <- switch(control$mode,
-                  "stepwise"=batchsom.lowlevel(somgrid,data,prototypes,theRule,
-                  control$radii,weights,control$max.iter,kernelType,
-                  control$normalised,control$cut,verbose),
+                  "stepwise"=batchsom.lowlevel(somgrid,data,prototypes,weights,
+                  control,verbose),
                   "continuous"=batchsom.lowlevelcontinuous(somgrid,data,
-                  prototypes,theRule,control$radii,weights,kernelType,
-                  control$normalised,control$cut,verbose))
+                  prototypes,weights,control,verbose))
     pre$control <- control
     if(keepdata) {
         pre$data  <- data
@@ -245,9 +189,7 @@ newbatchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
     pre
 }
 
-batchsom.lowlevel <- function(somgrid,data,prototypes,
-                              assignment,radii,weights,maxiter,
-                              kernelType,normalised,cut,verbose) {
+batchsom.lowlevel <- function(somgrid,data,prototypes,weights,control,verbose) {
     result <- .C("batch_som_optim",
                  proto=as.double(prototypes),
                  as.integer(somgrid$size),
@@ -255,17 +197,17 @@ batchsom.lowlevel <- function(somgrid,data,prototypes,
                  as.integer(nrow(data)),
                  as.integer(ncol(data)),
                  as.double(weights),
-                 as.integer(assignment),
+                 as.integer(control$assignment.int),
                  as.double(somgrid$dist),
-                 as.double(radii),
-                 as.integer(length(radii)),
-                 as.integer(maxiter),
-                 as.integer(kernelType)[1],
-                 as.integer(normalised)[1],
-                 as.double(cut)[1],
+                 as.double(control$radii),
+                 as.integer(length(control$radii)),
+                 as.integer(control$max.iter),
+                 as.integer(control$kernel.int),
+                 as.integer(control$normalised),
+                 as.double(control$cut),
                  as.integer(verbose),
                  clusters=integer(nrow(data)),
-                 errors=as.double(rep(-1,1+length(radii)*maxiter)),
+                 errors=as.double(rep(-1,1+length(control$radii)*control$max.iter)),
                  PACKAGE="yasomi")
     prototypes <- matrix(result$proto,ncol=ncol(prototypes),
                          dimnames=list(NULL,dimnames(data)[[2]]))
@@ -277,9 +219,8 @@ batchsom.lowlevel <- function(somgrid,data,prototypes,
     res
 }
 
-batchsom.lowlevelcontinuous <- function(somgrid,data,prototypes,
-                                        assignment,radii,weights,
-                                        kernelType,normalised,cut,verbose) {
+batchsom.lowlevelcontinuous <- function(somgrid,data,prototypes,weights,
+                                        control,verbose) {
     result <- .C("batch_som_optim_continuous",
                  proto=as.double(prototypes),
                  as.integer(somgrid$size),
@@ -287,16 +228,16 @@ batchsom.lowlevelcontinuous <- function(somgrid,data,prototypes,
                  as.integer(nrow(data)),
                  as.integer(ncol(data)),
                  as.double(weights),
-                 as.integer(assignment),
+                 as.integer(control$assignment.int),
                  as.double(somgrid$dist),
-                 as.double(radii),
-                 as.integer(length(radii)),
-                 as.integer(kernelType)[1],
-                 as.integer(normalised)[1],
-                 as.double(cut)[1],
+                 as.double(control$radii),
+                 as.integer(length(control$radii)),
+                 as.integer(control$kernel.int),
+                 as.integer(control$normalised),
+                 as.double(control$cut),
                  as.integer(verbose),
                  clusters=integer(nrow(data)),
-                 errors=as.double(rep(-1,1+length(radii))),
+                 errors=as.double(rep(-1,1+length(control$radii))),
                  PACKAGE="yasomi")
     prototypes <- matrix(result$proto,ncol=ncol(prototypes),
                          dimnames=list(NULL,dimnames(data)[[2]]))
@@ -311,7 +252,7 @@ batchsom.lowlevelcontinuous <- function(somgrid,data,prototypes,
 
 colorCode <- function(data,nbcolor) {
     onedimgrid <- somgrid(xdim=nbcolor,ydim=1,topo="rectangular")
-    colorsom <- batchsom(data,onedimgrid,radii=somradii(onedimgrid,nb=20))
+    colorsom <- batchsom(data,onedimgrid,steps=20)
     colorsom$classif
 }
 
@@ -372,14 +313,15 @@ print.som <- function(x,...)
     cat("       grid: ",x$somgrid$topo," grid of size ",x$somgrid$xdim,"x",
         x$somgrid$ydim," with diameter ",x$somgrid$diam,"\n",sep="")
     cat("     kernel: ",x$kernel,
-        if(!x$normalised) {" not normalised"} else {" normalised"},"\n",sep="")
-    cat(" assignment:",x$assignment,"\n")
-    if(length(x$radii)<6) {
-        cat("      radii:",x$radii,"\n")
+        if(!x$control$normalised) {" not normalised"} else {" normalised"},"\n",sep="")
+    cat(" assignment:",x$control$assignment,"\n")
+    if(length(x$control$radii)<6) {
+        cat("      radii:",x$control$radii,"\n")
     } else {
-        cat("      radii:",length(x$radii),"values from",max(x$radii),
-            "down to",min(x$radii),"\n")
+        cat("      radii:",length(x$control$radii),"values from",max(x$control$radii),
+            "down to",min(x$control$radii),"\n")
     }
+    cat("  annealing:",x$control$mode,"\n")
     cat("\n")
     invisible(x)
 }
@@ -399,11 +341,12 @@ summary.som <- function(object,...)
     cat("       grid: ",object$somgrid$topo," grid of size ",
         object$somgrid$xdim,"x",object$somgrid$ydim," with diameter ",
         object$somgrid$diam,"\n",sep="")
-    cat("     kernel: ",object$kernel,
-        if(!object$normalised) {" not normalised"} else {" normalised"},
+    cat("     kernel: ",object$control$kernel,
+        if(!object$control$normalised) {" not normalised"} else {" normalised"},
         "\n",sep="")
-    cat(" assignment:",object$assignment,"\n")
-    cat("      radii:",object$radii,"\n")
+    cat(" assignment:",object$control$assignment,"\n")
+    cat("      radii:",object$control$radii,"\n")
+    cat("  annealing:",object$control$mode,"\n")
     invisible()
 }
 

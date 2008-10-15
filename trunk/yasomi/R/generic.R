@@ -22,7 +22,14 @@ sominit.random <- function(data,somgrid,method=c("prototypes","random","cluster"
     UseMethod("sominit.random")
 }
 
-batchsom <- function(data,somgrid,init,prototypes,...) {
+batchsom <- function(data,somgrid,init=c("pca","random"),prototypes,weights,
+                     mode = c("continuous","stepwise"),
+                     min.radius, max.radius, steps,
+                     decrease = c("power", "linear"), max.iter,
+                     kernel = c("gaussian", "linear"), normalised,
+                     assignment = c("single", "heskes"),
+                     cut = 1e-07,
+                     verbose=FALSE,keepdata=TRUE,...) {
     UseMethod("batchsom")
 }
 
@@ -36,7 +43,7 @@ as.kernelmatrix <- function(data,...) {
 ## in annealing.R
 
 batchsom.control <- function(data,somgrid,
-                             mode = c("stepwise","continuous"),
+                             mode = c("continuous","stepwise"),
                              min.radius, max.radius, steps,
                              decrease = c("power", "linear"), max.iter,
                              kernel = c("gaussian", "linear"),
