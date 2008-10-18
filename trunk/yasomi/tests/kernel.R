@@ -31,6 +31,7 @@ som <- batchsom(X,sg,prototypes=prototypes.init,verbose=TRUE,
 
 stopifnot(all.equal(error.kaskilagus(som),error.kaskilagus(ksom)))
 stopifnot(all.equal(error.quantisation(som),error.quantisation(ksom)))
+stopifnot(all.equal(som$errors,ksom$errors))
 stopifnot(all.equal(som$classif,ksom$classif))
 stopifnot(all.equal(som$prototypes,kprototypes.final,
                     check.attributes = FALSE, check.names = FALSE))

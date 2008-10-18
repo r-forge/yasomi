@@ -264,6 +264,7 @@ fastKernelsom.lowlevelcontinuous.R <-
 }
 
 kernelsombmu <- function(prototypes,K,weights) {
+###FIXME: rename and share with kmeans
     Kp <- tcrossprod(K,prototypes)
     pnorms <- double(nrow(prototypes))
     for(i in 1:length(pnorms)) {
@@ -424,28 +425,11 @@ batchsom.kernelmatrix <- function(data,somgrid,init=c("pca","random"),
 
 sominit.random.kernelmatrix <- function(data,somgrid,
                                         method=c("prototypes","random","cluster"),weights,...) {
-### FIXME: share this with relationalsom
     method <- match.arg(method)
-    nb.data <- nrow(data)
-    nb <- somgrid$size
-    if(method=="prototypes" || (method=="cluster" && nb>=nb.data)) {
-        protos <- matrix(0,ncol=nb.data,nrow=nb)
-        if(missing(weights) || is.null(weights)) {
-            protos[cbind(1:nb,sample(nb.data,size=nb,replace=nb>nb.data))] <- 1
-        } else {
-            protos[cbind(1:nb,sample(nb.data,size=nb,replace=nb>nb.data,prob=weights))] <- 1
-        }
-    } else if(method=="random") {
-        protos <- matrix(runif(nb.data*nb),ncol=nb.data,nrow=nb)
-        protos <- sweep(protos,1,rowSums(protos),"/")
-    } else {
-        ## nb <nb.data
-        clusters <- cut(sample(nb.data),nb,labels=FALSE,include.lowest=TRUE)
-        protos <- matrix(0,ncol=nb.data,nrow=nb)
-        protos[cbind(clusters,1:nb.data)] <- 1
-        protos <- sweep(protos,1,rowSums(protos),"/")
+    if(missing(weights)) {
+        weights <- NULL
     }
-    protos
+    convex.prototypes.random(data,somgrid$size,method,weights)
 }
 
 sominit.pca.kernelmatrix <- function(data, somgrid, ...) {

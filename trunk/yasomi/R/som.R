@@ -36,31 +36,10 @@ sominit.random.default <- function(data,somgrid,
                                    method=c("prototypes","random","cluster"),
                                    weights,...) {
     method <- match.arg(method)
-    data <- as.matrix(data)
-    nb.data <- nrow(data)
-    nb <- somgrid$size
-    if(method=="prototypes" || (method=="cluster" && nb>=nb.data)) {
-        if(missing(weights) || is.null(weights)) {
-            data[sample(nb.data,size=somgrid$size,replace=nb>nb.data),]
-        } else {
-            data[sample(nb.data,size=somgrid$size,replace=nb>nb.data,prob=weights),]
-        }
-    } else if(method=="random") {
-        result <- matrix(0,ncol=ncol(data),nrow=nb)
-        for(i in 1:ncol(data)) {
-            therange <- range(data[,i])
-            result[,i] <- runif(nb,min=therange[1],max=therange[2])
-        }
-        result
-    } else {
-        ## nb <nb.data
-        clusters <- cut(sample(nb.data),nb,labels=FALSE,include.lowest=TRUE)
-        result <- matrix(0,ncol=ncol(data),nrow=nb)
-        for(i in 1:nb) {
-            result[i,] <- colMeans(as.matrix(data[clusters==i,],ncol=ncol(data)))
-        }
-        result
+    if(missing(weights)) {
+        weights <- NULL
     }
+    prototypes.random(data,somgrid$size,method,weights)
 }
 
 bmu <- function(prototypes,data,weights) {

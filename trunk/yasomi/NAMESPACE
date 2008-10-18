@@ -6,7 +6,7 @@ importFrom(proxy,as.dist)
 export(somgrid,batchsom,colorCode,mapToUnit,grid2lines,componentPlane,hitMap)
 export(umatrix,error.kaskilagus,error.quantisation,som.tune,som.tunecontrol)
 export(prototype.distances,distance.grid,sominit.pca,sominit.random)
-export(as.kernelmatrix)
+export(as.kernelmatrix,batchkmeans)
 # somgrid S3 methods
 S3method(print,somgrid)
 S3method(summary,somgrid)
@@ -62,5 +62,10 @@ S3method(as.dist,sompdist)
 # somtune S3 method
 S3method(plot,somtune)
 S3method(print,somtune)
+# kmeans default S3 method
+S3method(batchkmeans,default)
+S3method(error.quantisation,batchkmeans)
+# kmeans kernel S3 method
+S3method(batchkmeans,kernelmatrix)
 # C code
 useDynLib(yasomi)

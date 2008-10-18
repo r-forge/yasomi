@@ -121,6 +121,8 @@ principal component analysis in the standard vector case (see
   \item{control}{a list containing all the parameters used to fit the SOM}
   \item{data}{the original data if the function is called with
     \code{keepdata = TRUE}}
+  \item{weights}{the weights of the data points if the function is called with
+    \code{keepdata = TRUE} and if the \code{weights} is given}
   The list will generally contain additional components specific to each
   implementation. The returned object will also generally have another
   class more specific than \code{"som"}. 
@@ -136,18 +138,5 @@ principal component analysis in the standard vector case (see
   parameters (such as the radii), \code{\link{umatrix}} and
   \code{\link{distance.grid}} for visual analysis of the distances
   between the prototypes.}
-\examples{
-data(iris)
-# scaling
-data <- scale(iris[1:4])
-
-# a small hexagonal grid
-sg <- somgrid(xdim=7,ydim=7,topo="hex")
-
-# fit the SOM
-som <- batchsom(data,sg)
-
-# and display the prototypes
-plot(som)
-}
+%\examples{}
 \keyword{cluster}

@@ -1,3 +1,44 @@
+2008-10-18  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/batchkmeans.default.Rd: new documentation for the default method
+
+	* man/batchkmeans.kenelmatrix.Rd: new documentation for the kernel version
+
+	* man/batchkmeans.Rd: new documentation for the generic method
+
+	* man/sominit.random.Rd: fixed a typo
+
+	* tests/kmeans.R: new integration test for kmeans
+
+	* tests/kernel.R: added a test
+
+	* NAMESPACE: exporting kernel kmeans method
+
+	* R/kmeans.R (weightedFastKernelKmeansbmu): new function for kmeans bmu
+	(fastKernelKmeansbmu): new function for kmeans bmu
+
+2008-10-17  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/relational.R (sominit.random.dist): use the new shared function with kmeans
+
+	* R/kernel.R (sominit.random.kernelmatrix): use the new shared function with kmeans
+
+	* R/kmeans.R (error.quantisation.batchkmeans): quantisation error for the kmeans
+	(batchkmeans.kernelmatrix): kernel kmeans
+	(convex.prototypes.random): new function for random generation of prototypes in relational and kernel methods
+
+2008-10-16  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/som.R (sominit.random.default): bulk of the code moved to prototypes.random
+
+	* R/kmeans.R (prototypes.random): new function used by sominit.random.default and batchkmeans.default
+
+	* NAMESPACE: new function
+
+	* R/generic.R (batchkmeans): new generic function for kmeans 
+
+	* R/kmeans.R (batchkmeans.default): new file: kmeans implementations
+
 2008-10-15  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
 
 	* R/slow-versions.R (batchsom.lowlevel.R): updated to reflect the new calling interface in the fast implementations

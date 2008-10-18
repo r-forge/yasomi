@@ -81,7 +81,7 @@ some data via an implicit mapping to a kernel induced feature space.
   \item{\dots}{additional arguments to be passed to the initialisation method}
 }
 \details{
-  This function implements the Kernel Self-Organising Map algorithm
+  This methods implements the Kernel Self-Organising Map algorithm
   in the original data are implicitly mapped to a kernel induced feature
   space. If the initial value of
 \code{prototypes} is not provided, it is obtained by a call to

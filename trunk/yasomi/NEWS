@@ -3,15 +3,25 @@ Changes in yasomi 0.3
     o  	The main novelty provided by this version is the support of kernel
         self organising map.
 
-    o   High level consistency tests are now included in the tests directory.
+    o  	In addition, yasomi now provides variants of the K-means clustering 
+        algorithm.
 
-    o   Minor Bug fixes: missing parameter in some circumstances in the
-        batchsom functions.
+    o   A classical continuous annealing mode has been added for all variants 
+        of the SOM. It is now the default annealing mode.
+
+    o   The interface to batchsom has been modified once again to cope with
+    	the possility of choosing between two annealing modes and to improve
+    	the ease of use. 
+
+    o   High level consistency tests are now included in the tests directory.
 
     o   Major Bug fixes: 
     	1) in the relational SOM, when an inner loop did not reach a stable
            state, the neighborhood values were not updated. This induced a
     	   different annealing scheme as the one requested.
+
+    o   Minor Bug fixes: missing parameter in some circumstances in the
+        batchsom functions.
 
 
 Changes in yasomi 0.2

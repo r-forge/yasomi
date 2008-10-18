@@ -36,7 +36,7 @@ sominit.random(data, somgrid, method=c("prototypes","random","cluster"),\dots)
   \item{\code{"random"}}{the \code{"random"} method generate prototypes
     randomly and uniformly in the hypercube spanned by the data for
     standard Euclidean data. For dissimilarity data or for the Kernel
-    SOM, the method generates prototypes via random convex combinations
+    data, the method generates prototypes via random convex combinations
     of the data points. In all cases, the optional
   \code{weights} are not taken into account by this method.}
   \item{\code{"cluster"}}{the clustering initialisation method build a

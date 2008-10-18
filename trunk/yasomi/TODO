@@ -1,16 +1,16 @@
 Tentative for 0.3:
-  - Heskes' criterion for the relational SOM
-  - kernel SOM
-  - continuous annealing mode (in addition to the stepwise version implemented here)
+  - Heskes' criterion for the relational/kernel SOM
   - better plot.som
   - smarter and cleaner som.tune (one loop ;-)
   - more documentation
-  - include some tests in the distributed package
+  - include more tests in the distributed package
+  - k means
+  - neural gas
 
 BUGS or problems:
 - support of weights must be included everywhere needed, not only batchsom:
   - in error.*
-  - in sominit.pca.*
+  - in sominit.*
   - in colorCode?
   - possibly in predict.* (for the error calculation)
 - fix the border "problem" in plot.somgrid
@@ -27,7 +27,7 @@ BUGS or problems:
 - batchsom
   - handling of missing values
   - handling of factors
-  - detect oscillatory behavior?
+  - detect oscillatory behavior in C code?
   - save training information 
 - hitMap
   - should perhaps return a value
@@ -50,9 +50,15 @@ BUGS or problems:
 
 + relational SOM
   - vignette
+  - test for positivity in the pca initialisation
 
 + kernel SOM
-  - positivity checking
+  - positivity checking (partly done in the pca initialisation)
+  - code sharing with relational SOM
+
++ kmeans
+  - optimized implementation
+  - code sharing with som
 
 + graphics
   - fix plot.somgrid to use a interface close to filled.contour for specifying the color map
@@ -89,6 +95,7 @@ BUGS or problems:
   - add original references in graphical methods (in addition to Vesanto's thesis) 
   - add also references in most of the methods
   - add links to online references
+  - add documentation for weights in the return objects
   - status (ordered as in NAMESPACE):
     - somgrid: ok
     - batchsom: ok
@@ -157,6 +164,7 @@ Done in version 0.3:
 - kernel SOM
 - weighted observations
 - some integration tests
+- continuous annealing
 
 Done in version 0.2:
 - relational SOM (first version with optimal algorithm but no implementation tricks) :

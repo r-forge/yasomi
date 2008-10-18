@@ -117,7 +117,7 @@ batchsom.lowlevel.R <- function(somgrid,data,prototypes,weights,control,
                 bmus <- bmu.heskes.R(prototypes,data,nv,weights)
             }
             nclassif <- bmus$clusters
-            noChange = identical(classif,nclassif)
+            noChange <- identical(classif,nclassif)
             classif <- nclassif
             error <- bmus$error
             if(verbose) {

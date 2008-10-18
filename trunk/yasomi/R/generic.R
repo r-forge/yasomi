@@ -12,7 +12,7 @@ protoDist <- function(som,i,j,k,l,check) {
     UseMethod("protoDist")
 }
 
-## in som.R (slow-versions.R) and relational.R (slow-relational.R)
+## in som.R (slow-versions.R), relational.R (slow-relational.R) and kernel.R
 
 sominit.pca <- function(data,somgrid,...) {
     UseMethod("sominit.pca")
@@ -51,4 +51,13 @@ batchsom.control <- function(data,somgrid,
                              assignment = c("single", "heskes"),
                              cut = 1e-07,...) {
     UseMethod("batchsom.control")
+}
+
+## in kmeans.R
+
+batchkmeans <- function(data,ncenters,
+                        init=c("prototypes","random","cluster"),
+                        prototypes,weights,max.iter,
+                        verbose=FALSE,keepdata=TRUE,...) {
+    UseMethod("batchkmeans")
 }
