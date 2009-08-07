@@ -62,7 +62,6 @@ parameter:
   \code{weights} are not taken into account for balancing the clusters.}
     }
   }
-}
 \value{
   An object of class \code{"batchkmeans"}, a list with components
   including

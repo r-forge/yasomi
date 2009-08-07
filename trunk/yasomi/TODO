@@ -1,16 +1,21 @@
 Tentative for 0.3:
+  - revise weights handling (uniform)
   - Heskes' criterion for the relational/kernel SOM
-  - better plot.som
+  - unified kernel and relational SOM
   - smarter and cleaner som.tune (one loop ;-)
   - more documentation
-  - include more tests in the distributed package
+  - include more tests in the distributed package (with some unit tests)
   - k means
   - neural gas
+  - naming convention 
+  - review of graphical parameters
+  - use colorspace package
+  - update demo
 
 BUGS or problems:
 - support of weights must be included everywhere needed, not only batchsom:
   - in error.*
-  - in sominit.*
+  - in sominit.pca.*
   - in colorCode?
   - possibly in predict.* (for the error calculation)
 - fix the border "problem" in plot.somgrid
@@ -31,6 +36,7 @@ BUGS or problems:
   - save training information 
 - hitMap
   - should perhaps return a value
+  - display options: class size, within class variance, maybe something else...
 - tests of parameters
 - add new quality measures
 - torus like topology?
@@ -43,7 +49,6 @@ BUGS or problems:
   - take weights into account during initialisation (see FIXME in the code)
   - weighting for predict? 
   - weighting for new data in error.*?
-  - should we take into account weighting more extensively in sominit.random to mimic what would happen when using replicated data points?
 
 + initialisation methods
   - add randomness in PCA initialisation
@@ -59,23 +64,25 @@ BUGS or problems:
 + kmeans
   - optimized implementation
   - code sharing with som
+  - relational version
 
 + graphics
+  - revise margins and initial plot (plot.new etc.)
   - fix plot.somgrid to use a interface close to filled.contour for specifying the color map
   - use nice color map when adapted packages are available (e.g. color brewer)
     - bidule=suppressWarnings(suppressPackageStartupMessages(require("something")))
   - more options for distance.grid (mean, full but also neighbors and partial)
   - 3D umatrix (rgl)
   - add key to plot.somgrid without layout or a similar solution (?)
-  - better version of plot.som:
-    - use star glyh for low dimension
-    - allow parallel coordinates
-    - maybe bargraph for factors
   - add options to colorCode
   - color mapping in CIE Lab space (cf colorspace package)
   - variation over the u-matrix principle
   - smooth componentMap
-  - fix the legend in plot.somtune
+  - plot.somtune:
+    - test the solution, look in R graphics for a less hacky solution
+    - export more barplot parameters
+  - identify.somgrid:
+    - parameters
   - grid2lines might become a generic function, applicable to somgrid and to som
 
 + simple functions to improve
@@ -87,8 +94,7 @@ BUGS or problems:
 
 + documentation
   - write vignettes:
-    - general introduction :
-      - add a standard u matrix
+    - general introduction 
     - dissimilarity som
     - graphical methods
   - add a package doc
@@ -117,9 +123,10 @@ BUGS or problems:
     - print.somgrid: ok
     - summary.somgrid: ok
     - plot.somgrid: ok
+    + identify.somgrid: add an example?
     - print.som: ok
     - summary.som: ok
-    + plot.som: to be rewritten (with the method)
+    - plot.som: ok
     + error.quantisation.som: missing, but should that be exported?
     - print.somnum: ok
     - summary.somnum: ok
@@ -165,6 +172,10 @@ Done in version 0.3:
 - weighted observations
 - some integration tests
 - continuous annealing
+- better plot.som for prototypes/data display
+- better plot.somtune
+- basic interactivity with identify.somgrid
+- improved introduction vignette
 
 Done in version 0.2:
 - relational SOM (first version with optimal algorithm but no implementation tricks) :

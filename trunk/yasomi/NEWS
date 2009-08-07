@@ -6,12 +6,20 @@ Changes in yasomi 0.3
     o  	In addition, yasomi now provides variants of the K-means clustering 
         algorithm.
 
+    o  	The visual representation of a fitted SOM has been improved by the 
+        inclusion of a parallel coordinate like display, a barplot display
+        and a data mode which enables representation of multiple superposed 
+        glyphs per grid cell. 
+
     o   A classical continuous annealing mode has been added for all variants 
         of the SOM. It is now the default annealing mode.
 
     o   The interface to batchsom has been modified once again to cope with
-    	the possility of choosing between two annealing modes and to improve
-    	the ease of use. 
+        the possility of choosing between two annealing modes and to improve
+        the ease of use. 
+
+    o   Graphical default parameters are now explicitely given in function 
+        interfaces rather than silently provided when needed.
 
     o   High level consistency tests are now included in the tests directory.
 

@@ -3,7 +3,7 @@ Version: 0.2
 License: GPL-2
 Title: Yet Another Self Organising Map Implementation
 Depends: e1071, proxy
-Suggests: MASS
+Suggests: MASS, colorspace, RUnit
 Author: Fabrice Rossi <Fabrice.Rossi@apiacoa.org>
 Maintainer: Fabrice Rossi <Fabrice.Rossi@apiacoa.org>
 Description: Yasomi provides an implementation of several variants of the Self

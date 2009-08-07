@@ -54,9 +54,12 @@ KX <- as.kernelmatrix(tcrossprod(X))
 
 ksom <- batchsom(KX,sg,prototypes=rprototypes.init,weights=weights,verbose=TRUE,
                  max.radius=radius.max,steps=nb.radii,mode=mode)
+
+kprototypes.final <- ksom$prototypes%*%X
+
 stopifnot(all.equal(error.kaskilagus(som),error.kaskilagus(ksom)))
 stopifnot(all.equal(error.quantisation(som),error.quantisation(ksom)))
 stopifnot(all.equal(som$errors,ksom$errors))
 stopifnot(all.equal(som$classif,ksom$classif))
-stopifnot(all.equal(som$prototypes,rprototypes.final,
+stopifnot(all.equal(som$prototypes,kprototypes.final,
                     check.attributes = FALSE, check.names = FALSE))

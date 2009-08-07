@@ -7,14 +7,14 @@ The prior structure is represented by a regular grid of hexagons or
 squares.  The surface of each element is proportional to the square root of the number of observations assigned to the corresponding unit in the SOM.
 }
 \usage{
-hitMap(som,border=NA,with.cells=TRUE, \dots)
+hitMap(som,border=NA,with.grid=TRUE, \dots)
 }
 \arguments{
   \item{som}{an object of class \code{"som"}}
   \item{border}{the color to draw the border.  The default, \code{NA},
     omits border. Use \code{border = NULL} to use \code{par("fg")}. See
     also \code{\link{polygon}} and \code{\link{rect}}}
-  \item{with.cells}{logical. If \code{TRUE}, the hit map includes
+  \item{with.grid}{logical. If \code{TRUE}, the hit map includes
     two cells for each unit: an enclosing cell of standard size (see
     \code{\link{plot.somgrid}}) and an internal cell whose surface
     size encodes the cluster size. If \code{FALSE}, the internal cell

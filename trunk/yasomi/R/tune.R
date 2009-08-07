@@ -151,36 +151,65 @@ som.tune <- function(data,somgrid,control=som.tunecontrol(somgrid),weights,
     res
 }
 
-plot.somtune <- function(x,relative=TRUE,...) {
-    args <- list(...)
+plot.somtune <- function(x,relative=TRUE,sqrt.quant=!x$isquant,best.color="red",xlab,ylab,yaxs,legend.text,...) {
     if(length(x$dimensions)==1) {
-        if(is.null(args$xlab)) {
-            args$xlab <- x$dimensions[1]
+        if(missing(xlab)) {
+            xlab <- x$dimensions[1]
         }
-        if(is.null(args$ylab)) {
+        if(missing(ylab)) {
             if(x$isquant) {
-                args$ylab <- "Quantisation error"
+                if(sqrt.quant) {
+                    ylab <- "Square root of quantisation error"
+                } else {
+                    ylab <- "Quantisation error"
+                }
             } else {
-                args$ylab <- "Error measures"
+                ylab <- "Error measures"
             }
         }
-        if(is.null(args$yaxs)) {
-            args$yaxs <- "r"
+        if(missing(yaxs)) {
+            yaxs <- "r"
         }
         if(x$isquant) {
-            values <- x$quantisation
+            xlim <- c(0.5,1.2*length(x$quantisation)+0.5)
+            if(sqrt.quant) {
+                values <- sqrt(x$quantisation)
+            } else {
+                values <- x$quantisation
+            }
+            beside <- FALSE
         } else {
-            values <- rbind(x$quantisation,x$errors)
-            args$beside <- TRUE
-            if(is.null(args$legend.text)) {
-                args$legend.text <- c("Quantisation","Error")
+            xlim <- c(0.5,3*length(x$quantisation)+0.5)
+            if(sqrt.quant) {
+                values <- rbind(sqrt(x$quantisation),x$errors)
+            } else {
+                values <- rbind(x$quantisation,x$errors)
+            }
+            beside <- TRUE
+            if(missing(legend.text)) {
+                if(sqrt.quant) {
+                    legend.text <- c("Sqrt quantisation","Error")
+                } else {
+                    legend.text <- c("Quantisation","Error")
+                }
             }
         }
+        ylim <- c(0,max(values))
+        offset <- 0
         if(relative) {
             baseline <- 0.9*min(values)
             values <- values-baseline
-            args$offset <- baseline
+            offset <- baseline
+            ylim[1] <- baseline
         }
+        border <- rep(par("fg"),length(values))
+        if(!is.na(best.color)) {
+            if(x$isquant) {
+                border[x$best.index] <- best.color
+            } else {
+                border[2*x$best.index] <- best.color
+            }
+        } 
         config.names <- switch(x$dimensions[1],
                                "Initialisation method"=x$init,
                                "Initialisation"=1:length(x$quantisation),
@@ -188,8 +217,14 @@ plot.somtune <- function(x,relative=TRUE,...) {
                                "Initial radius"=round(x$radii,digits=2),
                                "Annealing method"=x$annealing,
                                "Kernel"=x$kernel)
-        do.call("barplot",
-                c(list(height=values,names.arg=config.names,axis.lty=1),args))
+        plot.new()
+        if(!x$isquant) {
+            the.range <- par()$"pin"[2]
+            the.height <- 6*strheight(legend.text,units="inches")[1]
+            ylim[2] <- ylim[2]+1.08*ylim[2]*the.height/the.range
+        }
+        plot.window(xlim=xlim,ylim=ylim,yaxs=yaxs)
+        barplot(height=values,names.arg=config.names,axis.lty=1,add=TRUE,xlab=xlab,ylab=ylab,legend.text=legend.text,beside=beside,offset=offset,border=border)
     } else {
         stop("cannot plot an object of class 'somtune' with more than one dimension")
     }

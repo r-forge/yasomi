@@ -14,7 +14,8 @@ relational.sqrt <- function(val,with.warning=TRUE) {
 }
 
 sominit.random.dist <- function(data,somgrid,
-                                method=c("prototypes","random","cluster"),weights,...) {
+                                method=c("prototypes","random","cluster"),
+                                weights,...) {
     method <- match.arg(method)
     if(missing(weights)) {
         weights <- NULL
@@ -28,18 +29,28 @@ double.centering <- function(D) {
     sweep(sweep(D,1,D.rowmean,"-"),2,D.rowmean,"-")+D.mean
 }
 
+weighted.double.centering <- function(D,weights) {
+    D.rowmean <- apply(sweep(D,1,weights,"*"),2,sum)/sum(weights)
+    D.mean <- sum(weights*D.rowmean)/sum(weights)
+    sweep(sweep(D,1,D.rowmean,"-"),2,D.rowmean,"-")+D.mean
+}
+
 normsFromDist <- function(D) {
     D.rowmean <- rowMeans(D)
     D.mean <- mean(D.rowmean)
     -0.5*(diag(D)+D.mean-2*D.rowmean)
 }
 
-sominit.pca.dist <- function(data, somgrid, ...) {
+sominit.pca.dist <- function(data, somgrid, weights, ...) {
 ### FIXME: data weights support
     D <- as.matrix(data^2,diag=0)
     ## we do something very close to MDS and kernel PCA
     ## first double centering
-    D.c <- -0.5*double.centering(D)
+    if(missing(weights) || is.null(weights)) {
+        D.c <- -0.5*double.centering(D)
+    } else {
+        D.c <- -0.5*weighted.double.centering(D,weights)
+    }
     ## then eigenanalysis
     D.eigen <- eigen(D.c,symmetric=T)
     ## normalize (positive eigen values only)

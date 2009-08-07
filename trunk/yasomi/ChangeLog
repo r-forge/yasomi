@@ -1,3 +1,91 @@
+2009-08-04  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/som.R (batchsom.default): keep weight missing is they are
+
+	* man/sominit.pca.default.Rd: updated documentation
+
+2009-08-03  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/som.R (sominit.pca.default): first implementation of the weighted version of the PCA. Based on princomp, to be revised. 
+
+	* inst/doc/kernel.Rnw: started to work on this vignette
+
+	* R/kmeans.R (convex.prototypes.random): the "cluster" method takes now into account the weights
+
+	* tests/weights.R: fixed a bug in the kernel som test
+
+	* R/kmeans.R (prototypes.random): the "cluster" method takes now into account the weights
+
+	* man/sominit.random.Rd: modified to reflect the new rule for weighting values in random convex combinations. 
+
+	* R/kmeans.R (convex.prototypes.random): the "random" method takes now into account the weights
+
+2009-08-01  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/identify.somgrid.Rd: documentation of the new identify function
+
+	* tests/unit.R: new file that lauches unit tests
+
+	* tests/unit/runitsomgrid.R (testGridSizes): new file with one simple unit test for somgrid
+
+	* DESCRIPTION (Suggests): added RUnit for elementary unit testing
+
+2009-07-31  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/plot.som.Rd: updated documentation
+
+	* inst/doc/introduction.Rnw: added more discussion and some figures
+
+	* R/graphics.R (plot.som): continued the implementation of the data mode
+
+	* R/utils.R (flex.scale.list): new function for scaling lists returned by mapToUnit
+	(to.matrix): new function to convert lists returned by mapToUnit to matrices
+
+2009-07-30  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/graphics.R (plot.som): started the implementation of the data mode
+
+	* DESCRIPTION (Suggests): colorspace is used in the vignettes
+
+	* inst/doc/introduction.Rnw: added hierarchical clustering of the 
+
+	* R/graphics.R (hitMap): use with.grid instead of with.cells for consistency
+
+	* man/hitMap.Rd: fixed to use the new parameter name
+
+	* man/plot.somtune.Rd: updated to reflect exported parameters
+
+	* R/tune.R (plot.somtune): make important parameters apparent, discared others
+
+2009-07-28  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/tune.R (plot.somtune): added a sqrt option for quantisation, fixed legend position (in a quite hacky way)
+
+2009-07-26  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* NAMESPACE: exporting identify.somgrid
+
+	* R/grid.R (identify.somgrid): new function for selecting cells in a som grid display
+
+2009-07-25  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* TODO: updated status
+
+	* R/utils.R (flex.scale): new scaling function
+
+	* NEWS: added a description of the new plot.som
+
+	* R/graphics.R (plot.som): added a barplot type for qualitative variable display
+
+	* R/utils.R: new file with general purpose utilities
+	(split.on.prefix): new function for parameters manipulation
+
+2009-07-21  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* R/grid.R (plot.somgrid): added support for type="n" to set up the scales with no printing
+
+	* R/graphics.R (plot.som): basic implementation of a parallel coordinate display of the prototypes of the SOM. Removed the automatic call to mapFactorToUnit.
+
 2008-10-18  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
 
 	* man/batchkmeans.default.Rd: new documentation for the default method

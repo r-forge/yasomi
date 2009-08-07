@@ -53,12 +53,12 @@ componentPlane <- function(som,dim=1,...) {
     do.call("plot",c(list(x=som$somgrid,colorValues=som$prototypes[,dim],border=NA),args))
 }
 
-hitMap <- function(som,border=NA,with.cells=TRUE,...) {
+hitMap <- function(som,border=NA,with.grid=TRUE,...) {
     args <- list(...)
     if(is.null(args$col)) {
         args$col <- "red"
     }
-    if(with.cells) {
+    if(with.grid) {
         add <- !is.null(args$add) && args$add
         plot(som$somgrid,add=add)
         args$add <- TRUE
@@ -79,20 +79,103 @@ umatrix <- function(som,...) {
     invisible(pdist)
 }
 
-## very basic version
-plot.som <- function(x,y,...) {
+plot.som <- function(x,y,mode=c("prototype","data"),type=c("parallel","stars","barplot"),with.grid=FALSE,barplot.align=c("bottom","center"),global.scale=FALSE,...) {
+    mode <- match.arg(mode)
+    type <- match.arg(type)
+    barplot.align <- match.arg(barplot.align)
+    ## prepare optional arguments
+    args <- list(...)
+    grid.params <- split.on.prefix("grid",args)
+    omar <- par()$mar
+    on.exit(par(mar=omar))
+    plane.mar <- c(0.5,0.5,4,0.5)
+    if(is.null(args$main) | identical(args$main,"")) {
+        plane.mar[3] <- 0.5
+    }
+    par(mar=plane.mar)
+    if(x$somgrid$topo=="rectangular") {
+        the.width <- 0.40
+        the.height <- 0.45
+    } else {
+        the.width <- 0.4
+        the.height <- 0.33
+    }
+    the.levels <- NULL
     if(missing(y)) {
         if(!inherits(x,"somnum")) {
             stop("'x' is not a standard numerical SOM")
         }
-        stars(x$prototypes,locations=x$somgrid$pts,len=0.5,radius=F,...)
-    } else {
-        if(is.factor(y)) {
-            ymat <- mapFactorToUnit(x,y)
-            stars(ymat,locations=x$somgrid$pts,len=0.5,draw.segments=T,col.segments=rainbow(ncol(ymat)),...)
+        if(mode=="prototype") {
+            y <- x$prototypes
+            classif <- 1:nrow(x$prototypes)
         } else {
-            stars(y,locations=x$somgrid$pts,len=0.5,...)
+            if(is.null(x$data)) {
+                stop("cannot display data without saved data")
+            }
+            y <- x$data
+            classif <- x$classif
+        }
+    } else {
+        if(mode=="prototype") {
+            if(nrow(y) != x$somgrid$size) {
+                stop("'y' has not the same dimension has 'x$somgrid'")
+            }
+        } else {
+            if(!is.list(y)) {
+                stop("'y' must be a list when mode='data'")
+            }
+            if(length(y) !=  x$somgrid$size) {
+                stop("'y' has not the same length has 'x$somgrid'")
+            }
+            data.e <- to.matrix(y)
+            y <- data.e$m
+            classif <- data.e$classif
+            the.levels <- data.e$levels
         }
     }
+    if(with.grid) {
+        if(is.null(grid.params$with.prefix$border)) {
+            grid.params$with.prefix$border="gray"
+        }
+        do.call("plot",c(list(x=x$somgrid),grid.params$with.prefix))
+    } else {
+        if(length(grid.params$with.prefix)>0) {
+            warning("grid.* arguments are discarded")
+        }
+        plot(x$somgrid,type="n")
+    }
+    if(type=="stars") {
+        if(is.null(grid.params$others$lwd)) {
+            grid.params$others$lwd=1
+        }
+        y.scaled <- flex.scale(y,c(0,0.5),global.scale)
+        do.call("stars",c(list(x=y.scaled,locations=x$somgrid$pts[classif,],radius=F,add=T,scale=F),grid.params$others))
+    } else if(type=="parallel") { 
+        y.scaled <- flex.scale(y,c(-the.height,the.height),global.scale)
+        base.x <- seq(from=-the.width,to=the.width,length.out=ncol(y))
+        x.dec <- rep(c(base.x,NA),times=nrow(y))
+        y.dec <-
+            as.vector(t(cbind(y.scaled,rep(NA,times=nrow(y)))))
+        x.base <- rep(x$somgrid$pts[classif,1],each=ncol(y)+1)
+        y.base <- rep(x$somgrid$pts[classif,2],each=ncol(y)+1)
+        do.call("lines",c(list(x=x.dec+x.base,y=y.dec+y.base),grid.params$others))
+    } else {
+        if(mode=="data" && is.null(the.levels)) {
+            stop("'barplot' is not supported in mode='data' for numerical data")
+        }
+        y.scaled <- flex.scale(y,c(-the.height,the.height),global.scale)
+        bar.width <- 0.9*2*the.width/ncol(y)
+        bar.space <- 0.1*2*the.width/(ncol(y)-1)
+        base.x <-
+            seq(from=-the.width,by=(bar.width+bar.space),length.out=ncol(y))
+        x.left <- rep(base.x,times=nrow(y))+rep(x$somgrid$pts[,1],each=ncol(y))
+        y.bottom <- rep(x$somgrid$pts[,2],each=ncol(y))
+        if(barplot.align=="bottom") {
+            y.bottom <- y.bottom - the.height
+            y.scaled <- y.scaled + the.height
+        }
+        rect(x.left,y.bottom,x.left+bar.width,y.bottom+as.vector(t(y.scaled)),col=rainbow(ncol(y)))
+    } 
 }
+
 

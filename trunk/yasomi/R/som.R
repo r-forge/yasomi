@@ -1,7 +1,15 @@
-sominit.pca.default <- function(data,somgrid,...) {
+sominit.pca.default <- function(data,somgrid,weights,with.princomp=FALSE,...) {
 ### FIXME: data weights support
     ## we don't scale the data
-    data.pca <- prcomp(data)
+    if(missing(weights) || is.null(weights)) {
+        if(with.princomp) {
+            data.pca <- princomp(covmat=cov.wt(data))
+        } else {
+            data.pca <- prcomp(data)
+        }
+    } else {
+        data.pca <- princomp(covmat=cov.wt(data,weights))
+    }
     ## the more detailled axis is assigned to the first eigenvector
     if (somgrid$xdim>=somgrid$ydim) {
         x.ev <- 1
@@ -26,7 +34,11 @@ sominit.pca.default <- function(data,somgrid,...) {
         base[,1] <- base[,1]+rep(c(0,2*data.pca$sdev[x.ev]/xspan),each=somgrid$xdim,length.out=nrow(base))
     }
     ## map back the grid to the original space
-    mapped <- tcrossprod(base,data.pca$rotation[,c(x.ev,y.ev)])
+    if(inherits(data.pca,"prcomp")) {
+        mapped <- tcrossprod(base,data.pca$rotation[,c(x.ev,y.ev)])
+    } else {
+        mapped <- tcrossprod(base,data.pca$loadings[,c(x.ev,y.ev)])
+    }
     ## decentering
     prototypes <- sweep(mapped,2,data.pca$center,"+")
     list(prototypes=prototypes,data.pca=data.pca)
@@ -133,7 +145,8 @@ batchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
             stop("'weights' and 'data' have different dimensions")
         }
     } else {
-        weights <- rep(1,nrow(data))
+        ## keep weights to NULL for now to avoid princomp initialization
+        weights <- NULL
     }
     if(missing(prototypes)) {
         ## initialisation based on the value of init
@@ -150,6 +163,9 @@ batchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
         if(nrow(prototypes)!=somgrid$size) {
             stop("'prototypes' and 'somgrid' are not compatible")
         }
+    }
+    if(is.null(weights)) {
+        weights <- rep(1,nrow(data))
     }
     ## distances?
     if(is.null(somgrid$dist)) {

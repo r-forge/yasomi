@@ -10,6 +10,7 @@ prototypes.random <- function(data,nb,method=c("prototypes","random","cluster"),
             data[sample(nb.data,size=nb,replace=nb>nb.data,prob=weights),]
         }
     } else if(method=="random") {
+        ## weights do not need to be taken into account here
         result <- matrix(0,ncol=ncol(data),nrow=nb)
         for(i in 1:ncol(data)) {
             therange <- range(data[,i])
@@ -18,10 +19,21 @@ prototypes.random <- function(data,nb,method=c("prototypes","random","cluster"),
         result
     } else {
         ## nb <nb.data
-        clusters <- cut(sample(nb.data),nb,labels=FALSE,include.lowest=TRUE)
         result <- matrix(0,ncol=ncol(data),nrow=nb)
-        for(i in 1:nb) {
-            result[i,] <- colMeans(as.matrix(data[clusters==i,],ncol=ncol(data)))
+        if(missing(weights) || is.null(weights)) {
+            clusters <- cut(sample(nb.data),nb,labels=FALSE,include.lowest=TRUE)
+            for(i in 1:nb) {
+                result[i,] <- colMeans(as.matrix(data[clusters==i,],ncol=ncol(data)))
+            }
+        } else {
+            totalWeight <- sum(weights)
+            subsets <- sample(nb.data)
+            breaks <- seq(from=0,to=totalWeight,length.out=nb+1)
+            sums <- cumsum(weights[subsets])
+            for(i in 1:nb) {
+                the.subset <- subsets[sums>breaks[i] & sums<=breaks[i+1]]
+                result[i,] <- apply(sweep(matrix(data[the.subset,],ncol=ncol(data)),1,weights[the.subset],"*"),2,sum)/sum(weights[the.subset])
+            }
         }
         result
     }
@@ -107,14 +119,30 @@ convex.prototypes.random <- function(data,nb,
             protos[cbind(1:nb,sample(nb.data,size=nb,replace=nb>nb.data,prob=weights))] <- 1
         }
     } else if(method=="random") {
-        protos <- matrix(runif(nb.data*nb),ncol=nb.data,nrow=nb)
+        if(missing(weights) || is.null(weights)) {
+            protos <- matrix(runif(nb.data*nb),ncol=nb.data,nrow=nb)
+        } else {
+            protos <- matrix(runif(nb.data*nb,max=rep(weights,each=nb)),ncol=nb.data,nrow=nb)
+        }
         protos <- sweep(protos,1,rowSums(protos),"/")
     } else {
         ## nb <nb.data
-        clusters <- cut(sample(nb.data),nb,labels=FALSE,include.lowest=TRUE)
         protos <- matrix(0,ncol=nb.data,nrow=nb)
-        protos[cbind(clusters,1:nb.data)] <- 1
-        protos <- sweep(protos,1,rowSums(protos),"/")
+        if(missing(weights) || is.null(weights)) {
+            clusters <- cut(sample(nb.data),nb,labels=FALSE,include.lowest=TRUE)
+            protos[cbind(clusters,1:nb.data)] <- 1
+            protos <- sweep(protos,1,rowSums(protos),"/")
+        } else {
+            totalWeight <- sum(weights)
+            subsets <- sample(nb.data)
+            breaks <- seq(from=0,to=totalWeight,length.out=nb+1)
+            sums <- cumsum(weights[subsets])
+            for(i in 1:nb) {
+                the.subset <- subsets[sums>breaks[i] & sums<=breaks[i+1]]
+                protos[i,the.subset] <- weights[the.subset]
+            }
+            protos <- sweep(protos,1,rowSums(protos),"/")
+        }
     }
     protos
 }

@@ -37,12 +37,20 @@ sominit.random(data, somgrid, method=c("prototypes","random","cluster"),\dots)
     randomly and uniformly in the hypercube spanned by the data for
     standard Euclidean data. For dissimilarity data or for the Kernel
     data, the method generates prototypes via random convex combinations
-    of the data points. In all cases, the optional
-  \code{weights} are not taken into account by this method.}
+    of the data points. In the Euclidean case, the optional
+  \code{weights} are not taken into account as they do
+  not modify the definition of the span of the data. In the
+  dissimilarity/kernel case, \code{weights} are used to define the prior
+  importance of each observation in the random convex conbinations: if
+  the first observation has weight 2 while the second has weight 1, then
+  in average, the coefficient of the first observation in random convex
+  combinations will be twice the one of the second observation. 
+}
   \item{\code{"cluster"}}{the clustering initialisation method build a
     random partition the data into balanced clusters and uses as initial
   prototypes the centre of mass of those clusters. The optional
-  \code{weights} are not taken into account for balancing the clusters.}
+  \code{weights} are taken into account for balancing the clusters: the
+  algorithm produces random clusters with approximate identical total weights.}
     }
   }
 \value{

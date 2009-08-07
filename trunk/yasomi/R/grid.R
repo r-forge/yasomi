@@ -116,6 +116,7 @@ plot.somgrid <- function(x,col=NA,size=NA,add=FALSE,border=NULL,
             size=NA
         }
     }
+    
     if(x$topo=="rectangular") {
         if(identical(size,NA)) {
             basesize <- 0.5
@@ -128,10 +129,17 @@ plot.somgrid <- function(x,col=NA,size=NA,add=FALSE,border=NULL,
         ybottom <- (x$pts[,2]-basesize)[filter]
         ytop <- (x$pts[,2]+basesize)[filter]
         if(!add) {
-            plot(NA,type="n",xlim=range(xleft,xright),
-                 ylim=range(ybottom,ytop),xlab="",ylab="",axes=FALSE,...)
+            plot.args <- c(list(x=NA,xlim=range(xleft,xright),
+                                ylim=range(ybottom,ytop),xlab="",
+                                ylab="",axes=FALSE),args)
+            if(!identical(args$type,"n")) {
+                plot.args$type <- "n"
+            }
+            do.call("plot",plot.args)
         }
-        rect(xleft,ybottom,xright,ytop,col=col[filter],border=border[filter])
+        if(!identical(args$type,"n")) {
+            rect(xleft,ybottom,xright,ytop,col=col[filter],border=border[filter])
+        }
     } else {
         if(identical(size,NA)) {
             edge <- 1/sqrt(3)
@@ -151,9 +159,47 @@ plot.somgrid <- function(x,col=NA,size=NA,add=FALSE,border=NULL,
         xpos <- (rep(x$pts[,1],each=7)+hX)[rep(filter,each=7)]
         ypos <- (rep(x$pts[,2],each=7)+hY)[rep(filter,each=7)]
         if(!add) {
-            plot(NA,type="n",xlim=range(xpos,na.rm=TRUE),ylim=range(ypos,na.rm=TRUE),xlab="",ylab="",axes=FALSE,...)
+            plot.args <- c(list(x=NA,xlim=range(xpos,na.rm=TRUE),
+                                ylim=range(ypos,na.rm=TRUE),xlab="",
+                                ylab="",axes=FALSE),args)
+            if(!identical(args$type,"n")) {
+                plot.args$type <- "n"
+            }
+            do.call("plot",plot.args)
         }
-        polygon(xpos,ypos,col=col[filter],border=border[filter])
+        if(!identical(args$type,"n")) {
+            polygon(xpos,ypos,col=col[filter],border=border[filter])
+        }
     }
 }
 
+identify.somgrid <- function(x, n=x$size,...) {
+    sel <- rep(FALSE,x$size)
+    res <- integer(0)
+    while(sum(sel) < args$n) {
+        pos <- locator(n=1,type="n")
+        if(!length(pos)) break
+        ## could be _way_ faster
+        dpos <- dist(matrix(unlist(pos),ncol=2),x$pts)
+        ans <- which.min(dpos)
+        if(sel[ans]) {
+            warning(paste("cell",ans,"is already selected"),immediate.=TRUE)
+        } else {
+            sel[ans] <- TRUE
+            res <- c(res, ans)
+            if(x$topo=="rectangular") {
+                basesize <- 0.5
+                rect(x$pts[ans,1]-basesize,x$pts[ans,2]-basesize,x$pts[ans,1]+basesize,x$pts[ans,2]+basesize,border="red",lwd=2)
+            } else {
+                edge <- 1/sqrt(3)
+                dec <- 0.5
+                hX <- c(dec,   0,   -dec,  -dec,   0,    dec,NA)
+                hY <- c(edge/2,edge,edge/2,-edge/2,-edge,-edge/2,NA)
+                xpos <- rep(x$pts[ans,1],each=7)+hX
+                ypos <- rep(x$pts[ans,2],each=7)+hY
+                polygon(xpos,ypos,border="red",lwd=2)
+            }
+        }
+    }
+    res
+}
