@@ -1,3 +1,9 @@
+2010-10-22  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* man/sominit.pca.dist.Rd: added the weight parameters to the documention. 
+
+	* demo/som-iris.R: fixed a parameter misspecification
+
 2009-08-04  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
 
 	* R/som.R (batchsom.default): keep weight missing is they are

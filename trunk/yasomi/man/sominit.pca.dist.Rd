@@ -12,12 +12,13 @@ data, then this method is equivalent to
 \code{\link{sominit.pca.default}}.
 }
 \usage{
-\method{sominit.pca}{dist}(data, somgrid, \dots)
+\method{sominit.pca}{dist}(data, somgrid, weights, \dots)
 }
 \arguments{
   \item{data}{the data to which the SOM will be fitted, i.e., a
     distance matrix of class \code{"dist"}}
   \item{somgrid}{a \code{somgrid} object}
+  \item{weights}{optional weights for the data points}
   \item{\dots}{not used}
 }
 \details{

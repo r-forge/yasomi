@@ -23,7 +23,7 @@ pairs(data,bg=rainbow(50)[code],pch=21)
 
 plot(som)
 
-plot(som,iris[[5]])
+plot(som,mapToUnit(som, iris[[5]]), mode = "data", type = "barplot")
 
 spar <- par(mfrow=c(2,2))
 for(i in 1:ncol(data)) {
