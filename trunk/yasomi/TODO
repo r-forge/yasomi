@@ -1,4 +1,5 @@
-Tentative for 0.3:
+Tentative for 0.4:
+  - stochastic SOM
   - revise weights handling (uniform)
   - Heskes' criterion for the relational/kernel SOM
   - unified kernel and relational SOM
