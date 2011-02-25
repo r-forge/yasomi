@@ -1,5 +1,5 @@
 Package: yasomi
-Version: 0.2
+Version: 0.3
 License: GPL-2
 Title: Yet Another Self Organising Map Implementation
 Depends: e1071, proxy
