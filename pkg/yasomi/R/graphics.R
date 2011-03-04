@@ -10,30 +10,34 @@ grid2lines <- function(som,prototypes) {
         }
     }
 
-    if(som$somgrid$topo=="rectangular") {
-        result=matrix(NA,
-        ncol=ncol(prototypes),
-        nrow=(som$somgrid$xdim+1)*(som$somgrid$ydim)+(som$somgrid$xdim)*(som$somgrid$ydim+1))
+    if(som$somgrid$xdim==1 || som$somgrid$ydim==1) {
+        result <- prototypes
     } else {
-        result=matrix(NA,
-        ncol=ncol(prototypes),
-        nrow=(som$somgrid$xdim+1)*(som$somgrid$ydim)+(som$somgrid$xdim)*(som$somgrid$ydim+1)+(som$somgrid$xdim-1)*(som$somgrid$ydim+1))
-    }
-    ## first "horizontal" lines
-    shift <- (som$somgrid$xdim+1)*som$somgrid$ydim
-    targetpos <- 1:(shift-1)
-    targetpos <- targetpos[-(seq(from=som$somgrid$xdim+1,to=length(targetpos),by=som$somgrid$xdim+1))]
-    result[targetpos,] <- prototypes
-    ## then "vertical" lines
-    targetpos <- (shift+2):(shift+som$somgrid$xdim*(som$somgrid$ydim+1)+1)
-    shift <- targetpos[length(targetpos)]
-    targetpos <- targetpos[-(seq(from=som$somgrid$ydim+1,to=length(targetpos),by=som$somgrid$ydim+1))]
-    result[targetpos,] <- prototypes[seq(from=1,by=som$somgrid$xdim,length.out=som$somgrid$ydim)+rep(0:(som$somgrid$xdim-1),each=som$somgrid$ydim),]
-    ## other "vertical" lines in hexagonal grids
-    if(som$somgrid$topo=="hexagonal") {
-        targetpos <- (shift+1):(shift+(som$somgrid$xdim-1)*(som$somgrid$ydim+1))
+        if(som$somgrid$topo=="rectangular") {
+            result=matrix(NA,
+            ncol=ncol(prototypes),
+            nrow=(som$somgrid$xdim+1)*(som$somgrid$ydim)+(som$somgrid$xdim)*(som$somgrid$ydim+1))
+        } else {
+            result=matrix(NA,
+            ncol=ncol(prototypes),
+            nrow=(som$somgrid$xdim+1)*(som$somgrid$ydim)+(som$somgrid$xdim)*(som$somgrid$ydim+1)+(som$somgrid$xdim-1)*(som$somgrid$ydim+1))
+        }
+        ## first "horizontal" lines
+        shift <- (som$somgrid$xdim+1)*som$somgrid$ydim
+        targetpos <- 1:(shift-1)
+        targetpos <- targetpos[-(seq(from=som$somgrid$xdim+1,to=length(targetpos),by=som$somgrid$xdim+1))]
+        result[targetpos,] <- prototypes
+        ## then "vertical" lines
+        targetpos <- (shift+2):(shift+som$somgrid$xdim*(som$somgrid$ydim+1)+1)
+        shift <- targetpos[length(targetpos)]
         targetpos <- targetpos[-(seq(from=som$somgrid$ydim+1,to=length(targetpos),by=som$somgrid$ydim+1))]
-        result[targetpos,] <- prototypes[seq(from=2,by=som$somgrid$xdim,length.out=som$somgrid$ydim)+(rep(c(0,-1),length.out=som$somgrid$ydim)+rep(0:(som$somgrid$xdim-2),each=som$somgrid$ydim)),]
+        result[targetpos,] <- prototypes[seq(from=1,by=som$somgrid$xdim,length.out=som$somgrid$ydim)+rep(0:(som$somgrid$xdim-1),each=som$somgrid$ydim),]
+        ## other "vertical" lines in hexagonal grids
+        if(som$somgrid$topo=="hexagonal") {
+            targetpos <- (shift+1):(shift+(som$somgrid$xdim-1)*(som$somgrid$ydim+1))
+            targetpos <- targetpos[-(seq(from=som$somgrid$ydim+1,to=length(targetpos),by=som$somgrid$ydim+1))]
+            result[targetpos,] <- prototypes[seq(from=2,by=som$somgrid$xdim,length.out=som$somgrid$ydim)+(rep(c(0,-1),length.out=som$somgrid$ydim)+rep(0:(som$somgrid$xdim-2),each=som$somgrid$ydim)),]
+        }
     }
     result
 }
