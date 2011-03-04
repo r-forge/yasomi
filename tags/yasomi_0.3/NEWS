@@ -1,0 +1,86 @@
+Changes in yasomi 0.3
+
+    o  	The main novelty provided by this version is the support of kernel
+        self organising map.
+
+    o  	In addition, yasomi now provides variants of the K-means clustering 
+        algorithm.
+
+    o  	The visual representation of a fitted SOM has been improved by the 
+        inclusion of a parallel coordinate like display, a barplot display
+        and a data mode which enables representation of multiple superposed 
+        glyphs per grid cell. 
+
+    o   A classical continuous annealing mode has been added for all variants 
+        of the SOM. It is now the default annealing mode.
+
+    o   The interface to batchsom has been modified once again to cope with
+        the possility of choosing between two annealing modes and to improve
+        the ease of use. 
+
+    o   Graphical default parameters are now explicitely given in function 
+        interfaces rather than silently provided when needed.
+
+    o   High level consistency tests are now included in the tests directory.
+
+    o   Major Bug fixe: 
+    	in the relational SOM, when an inner loop did not reach a stable
+        state, the neighborhood values were not updated. This induced a
+    	different annealing scheme as the one requested.
+
+    o   Minor Bug fixes: 
+    	missing parameter in some circumstances in the batchsom functions.
+
+
+Changes in yasomi 0.2
+
+    o  	The main novelty provided by this version is the support of
+    	dissimilarity data with the relational self organising map. Most of
+    	the functions have been made generic in order to support this new data
+    	type, both for fitting a SOM but also for visualising the results. 
+
+    o   The initialisation framework has been completely reworked, in
+    	particular to accommodate for the relational SOM. As a consequence the
+    	main function batchsom as a modified interface. 
+
+    o   Limited support for observation weighting has been added. In this
+    	version, the initialisation functions do not take the weights into
+    	account.
+
+    o   Documentation has been improved, in particular with the addition of an
+    	introductory vignette. 
+
+    o   Many small minor bugs as well as two major ones have been fixed.  
+      	The first major bug fixed was in the u-matrix like visualisation
+    	code. Discrete u-matrices (obtained via the umatrix and plot.sompdist
+    	functions) must be redrawn as the one obtained by yasomi 0.1 were
+    	bogus.
+	The second major bug fixed prevented the algorithm to make a full use
+      	of the last epochs of the fitting process. It is therefore preferable
+      	to rerun all simulations based on yasomi 0.1.
+	In addition the quantisation error was not clearly defined. In some
+      	functions, it was the mean squared Euclidean distance between data
+      	points and the associated bmu, in others it was the mean Euclidean
+      	distance. It is now the mean squared Euclidean distance everywhere,
+      	with a similar definition for the relational SOM. 
+	
+
+Changes in yasomi 0.1
+
+    o  	This initial revision provides self organising maps for standard
+       	numerical data (missing values are not supported) fitted via a batch
+       	algorithm. Efforts have been made to optimise the code both in R and
+       	via C implementation of slow parts.
+
+    o  	Fully automated parameter tuning can be performed via the som.tune
+    	function. In addition to the standard quantisation error, this
+    	function can select the best parameters by minimising Kaski and Lagus'
+    	distortion measure. 
+
+    o   Several graphical representations of the results are provided. A
+    	generic plotting function leverages the grid prior structure for glyph
+    	based rendering. Standard representations such as U-matrices,
+    	component places and hit maps are build on top of it. Another solution
+    	based on a smoothing strategy is also available (see the distance.grid
+    	function for details). 
+
