@@ -141,4 +141,31 @@ int bmu_heskes(double *proto,double *neigh,int *nproto,double *data,
 			      error,distances);
 }
 
+void bmu_single(double *proto,int *nproto,double *one_data,int *dim,
+		int *winner,double *error) 
+{
+    double bestDist,dist,tmp;
+    int j,k;
+    int bestSoFar;
+    int protoSize=*nproto,dimension=*dim;
+    
+    bestDist = R_PosInf;
+    bestSoFar = -1;
+    /* loop on prototypes */
+    for(j = 0; j < protoSize; j++) {
+	dist = 0;
+	/* loop on dimensions */
+	for(k = 0; k < dimension; k++) {
+	    tmp = one_data[k] - proto[j + k * protoSize];
+	    dist += tmp * tmp;
+	}
+	if(dist < bestDist) {
+	    bestDist = dist;
+	    bestSoFar = j;
+	}
+    }
+    *error = bestDist;
+    *winner = bestSoFar;
+}
+
 
