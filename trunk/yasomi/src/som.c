@@ -69,6 +69,9 @@ void batch_som(double *proto,int *nproto,double *data,int *ndata,
 	case 1:
 	    Rprintf(" linear kernel");
 	    break;
+	case 2:
+	    Rprintf(" zero one kernel");
+	    break;
 	}
 	switch(assignmentRule) {
 	case 0:
@@ -216,6 +219,9 @@ void batch_som_optim(double *proto,int *nproto,double *data,int *ndata,
 	    break;
 	case 1:
 	    Rprintf(" linear kernel");
+	    break;
+	case 2:
+	    Rprintf(" zero one kernel");
 	    break;
 	}
 	switch(assignmentRule) {
@@ -386,6 +392,9 @@ void batch_som_optim_continuous(double *proto,int *nproto,double *data,
 	    break;
 	case 1:
 	    Rprintf(" linear kernel");
+	    break;
+	case 2:
+	    Rprintf(" zero one kernel");
 	    break;
 	}
 	switch(assignmentRule) {

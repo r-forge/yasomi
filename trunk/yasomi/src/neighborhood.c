@@ -4,7 +4,7 @@
 
 /* Neighborhood function calculation. The kernel functions are defined such
    that neighborhood(x,y) is approximatly zero when the distance between x and
-   y is higher than the radius parameter.  
+   y is higher or equal to the radius parameter plus one.
    When normalized, a row major approach is used to preserve memory locality. */
 
 void neighborhood(double *distances,double *nv,int nbUnit,double radius,
@@ -18,17 +18,23 @@ void neighborhood(double *distances,double *nv,int nbUnit,double radius,
     switch(eKernelType) {
     case gaussian:
 	/* Gaussian kernel */
-	radius /= 3;
 	for(i = 0 ; i < size; i++) {
-	    tmp = distances[i]/radius;
-	    nv[i] = exp (-0.5*tmp*tmp);
+	    tmp = distances[i]/(radius+1);
+	    nv[i] = exp (GAUSSIAN_COEFF*tmp*tmp);
 	}
 	break;
     case linear:
 	/* Linear kernel */
 	for(i = 0 ; i < size; i++) {
 	    tmp = distances[i];
-	    nv[i] = tmp < radius ? (1-tmp/radius) : 0;
+	    nv[i] = tmp < radius + 1 ? (1-tmp/(radius+1)) : 0;
+	}
+	break;
+    case zeroone:
+	/* Zero one kernel */
+	for(i = 0 ; i < size; i++) {
+	    tmp = distances[i];
+	    nv[i] = tmp <= radius ? 1 : 0;
 	}
 	break;
     }
@@ -58,17 +64,23 @@ void neighborhood_single(double *distances,double *nv,int *nbUnit,
     switch(eKernelType) {
     case gaussian:
 	/* Gaussian kernel */
-	theRadius /= 3;
 	for(i = 0 ; i < nb; i++) {
-	    tmp = distances[i]/theRadius;
-	    nv[i] = exp (-0.5*tmp*tmp);
+	    tmp = distances[i]/(theRadius+1);
+	    nv[i] = exp (GAUSSIAN_COEFF*tmp*tmp);
 	}
 	break;
     case linear:
 	/* Linear kernel */
 	for(i = 0 ; i < nb; i++) {
 	    tmp = distances[i];
-	    nv[i] = tmp < theRadius ? (1-tmp/theRadius) : 0;
+	    nv[i] = tmp < theRadius + 1 ? (1-tmp/(theRadius+1)) : 0;
+	}
+	break;
+    case zeroone:
+	/* Zero one kernel */
+	for(i = 0 ; i < nb; i++) {
+	    tmp = distances[i];
+	    nv[i] = tmp <= theRadius ? 1 : 0;
 	}
 	break;
     }

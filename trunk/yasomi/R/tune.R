@@ -14,7 +14,8 @@ som.tunecontrol <- function(somgrid,init="pca",ninit=1,
          innernradii=innernradii,
          maxiter=maxiter,
          annealing=match.arg(annealing,c("power","linear"),several.ok = TRUE),
-         kernel=match.arg(kernel,c("gaussian","linear"),several.ok = TRUE),
+         kernel=match.arg(kernel,c("gaussian","linear", "zeroone"),
+         several.ok = TRUE),
          criterion=criterion)
 }
 

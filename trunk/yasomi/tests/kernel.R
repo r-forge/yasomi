@@ -25,9 +25,9 @@ ksom <- batchsom(KX,sg,prototypes=kprototypes.init,verbose=TRUE,
 kprototypes.final <- ksom$prototypes%*%X
 
 ## and now the same thing for the standard vector SOM
-
+## cut=0 is needed as the kernel SOM does not provide the cutting feature
 som <- batchsom(X,sg,prototypes=prototypes.init,verbose=TRUE,
-                max.radius=radius.max,steps=nb.radii,mode=mode)
+                max.radius=radius.max,steps=nb.radii,mode=mode,cut=0)
 
 stopifnot(all.equal(error.kaskilagus(som),error.kaskilagus(ksom)))
 stopifnot(all.equal(error.quantisation(som),error.quantisation(ksom)))

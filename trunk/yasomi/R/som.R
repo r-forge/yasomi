@@ -125,7 +125,8 @@ batchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
                              mode = c("continuous","stepwise"),
                              min.radius, max.radius, steps,
                              decrease = c("power", "linear"), max.iter,
-                             kernel = c("gaussian", "linear"), normalised,
+                             kernel = c("gaussian", "linear", "zeroone"),
+                             normalised,
                              assignment = c("single", "heskes"),
                              cut = 1e-07,
                              verbose=FALSE,keepdata=TRUE,...) {
@@ -139,7 +140,7 @@ batchsom.default <- function(data,somgrid,init=c("pca","random"),prototypes,
     the.call[[1]] <- batchsom.control
     control <- eval(the.call,envir = parent.frame())
     control$assignment.int <- switch(control$assignment,"single"=0,"heskes"=1)
-    control$kernel.int <- switch(control$kernel,"gaussian"=0,"linear"=1)
+    control$kernel.int <- switch(control$kernel,"gaussian"=0,"linear"=1,"zeroone"=2)
     if(!missing(weights)) {
         if(length(weights)!=nrow(data)) {
             stop("'weights' and 'data' have different dimensions")
@@ -336,7 +337,7 @@ summary.som <- function(object,...)
     cat("       grid: ",object$somgrid$topo," grid of size ",
         object$somgrid$xdim,"x",object$somgrid$ydim," with diameter ",
         object$somgrid$diam,"\n",sep="")
-    cat("     kernel: ",object$control$kernel,
+    cat("     kernel:",object$control$kernel,
         if(!object$control$normalised) {" not normalised"} else {" normalised"},
         "\n",sep="")
     cat(" assignment:",object$control$assignment,"\n")

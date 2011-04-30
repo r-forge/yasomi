@@ -1,0 +1,102 @@
+%% -*- ispell-dictionary: "british" -*-
+% \VignetteIndexEntry{Prior structures and neighbourhoods in YASOMI}
+% \VignetteDepends{e1071, proxy, colorspace}
+% \VignetteKeyword{Self Organising Map}
+% \VignetteKeyword{Self Organizing Map}
+% \VignetteKeyword{Neighbourhoods}
+% \VignetteKeyword{Neighborhoods}
+% \VignetteKeyword{Clustering}
+
+\documentclass[a4paper]{article}
+\usepackage{amsmath}
+
+\begin{document}
+\title{Prior structures and neighbourhoods in YASOMI}
+\author{Fabrice Rossi}
+
+\SweaveOpts{width=7,height=5}
+
+\maketitle
+
+\section{Prior structures}
+
+\section{Neighbourhoods}
+Self Organising Map fitting is based on a form of annealing implemented by a
+shrinking neighbour influence in the prior structure: when the prototype
+associated to cell $i$ (in the prior structure) is updated, then all other
+prototypes are updated similarly but with an update magnitude that decreases
+with the distance between cell $i$ and the cell of the updated prototype. For
+instance, in the stochastic SOM, the update of prototype $j$ at step $t$ is
+given by 
+\[
+p^{(t)}_j=p^{(t-1)}_j+\varepsilon^{(t)}N^{(t)}(i,j)\left(x^{(t)}-p^{(t-1)}_i\right),
+\]
+where $x^{(t)}$ is the data point considered at step $t$, $i$ is the best
+matching unit for this data point, $\varepsilon^{(t)}$ the learning rate and
+$N^{(t)}(i,j)$ the neighbouring influence between cells $i$ and $j$. 
+
+The classical form for $N^{(t)}(i,j)$ is 
+\[
+N^{(t)}(i,j)=K(R^{(t)},d_p(i,j)),
+\]
+where $d_p$ is a distance between units in the prior structure (see previous
+Section for details, $R^{(t)}$ is a radius of influence, which decreases
+during the fitting process, and $K(R,.)$ is a so-called \emph{kernel function}
+which maps $[0,\infty[$ to $[0,1]$. $K(R,.)$ should be decreasing from $1$ to
+$0$ at a speed specified by $R$. 
+
+To make the last assumption precise, yasomi uses the following conventions:
+\begin{enumerate}
+\item $K(R,.)$ is decreasing;
+\item $K(R,0)=1$;
+\item $K(R,R+1)\leq 0.01$.
+\end{enumerate}
+There are currently three kernel included in yasomi:
+\begin{description}
+\item[zero one] this kernel has binary outputs, that is
+  $K_{01}(R,.)\in\{0,1\}$. The $R$ parameter gives the radius of influence of the
+  kernel which is simply defined as follows:
+\[
+K_{01}(R,d)=
+\begin{cases}
+0 & \text{if $d>R$},\\
+1 & \text{if $d\leq R$}.
+\end{cases}
+\]
+\item[linear] this kernel replaces the strong one to zero jump of the previous
+  kernel by a linear decrease. In this case, $R+1$ gives the end of influence
+  of the kernel. It is defined has follows:
+\[
+K_{lin}(R,d)=
+\begin{cases}
+0 & \text{if $d\geq R+1$},\\
+1-\frac{d}{R+1} & \text{if $d<R+1$}.
+\end{cases}
+\]
+\item[gaussian] this kernel is a smooth version of the linear kernel and uses
+  the same convention that $R+1$ is the end of influence. The kernel is given
+  by 
+\[
+K_{gaussian}(R,d)=\exp^{b\frac{d^2}{(R+1)^2}},
+\]
+with $b=\ln(0.01)$. 
+\end{description}
+Figure \ref{fig:kernels} shows the behaviour of the three kernels for $R=2$. 
+
+\begin{figure}[htbp]
+  \begin{center}
+<<echo=FALSE,fig=TRUE>>= 
+distances <- seq(0,5,length.out=101) 
+R <- 2 
+b <- log(0.01)
+plot(distances,ifelse(distances<=R,1,0),type="l",lwd=2,main="R=2",ylab="kernel function")
+lines(distances,ifelse(distances<=R+1,1-distances/(R+1),0),col="red",lwd=2)
+lines(distances,exp(b*(distances/(R+1))^2),col="blue",lwd=2)
+legend("topright",legend=c("zero one","linear","gaussian"),lwd=2,col=c("black","red","blue")) 
+@
+\end{center}
+  
+\caption{Three kernel functions computed for $R=2$}
+\label{fig:kernels}
+\end{figure}
+\end{document}

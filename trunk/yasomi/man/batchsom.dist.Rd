@@ -10,7 +10,7 @@ dissimilarity data.
                 prototypes,weights,
                 mode = c("continuous","stepwise"), min.radius, max.radius,
                 steps, decrease = c("power", "linear"), max.iter,
-                kernel = c("gaussian", "linear"), normalised,
+                kernel = c("gaussian", "linear", "zeroone"), normalised,
                 assignment = c("single", "heskes"), cut = 1e-07,
                 verbose = FALSE, keepdata = TRUE, \dots)
 }
@@ -46,8 +46,8 @@ dissimilarity data.
     }
   }
   \item{min.radius}{the minimum neighbourhood influence radius. If
-    missing, the value depends on the one of \code{kernel} but ensures
-    in practice a local learning only (see details)}
+    missing, the value might depend on the one of \code{kernel} but ensures
+    in practice a local learning only (currently defaults to one)}
   \item{max.radius}{the maximal neighbourhood influence radius. If missing
     two third of the prior structure diameter plus one}
   \item{steps}{the number of radii to use during annealing}

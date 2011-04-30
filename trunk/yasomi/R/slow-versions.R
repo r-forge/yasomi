@@ -1,5 +1,5 @@
-neighborhood <- function(somgrid,T,kernel,normalised=TRUE) {
-    raw <- kernel(somgrid$dist/T)
+neighborhood <- function(somgrid,R,kernel,normalised=TRUE) {
+    raw <- kernel(R,somgrid$dist)
     if(normalised) {
         sweep(raw,1,rowSums(raw),"/")
     } else {
@@ -7,19 +7,21 @@ neighborhood <- function(somgrid,T,kernel,normalised=TRUE) {
     }
 }
 
-kernel.gaussian <- function(x) {
-    exp(-(3*x)^2/2)
+kernel.gaussian <- function(R,x) {
+    exp(-4.605170185988090914009*(x/(R+1))^2)
 }
 
-kernel.linear <- function(x) {
-    pre <- sapply(x,function(x) {
-        if(x<1) {1-x} else {0}
-    })
+kernel.linear <- function(R,x) {
+    pre <- ifelse(x<R+1,1-x/(R+1),0)
     if(is.matrix(x)) {
         matrix(pre,ncol=ncol(x),nrow=nrow(x))
     } else {
         pre
     }
+}
+
+kernel.zeroone <- function(R,x) {
+    ifelse(x<=R,1,0)
 }
 
 bmu.R <- function(prototypes,data,weights) {
@@ -46,14 +48,15 @@ bmu.heskes.R <- function(prototypes,data,nv,weights) {
 }
 
 batchsom.R <- function(data,somgrid,init=c("pca","random"),prototypes,
-                             weights,
-                             mode = c("continuous","stepwise"),
-                             min.radius, max.radius, steps,
-                             decrease = c("power", "linear"), max.iter,
-                             kernel = c("gaussian", "linear"), normalised,
-                             assignment = c("single", "heskes"),
-                             cut = 1e-07,
-                             verbose=FALSE,keepdata=TRUE,...) {
+                       weights,
+                       mode = c("continuous","stepwise"),
+                       min.radius, max.radius, steps,
+                       decrease = c("power", "linear"), max.iter,
+                       kernel = c("gaussian", "linear", "zeroone"),
+                       normalised,
+                       assignment = c("single", "heskes"),
+                       cut = 1e-07,
+                       verbose=FALSE,keepdata=TRUE,...) {
     ## process parameters and perform a few sanity checks
     if(class(somgrid)!="somgrid") {
         stop("'somgrid' is not of somgrid class")
@@ -67,7 +70,7 @@ batchsom.R <- function(data,somgrid,init=c("pca","random"),prototypes,
     if(control$mode=="continuous") {
         stop("continuous annealing mode is unsupported in batchsom.R")
     }
-    control$kernel.fun <- switch(control$kernel,"gaussian"=kernel.gaussian,"linear"=kernel.linear)
+    control$kernel.fun <- switch(control$kernel,"gaussian"=kernel.gaussian,"linear"=kernel.linear,"zeroone"=kernel.zeroone)
 
     if(!missing(weights)) {
         if(length(weights)!=nrow(data)) {

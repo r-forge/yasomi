@@ -21,6 +21,7 @@ BUGS or problems:
   - possibly in predict.* (for the error calculation)
 - fix the border "problem" in plot.somgrid
 - do we need a final assigment in the continuous annealing case?
+- neighborhood kernels are not documented
 
 + Long term R goals:
   - move to S4 classes

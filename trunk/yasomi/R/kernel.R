@@ -365,7 +365,8 @@ batchsom.kernelmatrix <- function(data,somgrid,init=c("pca","random"),
                                   mode = c("continuous","stepwise"),
                                   min.radius, max.radius, steps,
                                   decrease = c("power", "linear"), max.iter,
-                                  kernel = c("gaussian", "linear"), normalised,
+                                  kernel = c("gaussian", "linear", "zeroone"),
+                                  normalised,
                                   assignment = c("single", "heskes"),
                                   cut = 1e-07,
                                   verbose=FALSE,keepdata=TRUE,...) {
@@ -379,7 +380,7 @@ batchsom.kernelmatrix <- function(data,somgrid,init=c("pca","random"),
     }
     the.call[[1]] <- batchsom.control
     control <- eval(the.call,envir = parent.frame())
-    control$kernel.fun <- switch(control$kernel,"gaussian"=kernel.gaussian,"linear"=kernel.linear)
+    control$kernel.fun <- switch(control$kernel,"gaussian"=kernel.gaussian,"linear"=kernel.linear,"zeroone"=kernel.zeroone)
     if(!missing(weights)) {
         if(length(weights)!=nrow(data)) {
             stop("'weights' and 'data' have different dimensions")

@@ -1,5 +1,53 @@
 2011-04-30  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
 
+	* R/annealing.R (radius.exp): modified to accomodate for min.radius=0
+
+	* src/som.c: added the new kernel.
+
+	* tests/relational.R: added cut=0.
+
+	* tests/kernel.R: added cut=0.
+
+	* man/batchsom.Rd: added the new kernel.
+
+	* man/batchsom.kernelmatrix.Rd: added the new kernel.
+
+	* man/batchsom.dist.Rd: added the new kernel.
+
+	* man/batchsom.default.Rd: added the new kernel.
+
+	* man/som.tunecontrol.Rd: added the new kernel.
+
+	* R/tune.R (som.tunecontrol): added the new kernel.
+
+	* R/stochastic.R (ssom.default.R): added the new kernel.
+	(ssom.default): ditto.
+
+	* R/som.R (batchsom.default): added the new kernel.
+
+	* R/relational.R (batchsom.dist): added the new kernel.
+
+	* R/kernel.R (batchsom.kernelmatrix): added the new kernel.
+
+	* R/generic.R (batchsom): added the new kernel.
+	(batchsom.control): ditto.
+
+	* R/annealing.R (batchsom.control.default): added support for the zero one kernel and fix default min.radius to accomodate the revised kernel formulae.
+
+	* R/slow-versions.R (neighborhood): transmits now the radius to kernel functions.
+	(kernel.gaussian): rewritten to reflect the vignette.
+	(kernel.linear): rewritten to reflect the vignette.
+	(kernel.zeroone): new kernel.
+	(batchsom.R): added support for the new zero one kernel.
+
+	* inst/doc/grids.Rnw: new vignette about structures and neighbourhoods
+
+	* src/neighborhood.c (neighborhood): fixed formulas and added the new kernel.
+	(neighborhood_single): ditto.
+
+	* src/neighborhood.h (enum): added a new kernel type (zero one)
+	(GAUSSIAN_COEFF): normalisation constant for the gaussian kernel
+
 	* src/neighborhood.c (neighborhood_single): new function that computes the neighborhood values around a single unit rather than around all units.
 
 	* src/neighborhood.h: header of the new function (see above).

@@ -34,7 +34,8 @@ som.tunecontrol(somgrid, init = "pca", ninit = 1, assignment = "single",
     fitting (see \code{\link{batchsom}})}
   \item{annealing}{annealing scheme with valid values \code{"power"}
     (exponential like annealing) and \code{"linear"} (linear scheme)}
-  \item{kernel}{kernel chosen between \code{"gaussian"} and \code{"linear"}}
+  \item{kernel}{kernel chosen between \code{"gaussian"}, \code{"linear"}
+  and \code{"zeroone"}}
   \item{criterion}{an error criterion, i.e., a function that evaluate
     the quality of a fitted som on a dataset}
 }
