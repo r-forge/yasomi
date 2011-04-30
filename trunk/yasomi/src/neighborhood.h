@@ -9,4 +9,7 @@ typedef enum {
 void neighborhood(double *distances,double *nv,int nbUnit,double radius,
 		  int kernelType,int isNormalized);
 
+void neighborhood_single(double *distances,double *nv,int *nbUnit,
+			 double *radius,int *kernelType,int *isNormalized);
+
 #endif /* !YASOMI_NEIGHBORHOOD_H */

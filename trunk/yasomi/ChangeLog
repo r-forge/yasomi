@@ -1,6 +1,16 @@
+2011-04-30  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
+
+	* src/neighborhood.c (neighborhood_single): new function that computes the neighborhood values around a single unit rather than around all units.
+
+	* src/neighborhood.h: header of the new function (see above).
+
+	* src/bmu.c (bmu_single_full_data): new function that computes the bmu for a vector given the full data.
+
+	* src/bmu.h: header of the new function (see above).
+
 2010-10-22  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
 
-	* man/sominit.pca.dist.Rd: added the weight parameters to the documention. 
+	* man/sominit.pca.dist.Rd: added the weight parameters to the documention.
 
 	* demo/som-iris.R: fixed a parameter misspecification
 
@@ -12,7 +22,7 @@
 
 2009-08-03  Fabrice Rossi  <Fabrice dot Rossi at apiacoa dot org>
 
-	* R/som.R (sominit.pca.default): first implementation of the weighted version of the PCA. Based on princomp, to be revised. 
+	* R/som.R (sominit.pca.default): first implementation of the weighted version of the PCA. Based on princomp, to be revised.
 
 	* inst/doc/kernel.Rnw: started to work on this vignette
 
@@ -22,7 +32,7 @@
 
 	* R/kmeans.R (prototypes.random): the "cluster" method takes now into account the weights
 
-	* man/sominit.random.Rd: modified to reflect the new rule for weighting values in random convex combinations. 
+	* man/sominit.random.Rd: modified to reflect the new rule for weighting values in random convex combinations.
 
 	* R/kmeans.R (convex.prototypes.random): the "random" method takes now into account the weights
 
@@ -53,7 +63,7 @@
 
 	* DESCRIPTION (Suggests): colorspace is used in the vignettes
 
-	* inst/doc/introduction.Rnw: added hierarchical clustering of the 
+	* inst/doc/introduction.Rnw: added hierarchical clustering of the results.
 
 	* R/graphics.R (hitMap): use with.grid instead of with.cells for consistency
 
@@ -129,7 +139,7 @@
 
 	* NAMESPACE: new function
 
-	* R/generic.R (batchkmeans): new generic function for kmeans 
+	* R/generic.R (batchkmeans): new generic function for kmeans
 
 	* R/kmeans.R (batchkmeans.default): new file: kmeans implementations
 
@@ -500,7 +510,7 @@
 
 	* R/relational.R (predict.relationalsom): prediction for relational som (new function)
 
-	* R/quality.R (error.quantisation.som): generic version when no new data is used. 
+	* R/quality.R (error.quantisation.som): generic version when no new data is used.
 	(error.quantisation.somnum): numerical version
 	(error.quantisation.relationalsom): relational version
 
@@ -890,5 +900,5 @@
 
 	* demo/som-iris.R: updated this demo to use the distance.grid function
 
-	* R/som.R (somPCAInit): fixed a small bug in the eigenvector attribution 
+	* R/som.R (somPCAInit): fixed a small bug in the eigenvector attribution
 

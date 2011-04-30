@@ -169,3 +169,29 @@ void bmu_single(double *proto,int *nproto,double *one_data,int *dim,
 }
 
 
+void bmu_single_full_data(double *proto,int *nproto,double *data,int *ndata,
+			  int *dim,int *indiv,int *winner,double *error) {
+    double bestDist,dist,tmp;
+    int i=*indiv,j,k;
+    int bestSoFar;
+    int dataSize=*ndata,protoSize=*nproto,dimension=*dim;
+    
+    bestDist = R_PosInf;
+    bestSoFar = -1;
+    /* loop on prototypes */
+    for(j = 0; j < protoSize; j++) {
+	dist = 0;
+	/* loop on dimensions */
+	for(k = 0; k < dimension; k++) {
+	    tmp = data[i + k * dataSize] - proto[j + k * protoSize];
+	    dist += tmp * tmp;
+	}
+	if(dist < bestDist) {
+	    bestDist = dist;
+	    bestSoFar = j;
+	}
+    }
+    *winner = bestSoFar;
+    *error = bestDist;
+}
+

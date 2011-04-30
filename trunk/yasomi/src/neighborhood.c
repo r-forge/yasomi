@@ -45,3 +45,40 @@ void neighborhood(double *distances,double *nv,int nbUnit,double radius,
 	}
     }
 }
+
+void neighborhood_single(double *distances,double *nv,int *nbUnit,
+			 double *radius,int *kernelType,int *isNormalized) 
+{
+    int i;
+    double tmp;
+    kernel_type eKernelType = (kernel_type) *kernelType;
+    int nb=*nbUnit;
+    double theRadius=*radius;
+    
+    switch(eKernelType) {
+    case gaussian:
+	/* Gaussian kernel */
+	theRadius /= 3;
+	for(i = 0 ; i < nb; i++) {
+	    tmp = distances[i]/theRadius;
+	    nv[i] = exp (-0.5*tmp*tmp);
+	}
+	break;
+    case linear:
+	/* Linear kernel */
+	for(i = 0 ; i < nb; i++) {
+	    tmp = distances[i];
+	    nv[i] = tmp < theRadius ? (1-tmp/theRadius) : 0;
+	}
+	break;
+    }
+    if(*isNormalized) {
+	tmp = 0;
+	for(i = 0 ; i < nb; i++) {
+	    tmp += nv[i];
+	}
+	for(i = 0 ; i < nb; i++) {
+	    nv[i] /= tmp;
+	}
+    }
+}

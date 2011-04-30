@@ -18,5 +18,8 @@ int bmu_heskes_ext_mem(double *proto,double *neigh,int *nproto,double *data,
 void bmu_single(double *proto,int *nproto,double *one_data,int *dim,
 		int *winner,double *error);
 
+void bmu_single_full_data(double *proto,int *nproto,double *data,int *ndata,
+			  int *dim,int *indiv,int *winner,double *error);
+
 
 #endif /* !YASOMI_BMU_H */
